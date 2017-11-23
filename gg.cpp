@@ -244,8 +244,11 @@ namespace greased_grep
 						}
 						catch(...)
 						{
-							printf ("\tException canonicalizing %s\n",
-									name.c_str ());
+							if (m_debug)
+							{
+								printf ("\tException canonicalizing %s\n",
+										name.c_str ());
+							}
 						}
 						mapped_search (canon.c_str ());
 					}
@@ -322,6 +325,7 @@ namespace greased_grep
 		vector<string_view> m_reject {{""}};
 		u08_t m_root{1};
 		u08_t m_size{1};
+		bool m_debug{false};
 
 		string_view m_directory;
 		fs::path m_dir;
