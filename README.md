@@ -44,3 +44,15 @@ Examples:
 
 
 The last example is a good illustration.
+Here is is more specialized.
+This command reads:
+    Greased Grep for
+    "copyright" and "brief"
+    but ignore any containing either
+    "IBM" or "nevermore"
+	for all files in the tree from . down.
+
+
+```
+./gg copyright -IBM brief -nevermore .
+```
