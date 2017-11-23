@@ -1,4 +1,5 @@
 # Greased-Grep
+## High performance case insensitive search for files having all of one set and none of another set of strings
 ```
             The MIT License (https://opensource.org/licenses/MIT)
 
@@ -41,6 +42,5 @@ Examples:
         # Find all files with missing or other than Lettvin copyright.
 ```
 
-High performance case insensitive search for files having all of one set and none of another set of strings
 
-
+The last example is a good illustration.
