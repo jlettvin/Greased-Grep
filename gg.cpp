@@ -42,20 +42,25 @@ Examples:
         # Find all files with missing or other than Lettvin copyright.
 )Synopsis";
 
+// TODO fix that the final arg is a directory, otherwise synopsis.
 // TODO handle canonicalization problem.
 // TODO find bug for when m_table is not reserved
 
 #include <experimental/filesystem>
+
 #include <fmt/printf.h>
+
 #include <sys/types.h>
-#include <string_view>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <iostream>
+
 #include <unistd.h>
+#include <fcntl.h>
+
+#include <string_view>
+#include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <fcntl.h>
 #include <string>
 #include <vector>
 #include <set>
@@ -174,6 +179,10 @@ namespace greased_grep
 			m_dir = fs::canonical (m_dir);
 
 			// Find files and search contents
+			if (!fs::is_directory (m_dir))
+			{
+				synopsis ("last arg must be dir");
+			}
 			walk (m_dir);
 
 		} // operator ()
@@ -232,7 +241,6 @@ namespace greased_grep
 		{
 			if (fs::exists (a_path))
 			{
-				if (!fs::is_directory (a_path)) synopsis ("last arg must be dir");
 				for (const auto& element:fs::recursive_directory_iterator (a_path))
 				{
 					if (fs::is_directory (element.status ()))
