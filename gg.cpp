@@ -42,6 +42,10 @@ Examples:
         # Find all files with missing or other than Lettvin copyright.
 )Synopsis";
 
+// TODO check that the final arg is a directory, otherwise synopsis.
+// TODO handle canonicalization problem.
+// TODO find bug for when m_table is not reserved
+
 #include <experimental/filesystem>
 #include <fmt/printf.h>
 #include <sys/types.h>
@@ -127,6 +131,8 @@ namespace greased_grep
 		State& operator[] (u08_t a_offset) { return m_table[a_offset]; }
 
 		void operator++ () { m_table.resize (m_table.size () + 1); }
+
+		size_t size () { return m_table.size (); }
 	//------
 	private:
 	//------
@@ -210,7 +216,7 @@ namespace greased_grep
 					to = element.tgt ();
 					next = from;
 					if (to) { from = to; }
-					else { from = ++m_size; operator++ (); }
+					else { from = Table::size (); operator++ (); }
 					//from = to ? to : ++size;
 					element.tgt (from);
 					ELEMENT.tgt (from);
@@ -321,16 +327,15 @@ namespace greased_grep
 			}
 		} // mapped_search
 
-		vector<string_view> m_accept {{""}};
-		vector<string_view> m_reject {{""}};
-		u08_t m_root{1};
-		u08_t m_size{1};
-		bool m_debug{false};
+		vector<string_view> m_accept {{""}}; ///< list of accept {str} args
+		vector<string_view> m_reject {{""}}; ///< list of reject {str} args
+		u08_t m_root{1};                     ///< syntax tree root plane number
+		size_t m_debug{0};                   ///< turns on verbosity
 
 		string_view m_directory;
 		fs::path m_dir;
-		string m_firsts;
-		State& m_state1{operator[] (m_root)};
+		string m_firsts;                     ///< string of {arg} first letters
+		State& m_state1{operator[] (m_root)};///< root state plane
 	}; // class GreasedGrep
 }
 
