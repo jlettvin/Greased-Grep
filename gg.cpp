@@ -45,6 +45,8 @@ Examples:
 // TODO check that the final arg is a directory, otherwise synopsis.
 // TODO handle canonicalization problem.
 // TODO find bug for when m_table is not reserved
+// TODO when reject list is empty, terminate of completion of accept list
+// TODO when reject list is non-empty, terminate on first reject
 
 #include <experimental/filesystem>
 #include <fmt/printf.h>

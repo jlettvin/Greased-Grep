@@ -81,3 +81,10 @@ No buffering or data copying is required so
 overhead for indexing characters is fairly low.
 Tests have shown ambiguous time optimization
 but code simplification merits this choice.
+
+### TODO
+* TODO check that the final arg is a directory, otherwise synopsis.
+* TODO handle canonicalization problem.
+* TODO find bug for when m_table is not reserved
+* TODO when reject list is empty, terminate of completion of accept list
+* TODO when reject list is non-empty, terminate on first reject
