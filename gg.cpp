@@ -232,14 +232,21 @@ namespace greased_grep
 					if (fs::is_directory (element.status ()))
 					{
 						auto name = element.path ().filename ();
-						printf ("\tTREE: %s\n", name.c_str ());
-						if (name != ".git") walk (element);
+						walk (element);
 					}
 					else if (fs::is_regular_file (element.status ()))
 					{
 						auto name = element.path ().filename ();
-						printf ("\tFILE: %s\n", name.c_str ());
-						auto canon = fs::canonical (name);
+						auto canon = name;
+						try
+						{
+							canon = fs::canonical (name);
+						}
+						catch(...)
+						{
+							printf ("\tException canonicalizing %s\n",
+									name.c_str ());
+						}
 						mapped_search (canon.c_str ());
 					}
 				}
