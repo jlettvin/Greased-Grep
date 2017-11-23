@@ -42,11 +42,8 @@ Examples:
         # Find all files with missing or other than Lettvin copyright.
 )Synopsis";
 
-// TODO check that the final arg is a directory, otherwise synopsis.
 // TODO handle canonicalization problem.
 // TODO find bug for when m_table is not reserved
-// TODO when reject list is empty, terminate of completion of accept list
-// TODO when reject list is non-empty, terminate on first reject
 
 #include <experimental/filesystem>
 #include <fmt/printf.h>
@@ -233,8 +230,9 @@ namespace greased_grep
 		void walk (const fs::path& a_path)
 		//----------------------------------------------------------------------
 		{
-			if (fs::exists (a_path) && fs::is_directory (a_path))
+			if (fs::exists (a_path))
 			{
+				if (!fs::is_directory (a_path)) synopsis ("last arg must be dir");
 				for (const auto& element:fs::recursive_directory_iterator (a_path))
 				{
 					if (fs::is_directory (element.status ()))
@@ -265,6 +263,8 @@ namespace greased_grep
 		} // walk
 
 		//----------------------------------------------------------------------
+		// when reject list is empty, terminate on completion of accept list
+		// when reject list is non-empty, terminate on first reject
 		void search (const char* a_filename, void* a_pointer, auto a_filesize)
 		//----------------------------------------------------------------------
 		{
@@ -272,7 +272,8 @@ namespace greased_grep
 			set<i24_t> rejected  {};
 			string_view contents (static_cast<char*> (a_pointer), a_filesize);
 			size_t begin = contents.find_first_of (m_firsts);
-			while (begin != string_view::npos)
+			bool done{false};
+			while (begin != string_view::npos && !done)
 			{
 				contents.remove_prefix (begin);
 				auto st{1};
@@ -283,10 +284,16 @@ namespace greased_grep
 					st = element.tgt ();
 					pt = element.pat ();
 					if (pt != 0) {
+						if (pt < 0) return; ///< Immediate rejection
+						// If not immediate rejection, add to rejected list
 						auto& chose{(pt>0)?accepted:rejected};
 						chose.insert (pt);
+						done = (
+							m_reject.size () == 1 &&
+							accepted.size () == m_accept.size ()
+						);
 					}
-					if (!st) break;
+					if (done || !st) break;
 				}
 				contents.remove_prefix (1);
 				begin = contents.find_first_of (m_firsts);
