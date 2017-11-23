@@ -1,5 +1,5 @@
 # Greased-Grep
-## High performance case insensitive search for files having all of one set and none of another set of strings
+## High performance case insensitive search for files<BR /> having all of one set and none of another set of strings
 ```
             The MIT License (https://opensource.org/licenses/MIT)
 
@@ -60,3 +60,24 @@ This command reads:
 	for all files in the tree from . down.
 ```
 
+## Algorithm
+This code uses two significant optimizations on string searches:
+* skipping of irrelevant initial characters
+* FSM (Finite-State-Machine) table-driven with very low overhead
+* memory-mapped files
+
+### Skipping
+C++ strings have a 'find_first_of' method optimizing skip to a valid initial char.
+
+### FSM
+Memory is cheap (modern idiom) so
+very sparse tables are generated for
+rapid state transitions.
+Redundancy opportunities are taken by
+re-use of tables with common preceding characters.
+
+### Memory Mapped files
+No buffering or data copying is required so
+overhead for indexing characters is fairly low.
+Tests have shown ambiguous time optimization
+but code simplification merits this choice.
