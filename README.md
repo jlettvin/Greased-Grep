@@ -45,7 +45,13 @@ Examples:
 
 The last example is a good illustration.
 Here is is more specialized.
+
+```
+./gg copyright -IBM brief -nevermore .
+```
+
 This command reads:
+
 ```
     Greased Grep for
     "copyright" and "brief"
@@ -54,7 +60,3 @@ This command reads:
 	for all files in the tree from . down.
 ```
 
-
-```
-./gg copyright -IBM brief -nevermore .
-```
