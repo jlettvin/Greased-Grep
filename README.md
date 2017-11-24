@@ -137,10 +137,9 @@ Tests have shown ambiguous time optimization
 but code simplification merits this choice.
 
 ### TODO
-* TODO fix that the final arg is a directory, otherwise synopsis.
 * TODO find bug for when m_table is not reserved
 * TODO report "permission denied"
-* TODO measure performance agains fgrep/ack/ag
+* TODO measure performance against fgrep/ack/ag
 * TODO continue search as long as the target stream matches
 
 <hr />

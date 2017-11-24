@@ -42,10 +42,9 @@ Examples:
         # Find all files with missing or other than Lettvin copyright.
 )Synopsis";
 
-// TODO fix that the final arg is a directory, otherwise synopsis.
 // TODO find bug for when m_table is not reserved
 // TODO report "permission denied"
-// TODO measure performance agains fgrep/ack/ag
+// TODO measure performance against fgrep/ack/ag
 // TODO continue search as long as the target stream matches
 
 #include <experimental/filesystem>
@@ -242,7 +241,6 @@ namespace Lettvin
 		ingest (string_view a_str)
 		//----------------------------------------------------------------------
 		{
-			//printf ("\tINGEST: %s\n", a_str.data ());
 			if (m_directory.size ())
 			{
 				//static const char* direction[2]{"ACCEPT", "REJECT"};
@@ -262,7 +260,6 @@ namespace Lettvin
 				candidate.remove_prefix ((c0=='+' || c0=='-') ? 1 : 0);
 
 				field.push_back (candidate);
-				//printf ("\t%s: %s\n", direction[rejecting], candidate.data ());
 
 				// Insert a_str into state transition tree
 				for (char u:candidate)
@@ -293,7 +290,6 @@ namespace Lettvin
 				for (auto c:last) operator[] (next)[c].str (id);
 			}
 			m_directory = a_str;
-			//printf ("\tDIR? %s\n", a_str.data ());
 		} // ingest
 
 		//----------------------------------------------------------------------
@@ -385,19 +381,25 @@ namespace Lettvin
 		{
 			try
 			{
-				//printf ("\tROOT: %s\n", a_path.c_str ());
 				for (auto& element: fs::recursive_directory_iterator (a_path))
 				{
 					const char* filename{element.path ().c_str ()};
 					if (fs::is_regular_file (element.status ()))
 					{
-						mapped_search (filename);
+						try
+						{
+							mapped_search (filename);
+						}
+						catch (...)
+						{
+							printf ("gg: %s file Permission denied\n",  filename);
+						}
 					}
 				}
 			}
 			catch (...)
 			{
-				// Ignore permission denied errors
+				printf ("gg: %s dir Permission denied\n",  a_path.filename ().c_str ());
 			}
 		} // walk
 
