@@ -1,6 +1,12 @@
 # Greased-Grep
 ## High performance case insensitive search for files<br /> having all of one set and none of another set of strings
 ### $ gg copyright -Lettvin .  # find copyright files without Lettvin
+
+"gg" was chosen for this frequently-used command because it is easy to type.
+"gg" is the left-hand index-finger letter, and typing it twice is easy.
+"gfg" (greased-fgrep) would be more accurate since fgrep is not regex.
+But "gfg" is harder to type than "gg" so this is the decided app name.
+
 <hr />
 
 ```
