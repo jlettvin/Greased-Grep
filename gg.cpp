@@ -254,6 +254,8 @@ namespace Lettvin
 				bool rejecting        {c0 == '-'};
 				auto& field           {rejecting ? m_reject : m_accept};
 
+				m_noreject &= !rejecting; ///< aids in optimizing inner loop
+
 				i24_t sign{rejecting?-1:+1};
 				i24_t id{sign*static_cast<i24_t> (field.size ())};
 				candidate.remove_prefix ((c0=='+' || c0=='-') ? 1 : 0);
@@ -305,11 +307,13 @@ namespace Lettvin
 			string_view contents (static_cast<char*> (a_pointer), a_filesize);
 			size_t begin = contents.find_first_of (m_firsts);
 			bool done{false};
+			// outer loop (skip optimization)
 			while (begin != string_view::npos && !done)
 			{
 				contents.remove_prefix (begin);
 				auto st{1};
 				auto pt{0};
+				// inner loop (Finite State Machine optimization)
 				for (auto c: contents)
 				{
 					auto element{operator[] (st)[c]};
@@ -320,10 +324,9 @@ namespace Lettvin
 						// If not immediate rejection, add to rejected list
 						auto& chose{(pt>0)?accepted:rejected};
 						chose.insert (pt);
-						done = (
-							m_reject.size () == 1 &&
-							accepted.size () == m_accept.size ()
-						);
+						bool full_accept{m_accept.size () == accepted.size ()};
+						// completion optimization
+						done = (m_noreject && full_accept);
 					}
 					if (done || !st) break;
 				}
@@ -399,6 +402,7 @@ namespace Lettvin
 		vector<string_view> m_reject {{""}}; ///< list of reject {str} args
 		u08_t m_root{1};                     ///< syntax tree root plane number
 		size_t m_debug{0};                   ///< turns on verbosity
+		bool m_noreject{true};               ///< are there reject strings?
 
 		string_view m_directory;
 		fs::path m_dir;
