@@ -1,6 +1,8 @@
 # Greased-Grep
 ## High performance case insensitive search for files<br /> having all of one set and none of another set of strings
+### gg copyright -Lettvin .
 <hr />
+
 ```
             The MIT License (https://opensource.org/licenses/MIT)
 
@@ -42,10 +44,12 @@ Examples:
     gg copyright -Lettvin .
         # Find all files with missing or other than Lettvin copyright.
 ```
+
 <hr />
 
 The last example is a good illustration.
 Here is is more specialized.
+
 
 ```
 ./gg copyright -IBM brief -nevermore .
@@ -53,12 +57,14 @@ Here is is more specialized.
 
 This command reads:
 
+
 ```
     Greased Grep for files containing
     "copyright" and "brief" and
     not "IBM" and not "nevermore"
 	in the tree from "." down.
 ```
+
 <hr />
 This code has been tested on:
 * ubuntu linux 16.04 with kernel version 4.10.0-38
