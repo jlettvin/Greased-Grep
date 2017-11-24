@@ -65,66 +65,79 @@ Examples:
 #include <vector>
 #include <set>
 
-namespace greased_grep
+static void synopsis (const char* a_message = nullptr);
+
+namespace Lettvin
 {
 	using namespace std;
 	namespace fs = std::experimental::filesystem;
 	typedef unsigned char u08_t;
 	typedef int           i24_t;
 
-	//--------------------------------------------------------------------------
-	/// @brief synopsis (document usage in case of failure)
-	void synopsis (const char* a_message = nullptr)
-	//--------------------------------------------------------------------------
-	{
-		if (a_message != nullptr) { printf ("ERROR: %s\n\n", a_message); }
-		printf ("%s", Synopsis);
-		exit (1);
-	}
-
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 	/// @brief Single state-transition element.
-	class Element
+	///
+	/// constructor/getters/setters for atomic element unit.
+	//__________________________________________________________________________
+	class
+	Atom
+	//__________________________________________________________________________
 	{
 	//------
 	public:
 	//------
-		Element () {}
-		u08_t tgt (       ) const { return m_the.state.tgt; }
-		i24_t pat (       ) const { return m_the.state.pat;  }
-		void  tgt (u08_t a_c)       { m_the.state.tgt = a_c; }
-		void  pat (i24_t a_c)       { m_the.state.pat = a_c; }
+		Atom () {}                                               ///< ctor
+		u08_t tgt (         ) const { return  m_the.state.tgt; } ///< tgt getter
+		i24_t str (         ) const { return  m_the.state.str; } ///< str getter
+		void  tgt (u08_t a_tgt)     { m_the.state.tgt = a_tgt; } ///< tgt setter
+		void  str (i24_t a_str)     { m_the.state.str = a_str; } ///< str setter
 	//------
 	private:
 	//------
 		union {
 			unsigned short integral;                   ///< unused name
-			struct { i24_t pat:24; u08_t tgt; } state; ///< pattern/state ids
+			struct { i24_t str:24; u08_t tgt; } state; ///< strtern/state ids
 		} m_the
 		{.integral=0};
-	};
+	}; // class Atom
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-	class State
+	/// @brief Single state-transition plane of 256 Atoms
+	///
+	/// constructor/indexer
+	//__________________________________________________________________________
+	class
+	State
+	//__________________________________________________________________________
 	{
 	//------
 	public:
 	//------
-		State () {}
-		Element& operator[] (u08_t a_offset) { return m_handle[a_offset]; }
+		State () {}                                                ///< ctor
+		Atom& operator[] (u08_t a_off) { return m_handle[a_off]; } ///< indexer
 	//------
 	private:
 	//------
-		Element m_handle[256];
-	};
+		Atom m_handle[256];
+	}; // class State
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-	class Table
+	/// @brief vector of state-transition planes sufficient to enable search
+	///
+	/// constructor/indexer
+	//__________________________________________________________________________
+	class
+	Table
+	//__________________________________________________________________________
 	{
 	//------
 	public:
 	//------
+
+		//----------------------------------------------------------------------
+		/// @brief Table ctor (reserve many, instance 2)
 		Table ()
+		//----------------------------------------------------------------------
 		{
 			// TODO find bug for when m_table is not reserved
 			m_table.reserve (256);
@@ -132,33 +145,62 @@ namespace greased_grep
 			operator++ ();
 		}
 
-		State& operator[] (u08_t a_offset) { return m_table[a_offset]; }
+		//----------------------------------------------------------------------
+		/// @brief indexer
+		State&
+		operator[] (u08_t a_offset)
+		//----------------------------------------------------------------------
+		{
+			return m_table[a_offset];
+		}
 
-		void operator++ () { m_table.resize (m_table.size () + 1); }
+		//----------------------------------------------------------------------
+		/// @brief add State planes to vector
+		void
+		operator++ ()
+		//----------------------------------------------------------------------
+		{
+			m_table.resize (m_table.size () + 1);
+		}
 
-		size_t size () { return m_table.size (); }
+		//----------------------------------------------------------------------
+		/// @brief return current size of vector
+		size_t
+		size ()
+		//----------------------------------------------------------------------
+		{
+			return m_table.size ();
+		}
+
 	//------
 	private:
 	//------
-		vector<State> m_table;
-	};
+		vector<State> m_table; ///< State tables
+	}; // class Table
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-	class GreasedGrep : Table
+	//__________________________________________________________________________
+	/// @brief GreasedGrep implements overall state-transition operations
+	class
+	GreasedGrep : Table
+	//__________________________________________________________________________
 	{
 	//------
 	public:
 	//------
 
 		//----------------------------------------------------------------------
-		GreasedGrep (int a_argc, char** a_argv)
+		/// @brief ctor
+		GreasedGrep (int a_argc, char** a_argv) // ctor
 		//----------------------------------------------------------------------
 		{
 			while (--a_argc) ingest (*++a_argv);
 		} // ctor
 
 		//----------------------------------------------------------------------
-		void operator() ()
+		/// @brief ftor
+		void
+		operator() ()
 		//----------------------------------------------------------------------
 		{
 			// Validate ingested args
@@ -170,7 +212,7 @@ namespace greased_grep
 			// Initialize firsts to enable buffer skipping
 			for (size_t i=0; i<256; ++i)
 			{
-				const Element& element (m_state1[i]);
+				const Atom& element (m_state1[i]);
 				auto t{element.tgt ()};
 				if (t) m_firsts += static_cast<u08_t>(i);
 			}
@@ -192,7 +234,9 @@ namespace greased_grep
 	//------
 
 		//----------------------------------------------------------------------
-		void ingest (string_view a_str)
+		/// @brief ingest inserts state-transition table data
+		void
+		ingest (string_view a_str)
 		//----------------------------------------------------------------------
 		{
 			if (m_directory.size ())
@@ -220,7 +264,7 @@ namespace greased_grep
 #if 0
 					for (auto c:last)
 					{
-						Element& element{operator[] (from)[c]};
+						Atom& element{operator[] (from)[c]};
 						to = element.tgt ();
 						next = from;
 						if (to) { from = to; }
@@ -228,8 +272,8 @@ namespace greased_grep
 						element.tgt (from);
 					}
 #else
-					Element& ELEMENT{operator[] (from)[last[0]]};
-					Element& element{operator[] (from)[last[1]]};
+					Atom& ELEMENT{operator[] (from)[last[0]]};
+					Atom& element{operator[] (from)[last[1]]};
 					to = element.tgt ();
 					next = from;
 					if (to) { from = to; }
@@ -238,13 +282,95 @@ namespace greased_grep
 					ELEMENT.tgt (from);
 #endif
 				}
-				for (auto c:last) operator[] (next)[c].pat (id);
+				for (auto c:last) operator[] (next)[c].str (id);
 			}
 			m_directory = a_str;
 		} // ingest
 
 		//----------------------------------------------------------------------
-		void walk (const fs::path& a_path)
+		/// @brief find and report found strings
+		///
+		/// when reject list is empty, terminate on completion of accept list
+		/// when reject list is non-empty, terminate on first reject
+		void
+		search (const char* a_filename, void* a_pointer, auto a_filesize)
+		//----------------------------------------------------------------------
+		{
+			set<i24_t> accepted  {0};
+			set<i24_t> rejected  {};
+			string_view contents (static_cast<char*> (a_pointer), a_filesize);
+			size_t begin = contents.find_first_of (m_firsts);
+			bool done{false};
+			while (begin != string_view::npos && !done)
+			{
+				contents.remove_prefix (begin);
+				auto st{1};
+				auto pt{0};
+				for (auto c: contents)
+				{
+					auto element{operator[] (st)[c]};
+					st = element.tgt ();
+					pt = element.str ();
+					if (pt != 0) {
+						if (pt < 0) return; ///< Immediate rejection
+						// If not immediate rejection, add to rejected list
+						auto& chose{(pt>0)?accepted:rejected};
+						chose.insert (pt);
+						done = (
+							m_reject.size () == 1 &&
+							accepted.size () == m_accept.size ()
+						);
+					}
+					if (done || !st) break;
+				}
+				contents.remove_prefix (1);
+				begin = contents.find_first_of (m_firsts);
+			}
+
+			// Report files having all accepteds and no rejecteds.
+			if (!rejected.size () && accepted.size () == m_accept.size ())
+			{
+				printf ("%s\n", a_filename);
+			}
+		} // search
+
+		//----------------------------------------------------------------------
+		/// @brief map file into memory and call search
+		///
+		/// https://techoverflow.net/2013/08/21/a-simple-mmap-readonly-example/
+		void
+		mapped_search (const char* a_filename)
+		//----------------------------------------------------------------------
+		{
+			struct stat st;
+			stat (a_filename, &st);
+			auto filesize{st.st_size};
+			int fd = open (a_filename, O_RDONLY, 0);
+			if (fd >= 0)
+			{
+				void* contents = mmap (
+						NULL,
+						filesize,
+						PROT_READ,					// Optimize out dirty pages
+						MAP_PRIVATE | MAP_POPULATE,	// Allow preload
+						fd,
+						0);
+
+				if (contents != MAP_FAILED)
+				{
+					search (a_filename, contents, filesize);
+					int rc = munmap (contents, filesize);
+					if (rc != 0) synopsis ("munmap failed");
+				}
+
+				close (fd);
+			}
+		} // mapped_search
+
+		//----------------------------------------------------------------------
+		/// @brief walk organizes search for strings in memory-mapped file
+		void
+		walk (const fs::path& a_path)
 		//----------------------------------------------------------------------
 		{
 			if (fs::exists (a_path))
@@ -278,80 +404,7 @@ namespace greased_grep
 			}
 		} // walk
 
-		//----------------------------------------------------------------------
-		// when reject list is empty, terminate on completion of accept list
-		// when reject list is non-empty, terminate on first reject
-		void search (const char* a_filename, void* a_pointer, auto a_filesize)
-		//----------------------------------------------------------------------
-		{
-			set<i24_t> accepted  {0};
-			set<i24_t> rejected  {};
-			string_view contents (static_cast<char*> (a_pointer), a_filesize);
-			size_t begin = contents.find_first_of (m_firsts);
-			bool done{false};
-			while (begin != string_view::npos && !done)
-			{
-				contents.remove_prefix (begin);
-				auto st{1};
-				auto pt{0};
-				for (auto c: contents)
-				{
-					auto element{operator[] (st)[c]};
-					st = element.tgt ();
-					pt = element.pat ();
-					if (pt != 0) {
-						if (pt < 0) return; ///< Immediate rejection
-						// If not immediate rejection, add to rejected list
-						auto& chose{(pt>0)?accepted:rejected};
-						chose.insert (pt);
-						done = (
-							m_reject.size () == 1 &&
-							accepted.size () == m_accept.size ()
-						);
-					}
-					if (done || !st) break;
-				}
-				contents.remove_prefix (1);
-				begin = contents.find_first_of (m_firsts);
-			}
-
-			// Report files having all accepteds and no rejecteds.
-			if (!rejected.size () && accepted.size () == m_accept.size ())
-			{
-				printf ("%s\n", a_filename);
-			}
-		} // search
-
-		//----------------------------------------------------------------------
-		// https://techoverflow.net/2013/08/21/a-simple-mmap-readonly-example/
-		void mapped_search (const char* a_filename)
-		//----------------------------------------------------------------------
-		{
-			struct stat st;
-			stat (a_filename, &st);
-			auto filesize{st.st_size};
-			int fd = open (a_filename, O_RDONLY, 0);
-			if (fd >= 0)
-			{
-				void* contents = mmap (
-						NULL,
-						filesize,
-						PROT_READ,					// Optimize out dirty pages
-						MAP_PRIVATE | MAP_POPULATE,	// Allow preload
-						fd,
-						0);
-
-				if (contents != MAP_FAILED)
-				{
-					search (a_filename, contents, filesize);
-					int rc = munmap (contents, filesize);
-					if (rc != 0) synopsis ("munmap failed");
-				}
-
-				close (fd);
-			}
-		} // mapped_search
-
+		//dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
 		vector<string_view> m_accept {{""}}; ///< list of accept {str} args
 		vector<string_view> m_reject {{""}}; ///< list of reject {str} args
 		u08_t m_root{1};                     ///< syntax tree root plane number
@@ -362,12 +415,29 @@ namespace greased_grep
 		string m_firsts;                     ///< string of {arg} first letters
 		State& m_state1{operator[] (m_root)};///< root state plane
 	}; // class GreasedGrep
-}
+} // namespace Lettvin
 
 //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-int main (int argc, char** argv)
+
+//------------------------------------------------------------------------------
+/// @brief synopsis (document usage in case of failure)
+static
+void
+synopsis (const char* a_message)
+//------------------------------------------------------------------------------
 {
-	greased_grep::GreasedGrep gg (argc, argv);
+	if (a_message != nullptr) { printf ("ERROR: %s\n\n", a_message); }
+	printf ("%s", Synopsis);
+	exit (1);
+}
+
+//------------------------------------------------------------------------------
+/// @brief main (program execution entrypoint)
+int
+main (int argc, char** argv)
+//------------------------------------------------------------------------------
+{
+	Lettvin::GreasedGrep gg (argc, argv);
 	gg ();
 	return 0;
 } // main

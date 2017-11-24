@@ -1,5 +1,6 @@
 # Greased-Grep
-## High performance case insensitive search for files<BR /> having all of one set and none of another set of strings
+## High performance case insensitive search for files<br /> having all of one set and none of another set of strings
+<hr />
 ```
             The MIT License (https://opensource.org/licenses/MIT)
 
@@ -41,7 +42,7 @@ Examples:
     gg copyright -Lettvin .
         # Find all files with missing or other than Lettvin copyright.
 ```
-
+<hr />
 
 The last example is a good illustration.
 Here is is more specialized.
@@ -53,13 +54,31 @@ Here is is more specialized.
 This command reads:
 
 ```
-    Greased Grep for
-    "copyright" and "brief"
-    but ignore any containing either
-    "IBM" or "nevermore"
-	for all files in the tree from . down.
+    Greased Grep for files containing
+    "copyright" and "brief" and
+    not "IBM" and not "nevermore"
+	in the tree from "." down.
 ```
-
+<hr />
+This code has been tested on:
+* ubuntu linux 16.04 with kernel version 4.10.0-38
+* g++ version 7.1.0
+Contributors are welcome to port this to different systems
+and offer pushes for me to pull.
+Please attempt to keep to the code style:
+* nominal doxgen is used (or more)
+* class members begin with "m_" and have suggestive names.
+* method/function arguments begin with "a_".
+* vertically surround the return-type signature in dashed comments (//-----)
+* put return-type on a line before the method/function signature.
+* beginning brace is after the 2nd dashed comment, aligned with function name
+* similar rules are used for class declaration/definition but
+* Follow a close-brace with the name of the object (method/function/class)
+** Use "//CCCCCC..." repeated to column 79 or 80 above a class
+** align "public", "protected", and "private with open brace
+** short classes can be compressed vertically to fit in a single editor window
+* for a small compilation unit, the declaration and definition may be combined
+<hr />
 ## C++17
 This code depends on C++17 for experimental libraries.
 
@@ -72,6 +91,7 @@ This introduces thread-safe printf.
 ### experimental/filesystem
 This is a push of boost::filesystem into std::.
 
+<hr />
 ## Algorithm
 This code uses two significant optimizations on string searches:
 * skipping of irrelevant initial characters
@@ -98,3 +118,4 @@ but code simplification merits this choice.
 * TODO fix that the final arg is a directory, otherwise synopsis.
 * TODO handle canonicalization problem.
 * TODO find bug for when m_table is not reserved
+<hr />
