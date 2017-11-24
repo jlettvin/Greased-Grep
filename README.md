@@ -93,6 +93,7 @@ Please attempt to keep to the code style:
 ** short classes can be compressed vertically to fit in a single editor window
 * for a small compilation unit, the declaration and definition may be combined
 <hr />
+
 ## C++17
 This code depends on C++17 for experimental libraries.
 
@@ -106,6 +107,7 @@ This introduces thread-safe printf.
 This is a push of boost::filesystem into std::.
 
 <hr />
+
 ## Algorithm
 This code uses two significant optimizations on string searches:
 * skipping of irrelevant initial characters
@@ -132,4 +134,5 @@ but code simplification merits this choice.
 * TODO fix that the final arg is a directory, otherwise synopsis.
 * TODO handle canonicalization problem.
 * TODO find bug for when m_table is not reserved
+
 <hr />
