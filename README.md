@@ -117,7 +117,7 @@ This code uses two significant optimizations on string searches:
 ### Skipping
 C++ strings have a 'find_first_of' method optimizing skip to a valid initial char.
 
-### FSM
+### FSM (Finite State Machine)
 Memory is cheap (modern idiom) so
 very sparse tables are generated for
 rapid state transitions.
