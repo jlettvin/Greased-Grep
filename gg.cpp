@@ -144,7 +144,7 @@ namespace Lettvin
 			m_table.reserve (256);
 			operator++ ();
 			operator++ ();
-		}
+		} // ctor
 
 		//----------------------------------------------------------------------
 		/// @brief indexer
@@ -153,7 +153,7 @@ namespace Lettvin
 		//----------------------------------------------------------------------
 		{
 			return m_table[a_offset];
-		}
+		} // operator[]
 
 		//----------------------------------------------------------------------
 		/// @brief add State planes to vector
@@ -162,7 +162,7 @@ namespace Lettvin
 		//----------------------------------------------------------------------
 		{
 			m_table.resize (m_table.size () + 1);
-		}
+		} // operator++
 
 		//----------------------------------------------------------------------
 		/// @brief return current size of vector
@@ -171,12 +171,14 @@ namespace Lettvin
 		//----------------------------------------------------------------------
 		{
 			return m_table.size ();
-		}
+		} // size
 
 	//------
 	private:
 	//------
+
 		vector<State> m_table; ///< State tables
+
 	}; // class Table
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -402,6 +404,7 @@ namespace Lettvin
 		string m_firsts;                     ///< string of {arg} first letters
 		State& m_state1{operator[] (m_root)};///< root state plane
 	}; // class GreasedGrep
+
 } // namespace Lettvin
 
 //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
@@ -416,7 +419,7 @@ synopsis (const char* a_message)
 	if (a_message != nullptr) { printf ("ERROR: %s\n\n", a_message); }
 	printf ("%s", Synopsis);
 	exit (1);
-}
+} // synopsis
 
 //------------------------------------------------------------------------------
 /// @brief main (program execution entrypoint)
