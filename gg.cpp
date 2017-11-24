@@ -43,8 +43,9 @@ Examples:
 )Synopsis";
 
 // TODO fix that the final arg is a directory, otherwise synopsis.
-// TODO handle canonicalization problem.
 // TODO find bug for when m_table is not reserved
+// TODO report "permission denied"
+// TODO measure performance agains fgrep/ack/ag
 
 #include <experimental/filesystem>
 
@@ -373,13 +374,20 @@ namespace Lettvin
 		walk (const fs::path& a_path)
 		//----------------------------------------------------------------------
 		{
-			for (auto& element: fs::recursive_directory_iterator (a_path))
+			try
 			{
-				const char* filename{element.path ().c_str ()};
-				if (fs::is_regular_file (element.status ()))
+				for (auto& element: fs::recursive_directory_iterator (a_path))
 				{
-					mapped_search (filename);
+					const char* filename{element.path ().c_str ()};
+					if (fs::is_regular_file (element.status ()))
+					{
+						mapped_search (filename);
+					}
 				}
+			}
+			catch (...)
+			{
+				// Ignore permission denied errors
 			}
 		} // walk
 
