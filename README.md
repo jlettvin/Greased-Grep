@@ -60,6 +60,18 @@ This command reads:
 	for all files in the tree from . down.
 ```
 
+## C++17
+This code depends on C++17 for experimental libraries.
+
+### string_view
+This optimizes string operations over std::string.
+
+### fmt::printf
+This introduces thread-safe printf.
+
+### experimental/filesystem
+This is a push of boost::filesystem into std::.
+
 ## Algorithm
 This code uses two significant optimizations on string searches:
 * skipping of irrelevant initial characters
