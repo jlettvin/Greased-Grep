@@ -1,6 +1,6 @@
 # Greased-Grep
 ## High performance case insensitive search for files<br /> having all of one set and none of another set of strings
-### gg copyright -Lettvin .
+### $ gg copyright -Lettvin .  # find copyright files without Lettvin
 <hr />
 
 ```
