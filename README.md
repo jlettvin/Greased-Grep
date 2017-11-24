@@ -73,6 +73,11 @@ This code has been tested on:
 
 Contributors are welcome to port this to different systems
 and offer pushes for me to pull.
+Prefer readability of code over cleverness or elegance.
+If a block of code deserves attribution
+make sure to do right by its original author.
+If a block of code is difficult
+make sure to provide references to document what the code does.
 Please attempt to keep to the code style:
 
 * nominal doxgen is used (or more)
