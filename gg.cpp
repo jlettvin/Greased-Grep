@@ -23,20 +23,34 @@ SOFTWARE.
 _____________________________________________________________________________*/
 
 static const char* Synopsis =
-R"Synopsis(Usage: gg [+|-]{str} [[+|-]{str}...] {path} 
+R"Synopsis(Usage: gg [-s] [+|-]{str} [[+|-]{str}...] {path} 
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in
 	files found along {path}
 
-{str} are simple strings (no regex).
-{str} may be single-quoted to avoid shell interpretation.
+        {str} are simple strings (no regex).
+        {str} may be single-quoted to avoid shell interpretation.
+
+    [+]{str}
+        add accept string (+ optional)
+
+    -{str}
+        add reject string
+
+    -s
+        suppress permission denied errors
+
+    {path}
+        top directory for recursive search
 
 Examples:
 
     gg include /usr/local/src
+        # find all files having the string 'inlude' in /usr/local/src
 
     gg '#include <experimental/filesystem>' /usr/local/src
+        # find all files having the quoted string in /usr/local/src
 
     gg copyright -Lettvin .
         # Find all files with missing or other than Lettvin copyright.
@@ -240,6 +254,11 @@ namespace Lettvin
 		ingest (string_view a_str)
 		//----------------------------------------------------------------------
 		{
+			if (a_str == "-s")
+			{
+				m_suppress = true;
+				return;
+			}
 			if (m_directory.size ())
 			{
 				//static const char* direction[2]{"ACCEPT", "REJECT"};
@@ -391,14 +410,22 @@ namespace Lettvin
 						}
 						catch (...)
 						{
-							printf ("gg: %s file Permission denied\n",  filename);
+							if (!m_suppress)
+							{
+								printf ("gg: %s file Permission denied\n",
+										filename);
+							}
 						}
 					}
 				}
 			}
 			catch (...)
 			{
-				printf ("gg: %s dir Permission denied\n",  a_path.filename ().c_str ());
+				if (!m_suppress)
+				{
+					printf ("gg: %s dir Permission denied\n",
+							a_path.filename ().c_str ());
+				}
 			}
 		} // walk
 
@@ -408,6 +435,7 @@ namespace Lettvin
 		u08_t m_root{1};                     ///< syntax tree root plane number
 		size_t m_debug{0};                   ///< turns on verbosity
 		bool m_noreject{true};               ///< are there reject strings?
+		bool m_suppress{false};              ///< suppress error messages
 
 		string_view m_directory;
 		string m_firsts;                     ///< string of {arg} first letters
