@@ -200,7 +200,7 @@ namespace greased_grep
 				auto from             {m_root};
 				auto next             {from};
 				auto to               {from};
-				u08_t last[2]         {0,0};
+				vector<u08_t> last    {0,0};
 				string_view candidate {m_directory};
 				char c0               {candidate[0]};
 				bool rejecting        {c0 == '-'};
@@ -215,22 +215,30 @@ namespace greased_grep
 				// Insert a_str into state transition tree
 				for (char u:candidate)
 				{
-					char C{static_cast<char> (toupper (u))};
-					char c{static_cast<char> (tolower (u))};
-					last[0] = C;
-					last[1] = c;
-					Element& element{operator[] (from)[c]};
-					Element& ELEMENT{operator[] (from)[C]};
+					last[0] = static_cast<char> (toupper (u));
+					last[1] = static_cast<char> (tolower (u));
+#if 0
+					for (auto c:last)
+					{
+						Element& element{operator[] (from)[c]};
+						to = element.tgt ();
+						next = from;
+						if (to) { from = to; }
+						else { from = Table::size (); operator++ (); }
+						element.tgt (from);
+					}
+#else
+					Element& ELEMENT{operator[] (from)[last[0]]};
+					Element& element{operator[] (from)[last[1]]};
 					to = element.tgt ();
 					next = from;
 					if (to) { from = to; }
 					else { from = Table::size (); operator++ (); }
-					//from = to ? to : ++size;
 					element.tgt (from);
 					ELEMENT.tgt (from);
+#endif
 				}
-				operator[] (next)[last[0]].pat (id);
-				operator[] (next)[last[1]].pat (id);
+				for (auto c:last) operator[] (next)[c].pat (id);
 			}
 			m_directory = a_str;
 		} // ingest
