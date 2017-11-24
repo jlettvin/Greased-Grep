@@ -58,7 +58,6 @@ Examples:
 
 // TODO find bug for when m_table is not reserved
 // TODO measure performance against fgrep/ack/ag
-// TODO continue search as long as the target stream matches
 
 #include <experimental/filesystem>
 
