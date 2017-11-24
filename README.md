@@ -88,9 +88,9 @@ Please attempt to keep to the code style:
 * beginning brace is after the 2nd dashed comment, aligned with function name
 * similar rules are used for class declaration/definition but
 * Follow a close-brace with the name of the object (method/function/class)
-** Use "//CCCCCC..." repeated to column 79 or 80 above a class
-** align "public", "protected", and "private with open brace
-** short classes can be compressed vertically to fit in a single editor window
+* Use "//CCCCCC..." repeated to column 79 or 80 above a class
+* align "public", "protected", and "private with open brace
+* short classes can be compressed vertically to fit in a single editor window
 * for a small compilation unit, the declaration and definition may be combined
 <hr />
 
