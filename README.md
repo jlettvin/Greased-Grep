@@ -135,6 +135,7 @@ but code simplification merits this choice.
 * TODO find bug for when m_table is not reserved
 * TODO report "permission denied"
 * TODO measure performance agains fgrep/ack/ag
+* TODO continue search as long as the target stream matches
 
 <hr />
 
