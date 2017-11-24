@@ -9,6 +9,8 @@ But "gfg" is harder to type than "gg" so this is the decided app name.
 
 <hr />
 
+### Copyright
+
 ```
             The MIT License (https://opensource.org/licenses/MIT)
 
@@ -34,6 +36,8 @@ SOFTWARE.
 ```
 
 <hr />
+
+### Usage
 
 ```
 Usage: gg [-s] [+|-]{str} [[+|-]{str}...] {path} 
