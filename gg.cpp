@@ -373,33 +373,12 @@ namespace Lettvin
 		walk (const fs::path& a_path)
 		//----------------------------------------------------------------------
 		{
-			if (fs::exists (a_path))
+			for (auto& element: fs::recursive_directory_iterator (a_path))
 			{
-				for (const auto& element:fs::recursive_directory_iterator (a_path))
+				const char* filename{element.path ().c_str ()};
+				if (fs::is_regular_file (element.status ()))
 				{
-					if (fs::is_directory (element.status ()))
-					{
-						auto name = element.path ().filename ();
-						walk (element);
-					}
-					else if (fs::is_regular_file (element.status ()))
-					{
-						auto name = element.path ().filename ();
-						auto canon = name;
-						try
-						{
-							canon = fs::canonical (name);
-						}
-						catch(...)
-						{
-							if (m_debug)
-							{
-								printf ("\tException canonicalizing %s\n",
-										name.c_str ());
-							}
-						}
-						mapped_search (canon.c_str ());
-					}
+					mapped_search (filename);
 				}
 			}
 		} // walk

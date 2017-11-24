@@ -132,7 +132,6 @@ but code simplification merits this choice.
 
 ### TODO
 * TODO fix that the final arg is a directory, otherwise synopsis.
-* TODO handle canonicalization problem.
 * TODO find bug for when m_table is not reserved
 
 <hr />
