@@ -31,21 +31,39 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
 
-Usage: gg [+|-]{str} [[+|-]{str}...] {path} 
+<hr />
+
+```
+Usage: gg [-s] [+|-]{str} [[+|-]{str}...] {path} 
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in
 	files found along {path}
 
-{str} are simple strings (no regex).
-{str} may be single-quoted to avoid shell interpretation.
+        {str} are simple strings (no regex).
+        {str} may be single-quoted to avoid shell interpretation.
+
+    [+]{str}
+        add accept string (+ optional)
+
+    -{str}
+        add reject string
+
+    -s
+        suppress permission denied errors
+
+    {path}
+        top directory for recursive search
 
 Examples:
 
     gg include /usr/local/src
+        # find all files having the string 'inlude' in /usr/local/src
 
     gg '#include <experimental/filesystem>' /usr/local/src
+        # find all files having the quoted string in /usr/local/src
 
     gg copyright -Lettvin .
         # Find all files with missing or other than Lettvin copyright.
