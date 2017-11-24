@@ -67,11 +67,14 @@ This command reads:
 
 <hr />
 This code has been tested on:
+
 * ubuntu linux 16.04 with kernel version 4.10.0-38
 * g++ version 7.1.0
+
 Contributors are welcome to port this to different systems
 and offer pushes for me to pull.
 Please attempt to keep to the code style:
+
 * nominal doxgen is used (or more)
 * class members begin with "m_" and have suggestive names.
 * method/function arguments begin with "a_".
