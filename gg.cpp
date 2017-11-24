@@ -221,15 +221,14 @@ namespace Lettvin
 				if (t) m_firsts += static_cast<u08_t>(i);
 			}
 
-			// Prepare directory for use with std::experimental/filesystem.
-			m_dir = fs::canonical (m_dir);
-
-			// Find files and search contents
-			if (!fs::is_directory (m_dir))
+			// Check for valid directory
+			if (!fs::is_directory (m_directory))
 			{
 				synopsis ("last arg must be dir");
 			}
-			walk (m_dir);
+
+			// Find files and search contents
+			walk (m_directory);
 
 		} // operator ()
 
@@ -243,8 +242,10 @@ namespace Lettvin
 		ingest (string_view a_str)
 		//----------------------------------------------------------------------
 		{
+			//printf ("\tINGEST: %s\n", a_str.data ());
 			if (m_directory.size ())
 			{
+				//static const char* direction[2]{"ACCEPT", "REJECT"};
 				auto from             {m_root};
 				auto next             {from};
 				auto to               {from};
@@ -261,6 +262,7 @@ namespace Lettvin
 				candidate.remove_prefix ((c0=='+' || c0=='-') ? 1 : 0);
 
 				field.push_back (candidate);
+				//printf ("\t%s: %s\n", direction[rejecting], candidate.data ());
 
 				// Insert a_str into state transition tree
 				for (char u:candidate)
@@ -291,6 +293,7 @@ namespace Lettvin
 				for (auto c:last) operator[] (next)[c].str (id);
 			}
 			m_directory = a_str;
+			//printf ("\tDIR? %s\n", a_str.data ());
 		} // ingest
 
 		//----------------------------------------------------------------------
@@ -319,7 +322,7 @@ namespace Lettvin
 					auto element{operator[] (st)[c]};
 					st = element.tgt ();
 					pt = element.str ();
-					if (pt != 0) {
+					if (pt) {
 						if (pt < 0) return; ///< Immediate rejection
 						// If not immediate rejection, add to rejected list
 						auto& chose{(pt>0)?accepted:rejected};
@@ -382,6 +385,7 @@ namespace Lettvin
 		{
 			try
 			{
+				//printf ("\tROOT: %s\n", a_path.c_str ());
 				for (auto& element: fs::recursive_directory_iterator (a_path))
 				{
 					const char* filename{element.path ().c_str ()};
@@ -405,7 +409,6 @@ namespace Lettvin
 		bool m_noreject{true};               ///< are there reject strings?
 
 		string_view m_directory;
-		fs::path m_dir;
 		string m_firsts;                     ///< string of {arg} first letters
 		State& m_state1{operator[] (m_root)};///< root state plane
 	}; // class GreasedGrep
