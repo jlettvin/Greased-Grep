@@ -245,7 +245,8 @@ namespace Lettvin
 				synopsis ("last arg must be dir");
 			}
 
-			// Check for collisions between accept and reject lists
+			// Compile and check for collisions between accept and reject lists
+			compile ();
 
 			// Find files and search contents
 			walk (m_directory);
@@ -255,6 +256,19 @@ namespace Lettvin
 	//------
 	private:
 	//------
+
+		//----------------------------------------------------------------------
+		/// @brief ingest inserts state-transition table data
+		void
+		compile (int sign=0)
+		//----------------------------------------------------------------------
+		{
+			if (!sign)
+			{
+				compile (+1);
+				compile (-1);
+			}
+		}
 
 		//----------------------------------------------------------------------
 		/// @brief ingest inserts state-transition table data
