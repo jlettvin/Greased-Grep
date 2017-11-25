@@ -161,7 +161,7 @@ namespace Lettvin
 			// TODO find bug for when m_table is not reserved
 			m_table.reserve (256);
 			operator++ ();
-			operator++ ();
+			//operator++ ();
 		} // ctor
 
 		//----------------------------------------------------------------------
@@ -191,6 +191,43 @@ namespace Lettvin
 			return m_table.size ();
 		} // size
 
+		//----------------------------------------------------------------------
+		/// @brief debug utility for displaying the entire table
+		ostream&
+		show (ostream& os)
+		//----------------------------------------------------------------------
+		{
+			for (size_t state=0; state < m_table.size (); ++state)
+			{
+				os << "\tPLANE: " << state << endl;
+				auto& plane{m_table[state]};
+				os << string (64, '_') << '\n';
+				for (size_t row=0; row < 256; row+=16)
+				{
+					os << '|';
+					for (size_t col=0; col < 16; ++col)
+					{
+						Atom& entry{plane[row+col]};
+						int tgt{static_cast<int>(entry.tgt ())};
+						if (tgt) os << setw(3) << tgt << ' ';
+						else     os << "    ";
+					}
+					os << "|\n|";
+					for (size_t col=0; col < 16; ++col)
+					{
+						Atom& entry{plane[row+col]};
+						int str{static_cast<int>(entry.str ())};
+						if (str) os << setw(3) << str << ' ';
+						else     os << "    ";
+					}
+					os << "|\n";
+					os << '|' << string (64, '_') << "|\n";
+				}
+				os << '\n';
+			}
+			return os;
+		} // show
+
 	//------
 	private:
 	//------
@@ -203,7 +240,7 @@ namespace Lettvin
 	//__________________________________________________________________________
 	/// @brief GreasedGrep implements overall state-transition operations
 	class
-	GreasedGrep : Table
+	GreasedGrep : public Table
 	//__________________________________________________________________________
 	{
 	//------
@@ -250,6 +287,10 @@ namespace Lettvin
 			// Compile and check for collisions between accept and reject lists
 			compile ();
 
+			if (m_debug)
+			{
+				show (cout);
+			}
 			// Find files and search contents
 			walk (m_directory);
 
@@ -351,6 +392,11 @@ namespace Lettvin
 		ingest (string_view a_str)
 		//----------------------------------------------------------------------
 		{
+			if (a_str == "-d")
+			{
+				m_debug = 1;
+				return;
+			}
 			if (a_str == "-s")
 			{
 				m_suppress = true;
@@ -582,7 +628,7 @@ namespace Lettvin
 		size_t m_debug{0};                   ///< turns on verbosity
 		bool m_noreject{true};               ///< are there reject strings?
 		bool m_suppress{false};              ///< suppress error messages
-		bool m_caseless{false};
+		bool m_caseless{false};              ///< turn on case insensitivity
 
 		string_view m_directory;
 		string m_firsts;                     ///< string of {arg} first letters

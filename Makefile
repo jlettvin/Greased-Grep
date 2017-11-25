@@ -31,7 +31,7 @@ all: before gg test after
 .PHONY:
 test: FORCE
 	@./gg -i -s abc def ghi jkl .
-	@./gg -i -s +abc +def +ghi +jkl $(REJECT) .
+	@./gg -i -s -d +abc +def +ghi +jkl $(REJECT) .
 
 ################################################################################
 gg:	gg.cpp Makefile
