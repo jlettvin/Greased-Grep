@@ -213,7 +213,10 @@ namespace Lettvin
 		GreasedGrep (int a_argc, char** a_argv) // ctor
 		//----------------------------------------------------------------------
 		{
-			while (--a_argc) ingest (*++a_argv);
+			while (--a_argc)
+			{
+				ingest (*++a_argv);
+			}
 		} // ctor
 
 		//----------------------------------------------------------------------
@@ -291,6 +294,7 @@ namespace Lettvin
 				{
 					synopsis ("pattern strings must be longer than 1 byte");
 				}
+				field.push_back (candidate);
 
 				// Initially, the string as given is searched
 				// TODO generate variations like soundex/levenshtein, fatfinger
@@ -302,7 +306,6 @@ namespace Lettvin
 				// Insert variations into transition tree
 				for (auto& str: strs)
 				{
-					field.push_back (str);
 
 					// Insert a_str into state transition tree
 					for (char u:str)
