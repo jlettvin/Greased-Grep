@@ -40,7 +40,7 @@ SOFTWARE.
 ### Usage
 
 ```
-Usage: gg [-s] [+|-]{str} [[+|-]{str}...] {path} 
+Usage: gg [-i] [-s] [+|-]{str} [[+|-]{str}...] {path} 
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in

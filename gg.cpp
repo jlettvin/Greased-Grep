@@ -23,7 +23,7 @@ SOFTWARE.
 _____________________________________________________________________________*/
 
 static const char* Synopsis =
-R"Synopsis(Usage: gg [-s] [+|-]{str} [[+|-]{str}...] {path} 
+R"Synopsis(Usage: gg [-i] [-s] [+|-]{str} [[+|-]{str}...] {path} 
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in
@@ -284,54 +284,59 @@ namespace Lettvin
 				i24_t id{sign*static_cast<i24_t> (field.size ())};
 				candidate.remove_prefix ((c0=='+' || c0=='-') ? 1 : 0);
 
-				field.push_back (candidate);
-
-				// Insert a_str into state transition tree
-				for (char u:candidate)
+				if (candidate.size () < 2)
 				{
-					if (m_caseless)
-					{
-						last[0] = static_cast<char> (toupper (u));
-						last[1] = static_cast<char> (tolower (u));
-					}
-					else
-					{
-						last[0] = last[1] = u;
-					}
-#if 0
-					for (auto c:last)
-					{
-						Atom& element{operator[] (from)[c]};
-						to = element.tgt ();
-						next = from;
-						if (to) { from = to; }
-						else { from = Table::size (); operator++ (); }
-						element.tgt (from);
-					}
-#else
-					if (m_caseless)
-					{
-						Atom& ELEMENT{operator[] (from)[last[0]]};
-						Atom& element{operator[] (from)[last[1]]};
-						to = element.tgt ();
-						next = from;
-						if (to) { from = to; }
-						else { from = Table::size (); operator++ (); }
-						ELEMENT.tgt (from);
-						element.tgt (from);
-					}
-					else
-					{
-						Atom& element{operator[] (from)[last[1]]};
-						to = element.tgt ();
-						next = from;
-						if (to) { from = to; }
-						else { from = Table::size (); operator++ (); }
-						element.tgt (from);
-					}
-#endif
+					synopsis ("pattern strings must be longer than 1 byte");
 				}
-				for (auto c:last) operator[] (next)[c].str (id);
+
+				// Initially, the string as given is searched
+				// TODO generate variations like soundex/levenshtein, fatfinger
+				// TODO handle collision for variations
+				// e.g. "than" and "then" are legitimate mutual variations.
+				vector<string> strs;
+				strs.emplace_back (string(candidate));
+
+				// Insert variations into transition tree
+				for (auto& str: strs)
+				{
+					field.push_back (str);
+
+					// Insert a_str into state transition tree
+					for (char u:str)
+					{
+						if (m_caseless)
+						{
+							last[0] = static_cast<char> (toupper (u));
+							last[1] = static_cast<char> (tolower (u));
+							Atom& ELEMENT{operator[] (from)[last[0]]};
+							Atom& element{operator[] (from)[last[1]]};
+							to = element.tgt ();
+							next = from;
+							if (to) { from = to; }
+							else { from = Table::size (); operator++ (); }
+							ELEMENT.tgt (from);
+							element.tgt (from);
+						}
+						else
+						{
+							last[0] = u;
+							Atom& element{operator[] (from)[last[1]]};
+							to = element.tgt ();
+							next = from;
+							if (to) { from = to; }
+							else { from = Table::size (); operator++ (); }
+							element.tgt (from);
+						}
+					}
+					if (m_caseless)
+					{
+						for (auto c:last) operator[] (next)[c].str (id);
+					}
+					else
+					{
+						operator[] (next)[last[0]].str (id);
+					}
+				}
 			}
 			m_directory = a_str;
 		} // ingest
