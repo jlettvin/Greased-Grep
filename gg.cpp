@@ -63,6 +63,8 @@ Examples:
 // TODO measure performance against fgrep/ack/ag
 // TODO ingest args with ctor but compile strs at beginning of ftor
 
+#define GG_COMPILE false
+
 #include <experimental/filesystem>
 
 #include <fmt/printf.h>
@@ -267,7 +269,80 @@ namespace Lettvin
 			{
 				compile (+1);
 				compile (-1);
+				return;
 			}
+#if GG_COMPILE
+			bool rejecting{sign == -1};
+			auto& field{rejecting ? m_reject : m_accept};
+
+			//< aids in optimizing inner loop
+			if (rejecting && field.size () > 1) m_noreject = false;
+
+			for (size_t i = 1; i < field.size (); ++i)
+			{
+				vector<u08_t> last{0,0};
+				auto& candidate   {field[i]};
+				auto from         {m_root};
+				auto next         {from};
+				auto to           {from};
+
+				i24_t id{sign*static_cast<i24_t> (i)};
+
+				if (candidate.size () < 2)
+				{
+					synopsis ("pattern strings must be longer than 1 byte");
+				}
+
+				// Initially, the string as given is searched
+				// TODO generate variations like soundex/levenshtein, fatfinger
+				// TODO handle collision for variations
+				// e.g. "than" and "then" are legitimate mutual variations.
+				vector<string> strs;
+				strs.emplace_back (string(candidate));
+
+				// Insert variations into transition tree
+				for (auto& str: strs)
+				{
+
+					// Insert a_str into state transition tree
+					for (char u:str)
+					{
+						if (m_caseless)
+						{
+							last[0] = static_cast<char> (toupper (u));
+							last[1] = static_cast<char> (tolower (u));
+							Atom& ELEMENT{operator[] (from)[last[0]]};
+							Atom& element{operator[] (from)[last[1]]};
+							to = element.tgt ();
+							next = from;
+							if (to) { from = to; }
+							else { from = Table::size (); operator++ (); }
+							ELEMENT.tgt (from);
+							element.tgt (from);
+						}
+						else
+						{
+							last[0] = u;
+							Atom& element{operator[] (from)[last[1]]};
+							to = element.tgt ();
+							next = from;
+							if (to) { from = to; }
+							else { from = Table::size (); operator++ (); }
+							element.tgt (from);
+						}
+					}
+					if (m_caseless)
+					{
+						for (auto c:last) operator[] (next)[c].str (id);
+					}
+					else
+					{
+						operator[] (next)[last[0]].str (id);
+					}
+				}
+			}
+
+#endif
 		}
 
 		//----------------------------------------------------------------------
@@ -286,6 +361,19 @@ namespace Lettvin
 				m_caseless = true;
 				return;
 			}
+
+#if GG_COMPILE
+			if (m_directory.size ())
+			{
+				string_view candidate {m_directory};
+				char c0               {candidate[0]};
+				bool rejecting        {c0 == '-'};
+				auto& field           {rejecting ? m_reject : m_accept};
+
+				candidate.remove_prefix ((c0=='+' || c0=='-') ? 1 : 0);
+				field.push_back (candidate);
+			}
+#else
 			if (m_directory.size ())
 			{
 				//static const char* direction[2]{"ACCEPT", "REJECT"};
@@ -359,6 +447,7 @@ namespace Lettvin
 				}
 			}
 			m_directory = a_str;
+#endif
 		} // ingest
 
 		//----------------------------------------------------------------------
