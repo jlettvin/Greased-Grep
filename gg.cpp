@@ -61,6 +61,7 @@ Examples:
 
 // TODO find bug for when m_table is not reserved
 // TODO measure performance against fgrep/ack/ag
+// TODO ingest args with ctor but compile strs at beginning of ftor
 
 #include <experimental/filesystem>
 
@@ -240,6 +241,8 @@ namespace Lettvin
 			{
 				synopsis ("last arg must be dir");
 			}
+
+			// Check for collisions between accept and reject lists
 
 			// Find files and search contents
 			walk (m_directory);
