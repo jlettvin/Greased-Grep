@@ -55,6 +55,9 @@ Greased Grep search for files having (case insensitive):
     -{str}
         add reject string
 
+	-i
+        case insensitive search
+
     -s
         suppress permission denied errors
 

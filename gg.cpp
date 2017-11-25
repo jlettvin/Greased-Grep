@@ -38,6 +38,9 @@ Greased Grep search for files having (case insensitive):
     -{str}
         add reject string
 
+	-i
+        case insensitive search
+
     -s
         suppress permission denied errors
 
@@ -258,6 +261,11 @@ namespace Lettvin
 				m_suppress = true;
 				return;
 			}
+			else if (a_str == "-i")
+			{
+				m_caseless = true;
+				return;
+			}
 			if (m_directory.size ())
 			{
 				//static const char* direction[2]{"ACCEPT", "REJECT"};
@@ -281,8 +289,15 @@ namespace Lettvin
 				// Insert a_str into state transition tree
 				for (char u:candidate)
 				{
-					last[0] = static_cast<char> (toupper (u));
-					last[1] = static_cast<char> (tolower (u));
+					if (m_caseless)
+					{
+						last[0] = static_cast<char> (toupper (u));
+						last[1] = static_cast<char> (tolower (u));
+					}
+					else
+					{
+						last[0] = last[1] = u;
+					}
 #if 0
 					for (auto c:last)
 					{
@@ -294,14 +309,26 @@ namespace Lettvin
 						element.tgt (from);
 					}
 #else
-					Atom& ELEMENT{operator[] (from)[last[0]]};
-					Atom& element{operator[] (from)[last[1]]};
-					to = element.tgt ();
-					next = from;
-					if (to) { from = to; }
-					else { from = Table::size (); operator++ (); }
-					element.tgt (from);
-					ELEMENT.tgt (from);
+					if (m_caseless)
+					{
+						Atom& ELEMENT{operator[] (from)[last[0]]};
+						Atom& element{operator[] (from)[last[1]]};
+						to = element.tgt ();
+						next = from;
+						if (to) { from = to; }
+						else { from = Table::size (); operator++ (); }
+						ELEMENT.tgt (from);
+						element.tgt (from);
+					}
+					else
+					{
+						Atom& element{operator[] (from)[last[1]]};
+						to = element.tgt ();
+						next = from;
+						if (to) { from = to; }
+						else { from = Table::size (); operator++ (); }
+						element.tgt (from);
+					}
 #endif
 				}
 				for (auto c:last) operator[] (next)[c].str (id);
@@ -353,7 +380,12 @@ namespace Lettvin
 			// Report files having all accepteds and no rejecteds.
 			if (!rejected.size () && accepted.size () == m_accept.size ())
 			{
-				printf ("%s\n", a_filename);
+				auto report{fmt::format ("{}\n", a_filename)};
+				// Using the unix write primitive guarantees atomicity
+				// This is needed to avoid thread contention
+				auto wrote = write (1, report.c_str (), report.size ());
+				// This next line should never be executed.
+				if (wrote == -1) printf ("%s\n", a_filename);
 			}
 		} // search
 
@@ -405,6 +437,7 @@ namespace Lettvin
 					{
 						try
 						{
+							// mapped_search should be launched as a thread
 							mapped_search (filename);
 						}
 						catch (...)
@@ -435,6 +468,7 @@ namespace Lettvin
 		size_t m_debug{0};                   ///< turns on verbosity
 		bool m_noreject{true};               ///< are there reject strings?
 		bool m_suppress{false};              ///< suppress error messages
+		bool m_caseless{false};
 
 		string_view m_directory;
 		string m_firsts;                     ///< string of {arg} first letters
@@ -463,6 +497,7 @@ int
 main (int argc, char** argv)
 //------------------------------------------------------------------------------
 {
+	if (argc < 3) synopsis ("At least one pattern and a directory required.");
 	Lettvin::GreasedGrep gg (argc, argv);
 	gg ();
 	return 0;
