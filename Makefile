@@ -30,8 +30,10 @@ all: before gg test after
 ################################################################################
 .PHONY:
 test: FORCE
-	@./gg -i -s abc def ghi jkl .
-	@./gg -i -s -d +abc +def +ghi +jkl $(REJECT) .
+	@./gg -d ab . > artifact/ab.art
+	@./gg -d xy . > artifact/xy.art
+	@./gg -s abc def ghi jkl .
+	@./gg -s -d +abc +def +ghi +jkl $(REJECT) .
 
 ################################################################################
 gg:	gg.cpp Makefile
@@ -42,8 +44,8 @@ gg:	gg.cpp Makefile
 #	$(CC) $(COPTS) -o $@ $< $(LOPTS)
 #	@g++ -O3 -Wextra -Wall -Werror -std=c++17 -o gg gg.cpp -lfmt -lstdc++fs
 #	@strip gg
-#	@./gg -i -s abc def ghi jkl .
-#	@./gg -i -s +abc +def +ghi +jkl $(REJECT) .
+#	@./gg -s abc def ghi jkl .
+#	@./gg -s +abc +def +ghi +jkl $(REJECT) .
 ################################################################################
 
 ################################################################################

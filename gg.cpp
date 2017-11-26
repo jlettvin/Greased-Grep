@@ -38,8 +38,8 @@ Greased Grep search for files having (case insensitive):
     -{str}
         add reject string
 
-	-i
-        case insensitive search
+	-c
+        case sensitive search
 
     -s
         suppress permission denied errors
@@ -62,6 +62,7 @@ Examples:
 // TODO find bug for when m_table is not reserved
 // TODO measure performance against fgrep/ack/ag
 // TODO ingest args with ctor but compile strs at beginning of ftor
+// TODO eliminate empty planes
 
 #define GG_COMPILE false
 
@@ -161,7 +162,7 @@ namespace Lettvin
 			// TODO find bug for when m_table is not reserved
 			m_table.reserve (256);
 			operator++ ();
-			//operator++ ();
+			operator++ ();
 		} // ctor
 
 		//----------------------------------------------------------------------
@@ -201,36 +202,69 @@ namespace Lettvin
 			{
 				os << "\tPLANE: " << state << endl;
 				auto& plane{m_table[state]};
-				os << string (64, '_') << '\n';
+				os << ' ' << string (80, '_') << '\n';
 				for (size_t row=0; row < 256; row+=16)
 				{
 					os << '|';
 					for (size_t col=0; col < 16; ++col)
 					{
-						Atom& entry{plane[row+col]};
+						char id{static_cast<char>(row+col)};
+						Atom& entry{plane[id]};
 						int tgt{static_cast<int>(entry.tgt ())};
-						if (tgt) os << setw(3) << tgt << ' ';
-						else     os << "    ";
+						char gra{id>=' '&&id<='~'?id:' '};
+						if (tgt) os << gra << setw(3) << tgt << ' ';
+						else     os << "     ";
 					}
 					os << "|\n|";
 					for (size_t col=0; col < 16; ++col)
 					{
 						Atom& entry{plane[row+col]};
 						int str{static_cast<int>(entry.str ())};
-						if (str) os << setw(3) << str << ' ';
-						else     os << "    ";
+						if (str) os << setw(4) << str << ' ';
+						else     os << "     ";
 					}
 					os << "|\n";
-					os << '|' << string (64, '_') << "|\n";
 				}
+				os << '|' << string (80, '_') << "|\n";
 				os << '\n';
 			}
+#if 0
+			os << "\tENTRIES:" << endl;
+			for (size_t i=0; i < 256; ++i)
+			{
+				string str;
+				show (os, 1, str);
+			}
+#endif
 			return os;
 		} // show
 
 	//------
 	private:
 	//------
+
+		//----------------------------------------------------------------------
+		ostream&
+		show (ostream& os, size_t state, string& str)
+		//----------------------------------------------------------------------
+		{
+			for (size_t i=0; i < 256; ++i)
+			{
+				Atom& entry{m_table[state][i]};
+				if (entry.tgt ())
+				{
+					string tmp{str};
+					tmp += static_cast<char> (i);
+					//os << tmp << endl;
+					//show (os, entry.tgt (), tmp);
+				}
+				if (entry.str ())
+				{
+					os << setw (3) << entry.str () << ": " << str << '\n';
+				}
+			}
+			return os;
+		}
 
 		vector<State> m_table; ///< State tables
 
@@ -287,6 +321,7 @@ namespace Lettvin
 			// Compile and check for collisions between accept and reject lists
 			compile ();
 
+			// Visually inspect planes
 			if (m_debug)
 			{
 				show (cout);
@@ -348,27 +383,41 @@ namespace Lettvin
 					// Insert a_str into state transition tree
 					for (char u:str)
 					{
+						last[0] = m_caseless ? u static_cast<char> (toupper (u));
+						last[1] = m_caseless ? u static_cast<char> (tolower (u));
+
 						if (m_caseless)
 						{
-							last[0] = static_cast<char> (toupper (u));
-							last[1] = static_cast<char> (tolower (u));
 							Atom& ELEMENT{operator[] (from)[last[0]]};
 							Atom& element{operator[] (from)[last[1]]};
 							to = element.tgt ();
 							next = from;
-							if (to) { from = to; }
-							else { from = Table::size (); operator++ (); }
+							if (to)
+							{
+								from = to;
+							}
+							else
+							{
+								from = Table::size ();
+								operator++ ();
+							}
 							ELEMENT.tgt (from);
 							element.tgt (from);
 						}
 						else
 						{
-							last[0] = u;
 							Atom& element{operator[] (from)[last[1]]};
 							to = element.tgt ();
 							next = from;
-							if (to) { from = to; }
-							else { from = Table::size (); operator++ (); }
+							if (to)
+							{
+								from = to;
+							}
+							else
+							{
+								from = Table::size ();
+								operator++ ();
+							}
 							element.tgt (from);
 						}
 					}
@@ -402,9 +451,9 @@ namespace Lettvin
 				m_suppress = true;
 				return;
 			}
-			else if (a_str == "-i")
+			else if (a_str == "-c")
 			{
-				m_caseless = true;
+				m_caseless = false;
 				return;
 			}
 
@@ -466,8 +515,14 @@ namespace Lettvin
 							Atom& element{operator[] (from)[last[1]]};
 							to = element.tgt ();
 							next = from;
-							if (to) { from = to; }
-							else { from = Table::size (); operator++ (); }
+							if (to) {
+								from = to;
+							}
+							else
+							{
+								from = Table::size ();
+								operator++ ();
+							}
 							ELEMENT.tgt (from);
 							element.tgt (from);
 						}
@@ -477,8 +532,14 @@ namespace Lettvin
 							Atom& element{operator[] (from)[last[1]]};
 							to = element.tgt ();
 							next = from;
-							if (to) { from = to; }
-							else { from = Table::size (); operator++ (); }
+							if (to) {
+								from = to;
+							}
+							else
+							{
+								from = Table::size ();
+								operator++ ();
+							}
 							element.tgt (from);
 						}
 					}
@@ -628,7 +689,7 @@ namespace Lettvin
 		size_t m_debug{0};                   ///< turns on verbosity
 		bool m_noreject{true};               ///< are there reject strings?
 		bool m_suppress{false};              ///< suppress error messages
-		bool m_caseless{false};              ///< turn on case insensitivity
+		bool m_caseless{true};               ///< turn on case insensitivity
 
 		string_view m_directory;
 		string m_firsts;                     ///< string of {arg} first letters

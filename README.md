@@ -55,8 +55,8 @@ Greased Grep search for files having (case insensitive):
     -{str}
         add reject string
 
-    -i
-        case insensitive search
+	-c
+        case sensitive search
 
     -s
         suppress permission denied errors
@@ -165,6 +165,7 @@ but code simplification merits this choice.
 * TODO find bug for when m_table is not reserved
 * TODO measure performance against fgrep/ack/ag
 * TODO ingest args with ctor but compile strs at beginning of ftor
+* TODO eliminate empty planes
 
 <hr />
 
