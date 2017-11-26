@@ -115,7 +115,6 @@
 ./tgz/gg.20171125145034.tgz
 ./tgz/gg.20171125150816.tgz
 ./Makefile
-./.git/COMMIT_EDITMSG
 ./.git/hooks/applypatch-msg.sample
 ./.git/hooks/update.sample
 ./.git/hooks/prepare-commit-msg.sample
@@ -125,6 +124,7 @@
 ./.git/hooks/pre-rebase.sample
 ./.git/hooks/post-update.sample
 ./.git/hooks/pre-commit.sample
+./.git/objects/67/ecb04dada4ee1f614f832472ee8b48951d936c
 ./.git/objects/d9/2e37bd2aa1b708e25c4069fa25ab32def3d810
 ./.git/objects/1c/a4043cf4500e08e133e189835be30c61cdcf54
 ./.git/objects/c9/1db103ec22eb932245cf12b06484c63420d22d
@@ -136,6 +136,7 @@
 ./.git/logs/refs/heads/master
 ./.git/logs/refs/remotes/origin/master
 ./.git/logs/HEAD
+./.git/index
 ./artifact/xy.art
 ./artifact/ab.art
  ________________________________________________________________________________

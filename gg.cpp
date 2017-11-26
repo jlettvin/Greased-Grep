@@ -23,7 +23,7 @@ SOFTWARE.
 _____________________________________________________________________________*/
 
 static const char* Synopsis =
-R"Synopsis(Usage: gg [-i] [-s] [+|-]{str} [[+|-]{str}...] {path} 
+R"Synopsis(Usage: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in

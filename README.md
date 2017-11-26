@@ -1,6 +1,6 @@
 # Greased-Grep
 ## High performance case insensitive<br />recursive search for files having<br />all of one set and none of another set of strings
-### $ gg -i -s copyright -Lettvin .  # find copyright files without Lettvin
+### $ gg copyright -Lettvin .  # find copyright files without Lettvin
 
 "gg" name was chosen for this frequently-used command because it is easy to type.
 "gg" is the left-hand index-finger letter, and typing it twice is easy.
@@ -40,7 +40,7 @@ SOFTWARE.
 ### Usage
 
 ```
-Usage: gg [-i] [-s] [+|-]{str} [[+|-]{str}...] {path} 
+Usage: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in

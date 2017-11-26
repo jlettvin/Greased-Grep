@@ -109,7 +109,9 @@
 	PLANE: 3
 ./gg
 ./Makefile
+./.git/objects/67/ecb04dada4ee1f614f832472ee8b48951d936c
 ./.git/objects/99/1abaa2b545933e17ec5f24a8ff8e3881dfc833
+./.git/objects/b4/b9ede683783ead17bf8cccd41ab1d748f3ca2e
 ./.git/objects/a8/d141b9a8fe2951e79d267a8266da5c7ca97f99
 ./.git/objects/1c/a4043cf4500e08e133e189835be30c61cdcf54
 ./.git/objects/bb/f9a54f30621cff3981ddeb1d2d8139e0d0b7f5
@@ -126,6 +128,7 @@
 ./.git/objects/be/8d78a8e485cfe0c33b02074fcb28a0296bc23c
 ./.git/logs/refs/heads/master
 ./.git/logs/HEAD
+./.git/index
 ./artifact/ab.art
  ________________________________________________________________________________
 |                                                                                |
