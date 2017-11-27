@@ -78,7 +78,7 @@ Examples:
 #include <fcntl.h>
 
 #include <string_view>
-#include <iostream>
+#include <iostream>  // sync_with_stdio
 #include <fstream>
 #include <iomanip>
 #include <string>
@@ -161,8 +161,8 @@ namespace Lettvin
 		{
 			// TODO find bug for when m_table is not reserved
 			m_table.reserve (256);
-			//operator++ ();
-			//operator++ ();
+			operator++ ();
+			operator++ ();
 		} // ctor
 
 		//----------------------------------------------------------------------
@@ -195,7 +195,7 @@ namespace Lettvin
 		//----------------------------------------------------------------------
 		/// @brief debug utility for displaying the entire table
 		ostream&
-		show (ostream& os)
+		show_tables (ostream& os)
 		//----------------------------------------------------------------------
 		{
 			for (size_t state=0; state < m_table.size (); ++state)
@@ -228,43 +228,12 @@ namespace Lettvin
 				os << '|' << string (80, '_') << "|\n";
 				os << '\n';
 			}
-#if 0
-			os << "\tENTRIES:" << endl;
-			for (size_t i=0; i < 256; ++i)
-			{
-				string str;
-				show (os, 1, str);
-			}
-#endif
 			return os;
-		} // show
+		} // show_tables
 
 	//------
 	private:
 	//------
-
-		//----------------------------------------------------------------------
-		ostream&
-		show (ostream& os, size_t state, string& str)
-		//----------------------------------------------------------------------
-		{
-			for (size_t i=0; i < 256; ++i)
-			{
-				Atom& entry{m_table[state][i]};
-				if (entry.tgt ())
-				{
-					string tmp{str};
-					tmp += static_cast<char> (i);
-					//os << tmp << endl;
-					//show (os, entry.tgt (), tmp);
-				}
-				if (entry.str ())
-				{
-					os << setw (3) << entry.str () << ": " << str << '\n';
-				}
-			}
-			return os;
-		}
 
 		vector<State> m_table; ///< State tables
 
@@ -304,14 +273,6 @@ namespace Lettvin
 				synopsis ("specify at least one accept str");
 			}
 
-			// Initialize firsts to enable buffer skipping
-			for (size_t i=0; i<256; ++i)
-			{
-				const Atom& element (m_state1[i]);
-				auto t{element.tgt ()};
-				if (t) m_firsts += static_cast<u08_t>(i);
-			}
-
 			// Check for valid directory
 			if (!fs::is_directory (m_directory))
 			{
@@ -321,10 +282,20 @@ namespace Lettvin
 			// Compile and check for collisions between accept and reject lists
 			compile ();
 
+			// Initialize firsts to enable buffer skipping
+			for (size_t i=0; i<256; ++i)
+			{
+				const Atom& element (m_state1[i]);
+				auto t{element.tgt ()};
+				if (t) m_firsts += static_cast<u08_t>(i);
+			}
+
 			// Visually inspect planes
 			if (m_debug)
 			{
-				show (cout);
+				show_tables (cout);
+				show_tokens (cout);
+				cout << "\tFIRSTS: " << m_firsts << endl;
 			}
 			// Find files and search contents
 			walk (m_directory);
@@ -334,106 +305,6 @@ namespace Lettvin
 	//------
 	private:
 	//------
-
-		//----------------------------------------------------------------------
-		/// @brief ingest inserts state-transition table data
-		void
-		compile (int sign=0)
-		//----------------------------------------------------------------------
-		{
-			if (!sign)
-			{
-				compile (+1);
-				compile (-1);
-				return;
-			}
-#if GG_COMPILE
-			bool rejecting{sign == -1};
-			auto& field{rejecting ? m_reject : m_accept};
-
-			//< aids in optimizing inner loop
-			if (rejecting && field.size () > 1) m_noreject = false;
-
-			for (size_t i = 1; i < field.size (); ++i)
-			{
-				vector<u08_t> last{0,0};
-				auto& candidate   {field[i]};
-				auto from         {m_root};
-				auto next         {from};
-				auto to           {from};
-
-				i24_t id{sign*static_cast<i24_t> (i)};
-
-				if (candidate.size () < 2)
-				{
-					synopsis ("pattern strings must be longer than 1 byte");
-				}
-
-				// Initially, the string as given is searched
-				// TODO generate variations like soundex/levenshtein, fatfinger
-				// TODO handle collision for variations
-				// e.g. "than" and "then" are legitimate mutual variations.
-				vector<string> strs;
-				strs.emplace_back (string(candidate));
-
-				// Insert variations into transition tree
-				for (auto& str: strs)
-				{
-
-					// Insert a_str into state transition tree
-					for (char u:str)
-					{
-						last[0] = m_caseless ? u static_cast<char> (toupper (u));
-						last[1] = m_caseless ? u static_cast<char> (tolower (u));
-
-						if (m_caseless)
-						{
-							Atom& ELEMENT{operator[] (from)[last[0]]};
-							Atom& element{operator[] (from)[last[1]]};
-							to = element.tgt ();
-							next = from;
-							if (to)
-							{
-								from = to;
-							}
-							else
-							{
-								from = Table::size ();
-								operator++ ();
-							}
-							ELEMENT.tgt (from);
-							element.tgt (from);
-						}
-						else
-						{
-							Atom& element{operator[] (from)[last[1]]};
-							to = element.tgt ();
-							next = from;
-							if (to)
-							{
-								from = to;
-							}
-							else
-							{
-								from = Table::size ();
-								operator++ ();
-							}
-							element.tgt (from);
-						}
-					}
-					if (m_caseless)
-					{
-						for (auto c:last) operator[] (next)[c].str (id);
-					}
-					else
-					{
-						operator[] (next)[last[0]].str (id);
-					}
-				}
-			}
-
-#endif
-		}
 
 		//----------------------------------------------------------------------
 		/// @brief ingest inserts state-transition table data
@@ -457,34 +328,14 @@ namespace Lettvin
 				return;
 			}
 
-#if GG_COMPILE
 			if (m_directory.size ())
 			{
 				string_view candidate {m_directory};
+
 				char c0               {candidate[0]};
 				bool rejecting        {c0 == '-'};
 				auto& field           {rejecting ? m_reject : m_accept};
 
-				candidate.remove_prefix ((c0=='+' || c0=='-') ? 1 : 0);
-				field.push_back (candidate);
-			}
-#else
-			if (m_directory.size ())
-			{
-				//static const char* direction[2]{"ACCEPT", "REJECT"};
-				auto from             {m_root};
-				auto next             {from};
-				auto to               {from};
-				vector<u08_t> last    {0,0};
-				string_view candidate {m_directory};
-				char c0               {candidate[0]};
-				bool rejecting        {c0 == '-'};
-				auto& field           {rejecting ? m_reject : m_accept};
-
-				m_noreject &= !rejecting; ///< aids in optimizing inner loop
-
-				i24_t sign{rejecting?-1:+1};
-				i24_t id{sign*static_cast<i24_t> (field.size ())};
 				candidate.remove_prefix ((c0=='+' || c0=='-') ? 1 : 0);
 
 				if (candidate.size () < 2)
@@ -492,70 +343,126 @@ namespace Lettvin
 					synopsis ("pattern strings must be longer than 1 byte");
 				}
 				field.push_back (candidate);
+#if !GG_COMPILE
+				// This compile passes
+				i24_t sign            {rejecting?-1:+1};
+				compile (sign, candidate);
+#endif
+			}
+			m_directory = a_str;
+		} // ingest
 
-				// Initially, the string as given is searched
-				// TODO generate variations like soundex/levenshtein, fatfinger
-				// TODO handle collision for variations
-				// e.g. "than" and "then" are legitimate mutual variations.
-				vector<string> strs;
-				strs.emplace_back (string(candidate));
+		//----------------------------------------------------------------------
+		/// @brief ingest inserts state-transition table data
+		void
+		compile (int sign=0)
+		//----------------------------------------------------------------------
+		{
+			if (!sign)
+			{
+				compile (+1);
+				compile (-1);
+				return;
+			}
+			bool rejecting {sign == -1};
+			auto& field    {rejecting ? m_reject : m_accept};
+			size_t I       {field.size ()};
 
-				// Insert variations into transition tree
-				for (auto& str: strs)
+			//< m_noreject optimizes inner loop
+			if (rejecting && I > 1)
+			{
+				m_noreject = false;
+			}
+
+#if GG_COMPILE
+				// This compile fails
+			for (size_t i = 1; i < I; ++i)
+			{
+				compile (sign, field[i]);
+			}
+#endif
+		}
+
+		//----------------------------------------------------------------------
+		/// @brief compile a single string argument
+		///
+		/// Distribute characters into state tables for searching.
+		void
+		compile (int a_sign, string_view a_str)
+		//----------------------------------------------------------------------
+		{
+			if (m_debug)
+			{
+				printf ("\tCOMPILE %+d: %s\n", a_sign, a_str.data ());
+			}
+			bool rejecting        {a_sign == -1};
+			auto from             {m_root};
+			auto next             {from};
+			auto to               {from};
+			vector<u08_t> last    {0,0};
+			auto& field           {rejecting ? m_reject : m_accept};
+			i24_t id              {a_sign*static_cast<i24_t> (field.size ())};
+
+			// Initially, the string as given is searched
+			// TODO generate variations like soundex/levenshtein, fatfinger
+			// TODO handle collision for variations
+			// e.g. "than" and "then" are legitimate mutual variations.
+			vector<string> strs;
+			strs.emplace_back (string(a_str));
+
+			// Insert variations into transition tree
+			for (auto& str: strs)
+			{
+
+				// Insert a_str into state transition tree
+				for (char u:str)
 				{
-
-					// Insert a_str into state transition tree
-					for (char u:str)
+					if (m_caseless)
 					{
-						if (m_caseless)
-						{
-							last[0] = static_cast<char> (toupper (u));
-							last[1] = static_cast<char> (tolower (u));
-							Atom& ELEMENT{operator[] (from)[last[0]]};
-							Atom& element{operator[] (from)[last[1]]};
-							to = element.tgt ();
-							next = from;
-							if (to) {
-								from = to;
-							}
-							else
-							{
-								from = Table::size ();
-								operator++ ();
-							}
-							ELEMENT.tgt (from);
-							element.tgt (from);
+						last[0] = static_cast<char> (toupper (u));
+						last[1] = static_cast<char> (tolower (u));
+						Atom& ELEMENT{operator[] (from)[last[0]]};
+						Atom& element{operator[] (from)[last[1]]};
+						to = element.tgt ();
+						next = from;
+						if (to) {
+							from = to;
 						}
 						else
 						{
-							last[0] = u;
-							Atom& element{operator[] (from)[last[1]]};
-							to = element.tgt ();
-							next = from;
-							if (to) {
-								from = to;
-							}
-							else
-							{
-								from = Table::size ();
-								operator++ ();
-							}
-							element.tgt (from);
+							from = Table::size ();
+							operator++ ();
 						}
-					}
-					if (m_caseless)
-					{
-						for (auto c:last) operator[] (next)[c].str (id);
+						ELEMENT.tgt (from);
+						element.tgt (from);
 					}
 					else
 					{
-						operator[] (next)[last[0]].str (id);
+						last[0] = u;
+						Atom& element{operator[] (from)[last[1]]};
+						to = element.tgt ();
+						next = from;
+						if (to) {
+							from = to;
+						}
+						else
+						{
+							from = Table::size ();
+							operator++ ();
+						}
+						element.tgt (from);
 					}
 				}
+				if (m_caseless)
+				{
+					for (auto c:last) operator[] (next)[c].str (id);
+				}
+				else
+				{
+					operator[] (next)[last[0]].str (id);
+				}
 			}
-			m_directory = a_str;
-#endif
-		} // ingest
+		}
 
 		//----------------------------------------------------------------------
 		/// @brief find and report found strings
@@ -682,6 +589,23 @@ namespace Lettvin
 			}
 		} // walk
 
+		//----------------------------------------------------------------------
+		void
+		show_tokens (ostream& os)
+		//----------------------------------------------------------------------
+		{
+			os << "\tACCEPT:" << endl;
+			for (size_t i=1; i < m_accept.size (); ++i)
+			{
+				os << setw (2) << i << ": " << m_accept[i] << endl;
+			}
+			os << "\tREJECT:" << endl;
+			for (size_t i=1; i < m_reject.size (); ++i)
+			{
+				os << setw (2) << i << ": " << m_reject[i] << endl;
+			}
+		} // show_tokens
+
 		//dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
 		vector<string_view> m_accept {{""}}; ///< list of accept {str} args
 		vector<string_view> m_reject {{""}}; ///< list of reject {str} args
@@ -718,6 +642,7 @@ int
 main (int argc, char** argv)
 //------------------------------------------------------------------------------
 {
+	std::ios::sync_with_stdio (true);
 	if (argc < 3) synopsis ("At least one pattern and a directory required.");
 	Lettvin::GreasedGrep gg (argc, argv);
 	gg ();
