@@ -41,7 +41,10 @@ SOFTWARE.
 ### Usage
 
 ```
+Greased Grep version 0.0.1
+
 Usage: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
+
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in
