@@ -1,4 +1,4 @@
-# Greased-Grep
+# Greased-Grep (version 0.0.1)
 ## High performance case insensitive<br />recursive search for files having<br />all of one set and none of another set of strings
 ### $ gg copyright -Lettvin .  # find copyright files without Lettvin
 
