@@ -147,12 +147,14 @@
  1: xy
 	REJECT:
 	FIRSTS: Xx
+./tgz/gg.20171127042408.tgz
 ./Makefile
 ./.git/objects/67/ecb04dada4ee1f614f832472ee8b48951d936c
 ./.git/objects/99/1abaa2b545933e17ec5f24a8ff8e3881dfc833
 ./.git/objects/b4/b9ede683783ead17bf8cccd41ab1d748f3ca2e
 ./.git/objects/a8/d141b9a8fe2951e79d267a8266da5c7ca97f99
 ./.git/objects/1c/a4043cf4500e08e133e189835be30c61cdcf54
+./.git/objects/77/a7e8f8c1eea3ecef49061f8e5d4c2d46ac1622
 ./.git/objects/bb/f9a54f30621cff3981ddeb1d2d8139e0d0b7f5
 ./.git/objects/c9/1ca09d67fff50ecd1e4cede25ff33173c6006b
 ./.git/objects/c9/1db103ec22eb932245cf12b06484c63420d22d
