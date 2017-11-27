@@ -67,7 +67,6 @@ Examples:
 // TODO find bug for when m_table is not reserved
 // TODO measure performance against fgrep/ack/ag
 // TODO ingest args with ctor but compile strs at beginning of ftor
-// TODO eliminate empty planes
 
 #define GG_COMPILE false
 
