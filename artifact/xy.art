@@ -147,6 +147,7 @@
  1: xy
 	REJECT:
 	FIRSTS: Xx
+./gg
 ./tgz/gg.20171127042408.tgz
 ./Makefile
 ./.git/objects/67/ecb04dada4ee1f614f832472ee8b48951d936c

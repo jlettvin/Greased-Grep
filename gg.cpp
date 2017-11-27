@@ -22,8 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 _____________________________________________________________________________*/
 
+static const struct { unsigned major, minor, build; } s_version{0,0,1};
+
 static const char* Synopsis =
-R"Synopsis(Usage: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
+R"Synopsis(Greased Grep version %u.%u.%u
+
+Usage: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
+
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in
@@ -632,7 +637,7 @@ synopsis (const char* a_message)
 //------------------------------------------------------------------------------
 {
 	if (a_message != nullptr) { printf ("ERROR: %s\n\n", a_message); }
-	printf ("%s", Synopsis);
+	printf (Synopsis, s_version.major, s_version.minor, s_version.build);
 	exit (1);
 } // synopsis
 
