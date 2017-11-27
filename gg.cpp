@@ -268,9 +268,9 @@ namespace Lettvin
 		//----------------------------------------------------------------------
 		{
 			// Validate ingested args
-			if (m_accept.size () < 2)
+			if (m_accept.size () < 2 && m_reject.size () < 2)
 			{
-				synopsis ("specify at least one accept str");
+				synopsis ("specify at least one accept or reject str");
 			}
 
 			// Check for valid directory
