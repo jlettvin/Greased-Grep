@@ -161,8 +161,8 @@ namespace Lettvin
 		{
 			// TODO find bug for when m_table is not reserved
 			m_table.reserve (256);
-			operator++ ();
-			operator++ ();
+			//operator++ ();
+			//operator++ ();
 		} // ctor
 
 		//----------------------------------------------------------------------
