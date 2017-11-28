@@ -1,4 +1,6 @@
 	COMPILE +1: ab
+	INSERT 'A' and 'a'
+	INSERT 'B' and 'b'
 	PLANE: 0
  ________________________________________________________________________________
 |                                                                                |
@@ -151,11 +153,15 @@
 ./LICENSE
 ./old/gg1.cpp
 ./gg.cpp
+./gg1.cpp
 ./gg
 ./tgz/gg.20171125145034.tgz
 ./tgz/gg.20171126225054.tgz
+./tgz/gg.20171127044254.tgz
 ./tgz/gg.20171125150816.tgz
 ./Makefile
+./.git/refs/heads/master
+./.git/refs/remotes/origin/master
 ./.git/hooks/applypatch-msg.sample
 ./.git/hooks/update.sample
 ./.git/hooks/prepare-commit-msg.sample

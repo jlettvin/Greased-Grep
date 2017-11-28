@@ -43,7 +43,7 @@ Greased Grep search for files having (case insensitive):
     -{str}
         add reject string
 
-	-c
+    -c
         case sensitive search
 
     -s
@@ -67,8 +67,15 @@ Examples:
 // TODO find bug for when m_table is not reserved
 // TODO measure performance against fgrep/ack/ag
 // TODO ingest args with ctor but compile strs at beginning of ftor
+// TODO use memcmp for unique final string
 
+// Turn GG_COMPILE true to run compile AFTER command-line processing
+// For now, tests fail when GG_COMPILE is true
 #define GG_COMPILE false
+
+// Turn GG_NIBBLES true to reduce memory consumption by tables
+// This code is under development
+#define GG_NIBBLES false
 
 #include <experimental/filesystem>
 
@@ -142,7 +149,11 @@ namespace Lettvin
 	//------
 	private:
 	//------
+#if GG_NIBBLES
+		Atom m_handle[16];
+#else
 		Atom m_handle[256];
+#endif
 	}; // class State
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -164,9 +175,17 @@ namespace Lettvin
 		//----------------------------------------------------------------------
 		{
 			// TODO find bug for when m_table is not reserved
-			m_table.reserve (256);
-			operator++ ();
-			operator++ ();
+#if GG_NIBBLES
+			size_t prefill=2;
+#else
+			size_t prefill=1;
+#endif
+			m_table.reserve (prefill*256);
+			for (size_t i=0; i < prefill; ++i)
+			{
+				operator++ ();
+				operator++ ();
+			}
 		} // ctor
 
 		//----------------------------------------------------------------------
@@ -175,7 +194,11 @@ namespace Lettvin
 		operator[] (u08_t a_offset)
 		//----------------------------------------------------------------------
 		{
+#if GG_NIBBLES
+			return m_table[a_offset&0x0f];
+#else
 			return m_table[a_offset];
+#endif
 		} // operator[]
 
 		//----------------------------------------------------------------------
@@ -202,15 +225,22 @@ namespace Lettvin
 		show_tables (ostream& os)
 		//----------------------------------------------------------------------
 		{
+#if GG_NIBBLES
+			size_t COLS{4};
+			size_t ROWS{4};
+#else
+			size_t COLS{16};
+			size_t ROWS{16};
+#endif
 			for (size_t state=0; state < m_table.size (); ++state)
 			{
 				os << "\tPLANE: " << state << endl;
 				auto& plane{m_table[state]};
-				os << ' ' << string (80, '_') << '\n';
-				for (size_t row=0; row < 256; row+=16)
+				os << ' ' << string (5*COLS, '_') << '\n';
+				for (size_t row=0; row < ROWS*COLS; row+=COLS)
 				{
 					os << '|';
-					for (size_t col=0; col < 16; ++col)
+					for (size_t col=0; col < COLS; ++col)
 					{
 						char id{static_cast<char>(row+col)};
 						Atom& entry{plane[id]};
@@ -220,7 +250,7 @@ namespace Lettvin
 						else     os << "     ";
 					}
 					os << "|\n|";
-					for (size_t col=0; col < 16; ++col)
+					for (size_t col=0; col < COLS; ++col)
 					{
 						Atom& entry{plane[row+col]};
 						int str{static_cast<int>(entry.str ())};
@@ -229,7 +259,7 @@ namespace Lettvin
 					}
 					os << "|\n";
 				}
-				os << '|' << string (80, '_') << "|\n";
+				os << '|' << string (5*COLS, '_') << "|\n";
 				os << '\n';
 			}
 			return os;
@@ -388,6 +418,40 @@ namespace Lettvin
 		}
 
 		//----------------------------------------------------------------------
+		/// @brief insert either case-sensitive or both case letters into tree
+		///
+		/// Distribute characters into state tables for searching.
+		void
+		insert (char* ac, auto& from, auto& next)
+		//----------------------------------------------------------------------
+		{
+			if (m_debug)
+			{
+				printf ("\tINSERT '%c' and '%c'\n", ac[0], ac[1]);
+			}
+#if GG_NIBBLES
+			// TODO implement nibbles insertion
+#else
+			Atom& e0{operator[] (from)[ac[0]]};
+			auto to{e0.tgt ()};
+			next = from;
+			if (to) {
+				from = to;
+			}
+			else
+			{
+				from = Table::size ();
+				operator++ ();
+			}
+			e0.tgt (from);
+			if (ac[0] != ac[1])
+			{
+				operator[] (next)[ac[1]].tgt (from);
+			}
+#endif
+		} // insert
+
+		//----------------------------------------------------------------------
 		/// @brief compile a single string argument
 		///
 		/// Distribute characters into state tables for searching.
@@ -402,8 +466,7 @@ namespace Lettvin
 			bool rejecting        {a_sign == -1};
 			auto from             {m_root};
 			auto next             {from};
-			auto to               {from};
-			vector<u08_t> last    {0,0};
+			char last[2]          {0,0};
 			auto& field           {rejecting ? m_reject : m_accept};
 			i24_t id              {a_sign*static_cast<i24_t> (field.size ())};
 
@@ -425,36 +488,12 @@ namespace Lettvin
 					{
 						last[0] = static_cast<char> (toupper (u));
 						last[1] = static_cast<char> (tolower (u));
-						Atom& ELEMENT{operator[] (from)[last[0]]};
-						Atom& element{operator[] (from)[last[1]]};
-						to = element.tgt ();
-						next = from;
-						if (to) {
-							from = to;
-						}
-						else
-						{
-							from = Table::size ();
-							operator++ ();
-						}
-						ELEMENT.tgt (from);
-						element.tgt (from);
+						insert (last, from, next);
 					}
 					else
 					{
-						last[0] = u;
-						Atom& element{operator[] (from)[last[1]]};
-						to = element.tgt ();
-						next = from;
-						if (to) {
-							from = to;
-						}
-						else
-						{
-							from = Table::size ();
-							operator++ ();
-						}
-						element.tgt (from);
+						last[0] = last[1] = u;
+						insert (last, from, next);
 					}
 				}
 				if (m_caseless)
@@ -486,24 +525,32 @@ namespace Lettvin
 			while (begin != string_view::npos && !done)
 			{
 				contents.remove_prefix (begin);
-				auto st{1};
-				auto pt{0};
+				auto tgt{1}; // State
+				auto str{0}; // 
 				// inner loop (Finite State Machine optimization)
 				for (auto c: contents)
 				{
-					auto element{operator[] (st)[c]};
-					st = element.tgt ();
-					pt = element.str ();
-					if (pt) {
-						if (pt < 0) return; ///< Immediate rejection
+#if GG_NIBBLES
+					// Two-step for nibbles
+					auto element{operator[] (tgt)[(c>>4)&0x0f]};
+					tgt = element.tgt ();
+					if (!tgt) break;
+					element = operator[] (tgt)[c&0x0f];
+#else
+					auto element{operator[] (tgt)[c]};
+#endif
+					tgt = element.tgt ();
+					str = element.str ();
+					if (str) {
+						if (str < 0) return; ///< Immediate rejection
 						// If not immediate rejection, add to rejected list
-						auto& chose{(pt>0)?accepted:rejected};
-						chose.insert (pt);
+						auto& chose{(str>0)?accepted:rejected};
+						chose.insert (str);
 						bool full_accept{m_accept.size () == accepted.size ()};
 						// completion optimization
 						done = (m_noreject && full_accept);
 					}
-					if (done || !st) break;
+					if (done || !tgt) break;
 				}
 				contents.remove_prefix (1);
 				begin = contents.find_first_of (m_firsts);

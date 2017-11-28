@@ -1,4 +1,6 @@
 	COMPILE +1: xy
+	INSERT 'X' and 'x'
+	INSERT 'Y' and 'y'
 	PLANE: 0
  ________________________________________________________________________________
 |                                                                                |
@@ -147,16 +149,19 @@
  1: xy
 	REJECT:
 	FIRSTS: Xx
-./gg
 ./tgz/gg.20171127042408.tgz
+./tgz/gg.20171127044254.tgz
 ./Makefile
+./.git/objects/db/68eb48cb3a28dcfd6f65bb175f15dca62e89a8
 ./.git/objects/67/ecb04dada4ee1f614f832472ee8b48951d936c
 ./.git/objects/99/1abaa2b545933e17ec5f24a8ff8e3881dfc833
 ./.git/objects/b4/b9ede683783ead17bf8cccd41ab1d748f3ca2e
 ./.git/objects/a8/d141b9a8fe2951e79d267a8266da5c7ca97f99
 ./.git/objects/1c/a4043cf4500e08e133e189835be30c61cdcf54
+./.git/objects/14/4ccb14f7bdcfcdd6faa3b92a512b5d9bb5ec80
 ./.git/objects/77/a7e8f8c1eea3ecef49061f8e5d4c2d46ac1622
 ./.git/objects/bb/f9a54f30621cff3981ddeb1d2d8139e0d0b7f5
+./.git/objects/26/44f755c54aa155d8080400930f9929938b9e91
 ./.git/objects/c9/1ca09d67fff50ecd1e4cede25ff33173c6006b
 ./.git/objects/c9/1db103ec22eb932245cf12b06484c63420d22d
 ./.git/objects/46/5c648c945131a9bbb1f9daa31b9746c48e8029
@@ -167,6 +172,7 @@
 ./.git/objects/28/9af5a9b61bae6167e0beb949577b9d3ae88e1a
 ./.git/objects/4c/6b0cb2a7d870c3b7e509911b107993efe8cfb9
 ./.git/objects/a4/eeae7f1036d5891ea540641dc6da3307df10b7
+./.git/objects/89/9c4bf40c0d0fc749609ce0dee5c683159a7d0c
 ./.git/objects/7f/234e5bcb26c63c3b6ddfe453821d63818354b2
 ./.git/objects/be/8d78a8e485cfe0c33b02074fcb28a0296bc23c
 ./.git/logs/refs/heads/master

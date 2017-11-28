@@ -152,6 +152,9 @@ This code uses two significant optimizations on string searches:
 ### Skipping
 C++ strings have a 'find_first_of' method optimizing skip to a valid initial char.
 
+### Tail comparison (TODO)
+Once subsequent chars must be unique, a memicmp outperforms the FSM.
+
 ### FSM (Finite State Machine)
 Memory is cheap (modern idiom) so
 very sparse tables are generated for
@@ -169,6 +172,7 @@ but code simplification merits this choice.
 * TODO find bug for when m_table is not reserved
 * TODO measure performance against fgrep/ack/ag
 * TODO ingest args with ctor but compile strs at beginning of ftor
+* TODO use memcmp for unique final string
 
 <hr />
 
