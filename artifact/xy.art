@@ -1,6 +1,6 @@
 	COMPILE +1: xy
-	INSERT 'X' and 'x'
-	INSERT 'Y' and 'y'
+	INSERT 58 and 78
+	INSERT 59 and 79
 	PLANE: 0
  ________________________________________________________________________________
 |                                                                                |

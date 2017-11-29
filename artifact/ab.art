@@ -1,6 +1,6 @@
 	COMPILE +1: ab
-	INSERT 'A' and 'a'
-	INSERT 'B' and 'b'
+	INSERT 41 and 61
+	INSERT 42 and 62
 	PLANE: 0
  ________________________________________________________________________________
 |                                                                                |
@@ -160,8 +160,6 @@
 ./tgz/gg.20171127044254.tgz
 ./tgz/gg.20171125150816.tgz
 ./Makefile
-./.git/refs/heads/master
-./.git/refs/remotes/origin/master
 ./.git/hooks/applypatch-msg.sample
 ./.git/hooks/update.sample
 ./.git/hooks/prepare-commit-msg.sample

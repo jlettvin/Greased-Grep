@@ -43,7 +43,7 @@ SOFTWARE.
 ```
 Greased Grep version 0.0.1
 
-Usage: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
+USAGE: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
 
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
@@ -53,22 +53,23 @@ Greased Grep search for files having (case insensitive):
         {str} are simple strings (no regex).
         {str} may be single-quoted to avoid shell interpretation.
 
-    [+]{str}
-        add accept string (+ optional)
+ARGUMENTS:
 
-    -{str}
-        add reject string
+    [+]{str}      # add accept string (+ optional)
 
-	-c
-        case sensitive search
+    -{str}        # add reject string
 
-    -s
-        suppress permission denied errors
+    {path}        # top directory for recursive search
 
-    {path}
-        top directory for recursive search
+OPTIONS:
 
-Examples:
+    -c            # case sensitive search
+
+    -n            # use nibbles (lower memory use half-speed search)
+
+    -s            # suppress permission denied errors
+
+EXAMPLES:
 
     gg include /usr/local/src
         # find all files having the string 'inlude' in /usr/local/src

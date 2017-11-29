@@ -22,12 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 _____________________________________________________________________________*/
 
-static const struct { unsigned major, minor, build; } s_version{0,0,1};
-
 static const char* Synopsis =
 R"Synopsis(Greased Grep version %u.%u.%u
 
-Usage: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
+USAGE: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
 
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
@@ -37,22 +35,23 @@ Greased Grep search for files having (case insensitive):
         {str} are simple strings (no regex).
         {str} may be single-quoted to avoid shell interpretation.
 
-    [+]{str}
-        add accept string (+ optional)
+ARGUMENTS:
 
-    -{str}
-        add reject string
+    [+]{str}      # add accept string (+ optional)
 
-    -c
-        case sensitive search
+    -{str}        # add reject string
 
-    -s
-        suppress permission denied errors
+    {path}        # top directory for recursive search
 
-    {path}
-        top directory for recursive search
+OPTIONS:
 
-Examples:
+    -c            # case sensitive search
+
+    -n            # use nibbles (lower memory use half-speed search)
+
+    -s            # suppress permission denied errors
+
+EXAMPLES:
 
     gg include /usr/local/src
         # find all files having the string 'inlude' in /usr/local/src
@@ -64,46 +63,71 @@ Examples:
         # Find all files with missing or other than Lettvin copyright.
 )Synopsis";
 
+//TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 // TODO find bug for when m_table is not reserved
 // TODO measure performance against fgrep/ack/ag
 // TODO ingest args with ctor but compile strs at beginning of ftor
 // TODO use memcmp for unique final string
+//TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
+//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 // Turn GG_COMPILE true to run compile AFTER command-line processing
 // For now, tests fail when GG_COMPILE is true
 #define GG_COMPILE false
 
-// Turn GG_NIBBLES true to reduce memory consumption by tables
-// This code is under development
-#define GG_NIBBLES false
+//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-#include <experimental/filesystem>
+//..............................................................................
+#include <experimental/filesystem> // recursive directory walk
 
-#include <fmt/printf.h>
+//..............................................................................
+#include <fmt/printf.h>            // modern printf
 
-#include <sys/types.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
+//..............................................................................
+#include <sys/mman.h>              // Memory mapping
+#include <sys/stat.h>              // File status via descriptor
 
-#include <unistd.h>
-#include <fcntl.h>
+//..............................................................................
+#include <unistd.h>                // file descriptor open/write/close
+#include <fcntl.h>                 // file descriptor open O_RDONLY
 
-#include <string_view>
-#include <iostream>  // sync_with_stdio
-#include <fstream>
-#include <iomanip>
-#include <string>
-#include <vector>
-#include <set>
+//..............................................................................
+#include <string_view>             // Improve performance on mmap of file
+#include <iostream>                // sync_with_stdio (mix printf with cout)
+#include <iomanip>                 // setw and other cout formatting
 
-static void synopsis (const char* a_message = nullptr);
+//..............................................................................
+#include <string>                  // container
+#include <vector>                  // container
+#include <set>                     // container
 
+//..............................................................................
+#include "gg.h"                    // version
+
+//NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 namespace Lettvin
 {
-	using namespace std;
 	namespace fs = std::experimental::filesystem;
+
+	using namespace std;  // No naming collisions in this small namespace
+
 	typedef unsigned char u08_t;
 	typedef int           i24_t;
+
+	//--------------------------------------------------------------------------
+	/// @brief synopsis (document usage in case of failure)
+	static
+	void
+	synopsis (const char* a_message)
+	//--------------------------------------------------------------------------
+	{
+		if (a_message != nullptr)
+		{
+			printf ("ERROR: %s\n\n", a_message);
+		}
+		printf (Synopsis, s_version.major, s_version.minor, s_version.build);
+		exit (1);
+	} // synopsis
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 	/// @brief Single state-transition element.
@@ -144,17 +168,16 @@ namespace Lettvin
 	//------
 	public:
 	//------
-		State () {}                                                ///< ctor
-		Atom& operator[] (u08_t a_off) { return m_handle[a_off]; } ///< indexer
+		State () : m_handle (s_size)      {                         } ///< ctor
+		Atom& operator[] (u08_t a_off)    { return m_handle[a_off]; } ///< index
+		static void nibbles (bool a_flag) { s_size = a_flag ? 16 : 256; }
 	//------
 	private:
 	//------
-#if GG_NIBBLES
-		Atom m_handle[16];
-#else
-		Atom m_handle[256];
-#endif
+		vector<Atom> m_handle;
+		static size_t s_size;
 	}; // class State
+	size_t State::s_size{256};
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 	/// @brief vector of state-transition planes sufficient to enable search
@@ -171,17 +194,24 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief Table ctor (reserve many, instance 2)
+		static
+		void
+		nibbles (bool a_flag)
+		//----------------------------------------------------------------------
+		{
+			s_nibbles = a_flag;
+			s_prefill = s_nibbles ? 2 : 1;
+			s_mask    = s_nibbles ? 0x0fULL : 0xffULL;
+		} // nibbles
+
+		//----------------------------------------------------------------------
+		/// @brief Table ctor (reserve many, instance 2)
 		Table ()
 		//----------------------------------------------------------------------
 		{
 			// TODO find bug for when m_table is not reserved
-#if GG_NIBBLES
-			size_t prefill=2;
-#else
-			size_t prefill=1;
-#endif
-			m_table.reserve (prefill*256);
-			for (size_t i=0; i < prefill; ++i)
+			m_table.reserve (s_prefill*256);
+			for (size_t i=0; i < s_prefill; ++i)
 			{
 				operator++ ();
 				operator++ ();
@@ -194,11 +224,7 @@ namespace Lettvin
 		operator[] (u08_t a_offset)
 		//----------------------------------------------------------------------
 		{
-#if GG_NIBBLES
-			return m_table[a_offset&0x0f];
-#else
-			return m_table[a_offset];
-#endif
+			return m_table[a_offset & s_mask];
 		} // operator[]
 
 		//----------------------------------------------------------------------
@@ -222,56 +248,58 @@ namespace Lettvin
 		//----------------------------------------------------------------------
 		/// @brief debug utility for displaying the entire table
 		ostream&
-		show_tables (ostream& os)
+		show_tables (ostream& a_os)
 		//----------------------------------------------------------------------
 		{
-#if GG_NIBBLES
-			size_t COLS{4};
-			size_t ROWS{4};
-#else
-			size_t COLS{16};
-			size_t ROWS{16};
-#endif
+			size_t COLS{s_nibbles ? 4ULL : 16ULL};
+			size_t ROWS{s_nibbles ? 4ULL : 16ULL};
 			for (size_t state=0; state < m_table.size (); ++state)
 			{
-				os << "\tPLANE: " << state << endl;
+				a_os << "\tPLANE: " << state << endl;
 				auto& plane{m_table[state]};
-				os << ' ' << string (5*COLS, '_') << '\n';
+				a_os << ' ' << string (5*COLS, '_') << '\n';
 				for (size_t row=0; row < ROWS*COLS; row+=COLS)
 				{
-					os << '|';
+					a_os << '|';
 					for (size_t col=0; col < COLS; ++col)
 					{
 						char id{static_cast<char>(row+col)};
 						Atom& entry{plane[id]};
 						int tgt{static_cast<int>(entry.tgt ())};
 						char gra{id>=' '&&id<='~'?id:' '};
-						if (tgt) os << gra << setw(3) << tgt << ' ';
-						else     os << "     ";
+						if (tgt) a_os << gra << setw(3) << tgt << ' ';
+						else     a_os << "     ";
 					}
-					os << "|\n|";
+					a_os << "|\n|";
 					for (size_t col=0; col < COLS; ++col)
 					{
 						Atom& entry{plane[row+col]};
 						int str{static_cast<int>(entry.str ())};
-						if (str) os << setw(4) << str << ' ';
-						else     os << "     ";
+						if (str) a_os << setw(4) << str << ' ';
+						else     a_os << "     ";
 					}
-					os << "|\n";
+					a_os << "|\n";
 				}
-				os << '|' << string (5*COLS, '_') << "|\n";
-				os << '\n';
+				a_os << '|' << string (5*COLS, '_') << "|\n";
+				a_os << '\n';
 			}
-			return os;
+			return a_os;
 		} // show_tables
 
 	//------
 	private:
 	//------
 
+		static bool   s_nibbles;
+		static size_t s_prefill;
+		static size_t s_mask;
+
 		vector<State> m_table; ///< State tables
 
 	}; // class Table
+	bool   Table::s_nibbles{false};
+	size_t Table::s_prefill{1};
+	size_t Table::s_mask{0xffULL};
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 	//__________________________________________________________________________
@@ -346,21 +374,24 @@ namespace Lettvin
 		ingest (string_view a_str)
 		//----------------------------------------------------------------------
 		{
-			if (a_str == "-d")
+			// Handle options
+			if (a_str.size () == 2 && a_str[0] == '-')
 			{
-				m_debug = 1;
-				return;
+				if (m_accept.size () > 1 || m_reject.size () > 1)
+				{
+					synopsis ("command-line options must precede other args");
+				}
+				switch (a_str[1])
+				{
+					case 'c': m_caseless = false; return;
+					case 'd': m_debug    =     1; return;
+					case 'n': m_nibbles  =  true; return;
+					case 's': m_suppress =  true; return;
+				}
+				synopsis (a_str.data ());
 			}
-			if (a_str == "-s")
-			{
-				m_suppress = true;
-				return;
-			}
-			else if (a_str == "-c")
-			{
-				m_caseless = false;
-				return;
-			}
+			State::nibbles (m_nibbles);
+			Table::nibbles (m_nibbles);
 
 			if (m_directory.size ())
 			{
@@ -389,16 +420,16 @@ namespace Lettvin
 		//----------------------------------------------------------------------
 		/// @brief ingest inserts state-transition table data
 		void
-		compile (int sign=0)
+		compile (int a_sign=0)
 		//----------------------------------------------------------------------
 		{
-			if (!sign)
+			if (!a_sign)
 			{
 				compile (+1);
 				compile (-1);
 				return;
 			}
-			bool rejecting {sign == -1};
+			bool rejecting {a_sign == -1};
 			auto& field    {rejecting ? m_reject : m_accept};
 			size_t I       {field.size ()};
 
@@ -412,7 +443,7 @@ namespace Lettvin
 				// This compile fails
 			for (size_t i = 1; i < I; ++i)
 			{
-				compile (sign, field[i]);
+				compile (a_sign, field[i]);
 			}
 #endif
 		}
@@ -421,34 +452,52 @@ namespace Lettvin
 		/// @brief insert either case-sensitive or both case letters into tree
 		///
 		/// Distribute characters into state tables for searching.
+		/// TODO nibbles handling is under development and may not work yet.
 		void
-		insert (char* ac, auto& from, auto& next)
+		insert (char* a_chars, auto& a_from, auto& a_next, bool a_nibbles=false)
 		//----------------------------------------------------------------------
 		{
 			if (m_debug)
 			{
-				printf ("\tINSERT '%c' and '%c'\n", ac[0], ac[1]);
+				printf ("\tINSERT %2.2x and %2.2x\n", a_chars[0], a_chars[1]);
 			}
-#if GG_NIBBLES
-			// TODO implement nibbles insertion
-#else
-			Atom& e0{operator[] (from)[ac[0]]};
-			auto to{e0.tgt ()};
-			next = from;
-			if (to) {
-				from = to;
+			auto c0{a_chars[0]};
+			auto c1{a_chars[1]};
+			// TODO validate nibbles insertion
+			if (a_nibbles && m_nibbles)
+			{
+				auto upper00{ c0     & 0x0f};
+				auto upper01{(c0>>4) & 0x0f};
+				auto lower10{ c1     & 0x0f};
+				auto lower11{(c1>>4) & 0x0f};
+				char hi[2], lo[2];
+				hi[0] = upper01;
+				hi[1] = lower11;
+				lo[0] = upper00;
+				lo[1] = lower10;
+				insert (hi, a_from, a_next, false);
+				insert (lo, a_from, a_next, false);
+				return;
 			}
 			else
 			{
-				from = Table::size ();
-				operator++ ();
+				Atom& element{operator[] (a_from)[c0]};
+				auto to{element.tgt ()};
+				a_next = a_from;
+				if (to) {
+					a_from = to;
+				}
+				else
+				{
+					a_from = Table::size ();
+					operator++ ();
+				}
+				element.tgt (a_from);
+				if (c0 != c1)
+				{
+					operator[] (a_next)[c1].tgt (a_from);
+				}
 			}
-			e0.tgt (from);
-			if (ac[0] != ac[1])
-			{
-				operator[] (next)[ac[1]].tgt (from);
-			}
-#endif
 		} // insert
 
 		//----------------------------------------------------------------------
@@ -488,12 +537,12 @@ namespace Lettvin
 					{
 						last[0] = static_cast<char> (toupper (u));
 						last[1] = static_cast<char> (tolower (u));
-						insert (last, from, next);
+						insert (last, from, next, m_nibbles);
 					}
 					else
 					{
 						last[0] = last[1] = u;
-						insert (last, from, next);
+						insert (last, from, next, m_nibbles);
 					}
 				}
 				if (m_caseless)
@@ -530,15 +579,15 @@ namespace Lettvin
 				// inner loop (Finite State Machine optimization)
 				for (auto c: contents)
 				{
-#if GG_NIBBLES
-					// Two-step for nibbles
-					auto element{operator[] (tgt)[(c>>4)&0x0f]};
-					tgt = element.tgt ();
-					if (!tgt) break;
-					element = operator[] (tgt)[c&0x0f];
-#else
-					auto element{operator[] (tgt)[c]};
-#endif
+					auto n00{c};
+					if (m_nibbles)
+					{
+						// Two-step for nibbles
+						n00 = c & 0xf;
+						auto element{operator[] (tgt)[(c>>4) & 0x0f]};
+						if (!element.tgt ()) break;
+					}
+					auto element = operator[] (tgt)[n00];
 					tgt = element.tgt ();
 					str = element.str ();
 					if (str) {
@@ -642,18 +691,18 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		void
-		show_tokens (ostream& os)
+		show_tokens (ostream& a_os)
 		//----------------------------------------------------------------------
 		{
-			os << "\tACCEPT:" << endl;
+			a_os << "\tACCEPT:" << endl;
 			for (size_t i=1; i < m_accept.size (); ++i)
 			{
-				os << setw (2) << i << ": " << m_accept[i] << endl;
+				a_os << setw (2) << i << ": " << m_accept[i] << endl;
 			}
-			os << "\tREJECT:" << endl;
+			a_os << "\tREJECT:" << endl;
 			for (size_t i=1; i < m_reject.size (); ++i)
 			{
-				os << setw (2) << i << ": " << m_reject[i] << endl;
+				a_os << setw (2) << i << ": " << m_reject[i] << endl;
 			}
 		} // show_tokens
 
@@ -665,6 +714,7 @@ namespace Lettvin
 		bool m_noreject{true};               ///< are there reject strings?
 		bool m_suppress{false};              ///< suppress error messages
 		bool m_caseless{true};               ///< turn on case insensitivity
+		bool m_nibbles {false};              ///< use small-plane nibble code
 
 		string_view m_directory;
 		string m_firsts;                     ///< string of {arg} first letters
@@ -672,30 +722,22 @@ namespace Lettvin
 	}; // class GreasedGrep
 
 } // namespace Lettvin
+//NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 
 //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 
 //------------------------------------------------------------------------------
-/// @brief synopsis (document usage in case of failure)
-static
-void
-synopsis (const char* a_message)
-//------------------------------------------------------------------------------
-{
-	if (a_message != nullptr) { printf ("ERROR: %s\n\n", a_message); }
-	printf (Synopsis, s_version.major, s_version.minor, s_version.build);
-	exit (1);
-} // synopsis
-
-//------------------------------------------------------------------------------
 /// @brief main (program execution entrypoint)
 int
-main (int argc, char** argv)
+main (int a_argc, char** a_argv)
 //------------------------------------------------------------------------------
 {
 	std::ios::sync_with_stdio (true);
-	if (argc < 3) synopsis ("At least one pattern and a directory required.");
-	Lettvin::GreasedGrep gg (argc, argv);
+	if (a_argc < 3)
+	{
+		Lettvin::synopsis ("At least one pattern and a directory required.");
+	}
+	Lettvin::GreasedGrep gg (a_argc, a_argv);
 	gg ();
 	return 0;
 } // main
