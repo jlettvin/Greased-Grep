@@ -286,13 +286,14 @@ namespace Lettvin
 			return a_os;
 		} // show_tables
 
+		static size_t s_mask;
+
 	//------
 	private:
 	//------
 
 		static bool   s_nibbles;
 		static size_t s_prefill;
-		static size_t s_mask;
 
 		vector<State> m_table; ///< State tables
 
@@ -454,13 +455,14 @@ namespace Lettvin
 		/// Distribute characters into state tables for searching.
 		/// TODO nibbles handling is under development and may not work yet.
 		void
-		insert (char* a_chars, auto& a_from, auto& a_next, bool a_nibbles=false)
+		insert (
+				char* a_chars,
+				auto& a_from,
+				auto& a_next,
+				bool a_stop=false,
+				bool a_nibbles=false)
 		//----------------------------------------------------------------------
 		{
-			if (m_debug)
-			{
-				printf ("\tINSERT %2.2x and %2.2x\n", a_chars[0], a_chars[1]);
-			}
 			auto c0{a_chars[0]};
 			auto c1{a_chars[1]};
 			// TODO validate nibbles insertion
@@ -475,12 +477,17 @@ namespace Lettvin
 				hi[1] = lower11;
 				lo[0] = upper00;
 				lo[1] = lower10;
-				insert (hi, a_from, a_next, false);
-				insert (lo, a_from, a_next, false);
+				insert (hi, a_from, a_next, a_stop, false);
+				insert (lo, a_from, a_next, a_stop, false);
 				return;
 			}
 			else
 			{
+				if (m_debug)
+				{
+					printf ("\tINSERT %2.2x and %2.2x on plane %x\n",
+							a_chars[0], a_chars[1], a_from);
+				}
 				Atom& element{operator[] (a_from)[c0]};
 				auto to{element.tgt ()};
 				a_next = a_from;
@@ -489,8 +496,15 @@ namespace Lettvin
 				}
 				else
 				{
-					a_from = Table::size ();
-					operator++ ();
+					//if (a_stop)
+					//{
+						//a_from = 0;
+					//}
+					//else
+					{
+						a_from = Table::size ();
+						operator++ ();
+					}
 				}
 				element.tgt (a_from);
 				if (c0 != c1)
@@ -512,12 +526,12 @@ namespace Lettvin
 			{
 				printf ("\tCOMPILE %+d: %s\n", a_sign, a_str.data ());
 			}
-			bool rejecting        {a_sign == -1};
-			auto from             {m_root};
-			auto next             {from};
-			char last[2]          {0,0};
-			auto& field           {rejecting ? m_reject : m_accept};
-			i24_t id              {a_sign*static_cast<i24_t> (field.size ())};
+			bool rejecting {a_sign == -1};
+			auto from      {m_root};
+			auto next      {from};
+			char last[2]   {0,0};
+			auto& field    {rejecting ? m_reject : m_accept};
+			i24_t id       {a_sign*static_cast<i24_t> (field.size () - 1)};
 
 			// Initially, the string as given is searched
 			// TODO generate variations like soundex/levenshtein, fatfinger
@@ -531,27 +545,34 @@ namespace Lettvin
 			{
 
 				// Insert a_str into state transition tree
-				for (char u:str)
+				for (size_t I=str.size () - 1, i=0; i <= I; ++i)
+				//for (char u:str)
 				{
+					char u{str[i]};
+					bool stop{i==I};
 					if (m_caseless)
 					{
 						last[0] = static_cast<char> (toupper (u));
 						last[1] = static_cast<char> (tolower (u));
-						insert (last, from, next, m_nibbles);
+						insert (last, from, next, stop, m_nibbles);
 					}
 					else
 					{
 						last[0] = last[1] = u;
-						insert (last, from, next, m_nibbles);
+						insert (last, from, next, stop, m_nibbles);
 					}
 				}
 				if (m_caseless)
 				{
-					for (auto c:last) operator[] (next)[c].str (id);
+					for (auto c:last) operator[] (next)[c&s_mask].str (id);
 				}
 				else
 				{
-					operator[] (next)[last[0]].str (id);
+					if (m_debug)
+					{
+						printf ("\tLINK %x %lx %x\n", next, last[0]&s_mask, id);
+					}
+					operator[] (next)[last[0]&s_mask].str (id);
 				}
 			}
 		}
@@ -585,7 +606,8 @@ namespace Lettvin
 						// Two-step for nibbles
 						n00 = c & 0xf;
 						auto element{operator[] (tgt)[(c>>4) & 0x0f]};
-						if (!element.tgt ()) break;
+						tgt = element.tgt ();
+						if (!tgt) break;
 					}
 					auto element = operator[] (tgt)[n00];
 					tgt = element.tgt ();

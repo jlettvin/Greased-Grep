@@ -1,6 +1,6 @@
 	COMPILE +1: ab
-	INSERT 41 and 61
-	INSERT 42 and 62
+	INSERT 41 and 61 on plane 1
+	INSERT 42 and 62 on plane 2
 	PLANE: 0
  ________________________________________________________________________________
 |                                                                                |
@@ -84,11 +84,11 @@
 |                                                                                |
 |                                                                                |
 |          B  3                                                                  |
-|             2                                                                  |
+|             1                                                                  |
 |                                                                                |
 |                                                                                |
 |          b  3                                                                  |
-|             2                                                                  |
+|             1                                                                  |
 |                                                                                |
 |                                                                                |
 |                                                                                |
@@ -153,12 +153,12 @@
 ./LICENSE
 ./old/gg1.cpp
 ./gg.cpp
-./gg1.cpp
 ./gg
 ./tgz/gg.20171125145034.tgz
 ./tgz/gg.20171126225054.tgz
 ./tgz/gg.20171127044254.tgz
 ./tgz/gg.20171125150816.tgz
+./tgz/gg.20171129001052.tgz
 ./Makefile
 ./.git/hooks/applypatch-msg.sample
 ./.git/hooks/update.sample

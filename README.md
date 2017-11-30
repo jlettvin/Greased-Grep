@@ -88,7 +88,7 @@ Here is is more specialized.
 
 
 ```
-./gg copyright -IBM brief -nevermore .
+$ ./gg copyright -IBM brief -nevermore .
 ```
 
 This command reads:
@@ -100,6 +100,19 @@ This command reads:
     not "IBM" and not "nevermore"
 	in the tree from "." down.
 ```
+
+On stackoverflow I requested an equivalent grep command-line and received:
+https://stackoverflow.com/questions/47562028/how-to-caseless-grep-listing-names-of-files-containing-all-of-several-strings-an
+
+```
+$ grep -FlirZ 'main' . \
+    | xargs -0 grep -FliZ 'copyright' \
+    | xargs -0 grep -FLi -e 'fcntl' -e 'namespace'
+```
+
+This is an excellent approach and still
+Greased-Grep will likely outperform it.
+It will be compared when performance testing is integrated.
 
 <hr />
 This code has been tested on:
