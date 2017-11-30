@@ -105,9 +105,9 @@ On stackoverflow I requested an equivalent grep command-line and received:
 https://stackoverflow.com/questions/47562028/how-to-caseless-grep-listing-names-of-files-containing-all-of-several-strings-an
 
 ```
-$ grep -FlirZ 'main' . \
-    | xargs -0 grep -FliZ 'copyright' \
-    | xargs -0 grep -FLi -e 'fcntl' -e 'namespace'
+$ grep -FlirZ 'copyright' . \
+    | xargs -0 grep -FliZ 'brief' \
+    | xargs -0 grep -FLi -e 'IBM' -e 'nevermore'
 ```
 
 This is an excellent approach and still
