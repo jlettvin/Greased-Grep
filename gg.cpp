@@ -50,7 +50,7 @@ OPTIONS:
 
     -c            # case sensitive search
 
-	-d            # turn on debugging output
+    -d            # turn on debugging output
 
     -n            # use nibbles (lower memory use half-speed search)
 
