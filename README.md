@@ -43,7 +43,7 @@ SOFTWARE.
 ```
 Greased Grep version 0.0.1
 
-USAGE: gg [-c] [-s] [+|-]{str} [[+|-]{str}...] {path} 
+USAGE: gg [-c] [-n] [-s] [-t] [+|-]{str} [[+|-]{str}...] {path} 
 
 Greased Grep search for files having (case insensitive):
     all instances of +{str} or {str} and
@@ -68,6 +68,8 @@ OPTIONS:
     -n            # use nibbles (lower memory use half-speed search)
 
     -s            # suppress permission denied errors
+
+    -t            # test algorithms (unit and timing)
 
 EXAMPLES:
 

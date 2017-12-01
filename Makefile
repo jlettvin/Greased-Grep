@@ -30,15 +30,15 @@ all: before gg test after
 ################################################################################
 .PHONY:
 test: FORCE
-	@./gg -d ab . > artifact/ab.art
-	@./gg -d xy . > artifact/xy.art
-	@./gg -s abc def ghi jkl .
-	@./gg -s -d +abc +def +ghi +jkl $(REJECT) .
-	@./gg -c -d -n AA .
+	./gg -d ab . > artifact/ab.art
+	./gg -d xy . > artifact/xy.art
+	./gg -s abc def ghi jkl .
+	./gg -s -d +abc +def +ghi +jkl $(REJECT) .
+	./gg -c -d -n AA .
 
 ################################################################################
-gg:	gg.cpp Makefile
-	@./reversion.py
+gg:	gg.cpp gg.h Makefile
+	@./reversion.py gg_version.h
 	$(CC) $(COPTS) -o gg gg.cpp $(LOPTS)
 
 ################################################################################
