@@ -209,9 +209,9 @@ show_tables (ostream& a_os)
 				char id{static_cast<char>(row+col)};
 				Atom& entry{plane[id]};
 				int tgt{static_cast<int>(entry.tgt ())};
-				char gra{id>=' '&&id<='~'?id:' '};
+				char gra{id>=' '&&id<='~'?id:'?'};
 				if (tgt) a_os << gra << setw(3) << tgt << ' ';
-				else     a_os << "     ";
+				else     a_os << ".....";
 			}
 			a_os << "|\n|";
 			for (size_t col=0; col < COLS; ++col)
@@ -219,7 +219,7 @@ show_tables (ostream& a_os)
 				Atom& entry{plane[row+col]};
 				int str{static_cast<int>(entry.str ())};
 				if (str) a_os << setw(4) << str << ' ';
-				else     a_os << "     ";
+				else     a_os << ".....";
 			}
 			a_os << "|\n";
 		}
@@ -253,6 +253,14 @@ operator() ()
 	if (m_test)
 	{
 		printf ("TESTS\n");
+		double minimized{1.0};
+		static const size_t overhead_loop_count{10};
+		for (size_t i=overhead_loop_count; i; --i)
+		{
+			minimized = min (minimized, interval (noop));
+		}
+		m_overhead = minimized;
+		cout << " # overhead min: " << m_overhead << endl;
 		return;
 	}
 
@@ -531,15 +539,17 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 		auto tgt{1}; // State
 		auto str{0}; // 
 		// inner loop (Finite State Machine optimization)
-		for (auto c: contents)
+		for (char c: contents)
 		{
-			auto n00{c};
-			if (m_nibbles)
+			char n00{c};
+			if (s_nibbles)
 			{
 				// Two-step for nibbles
-				n00 = c & 0xf;
-				auto element{operator[] (tgt)[(c>>4) & 0x0f]};
+				n00 = (c>>4) & 0xf;
+				Atom element{operator[] (tgt)[n00]};
 				tgt = element.tgt ();
+				n00 = c & 0xf;
+				cout << "\t\tNIBBLE! " << s_nibbles << ' ' << tgt << endl;
 				if (!tgt) break;
 			}
 			auto element = operator[] (tgt)[n00];
@@ -674,11 +684,18 @@ int
 main (int a_argc, char** a_argv)
 //------------------------------------------------------------------------------
 {
-	std::ios::sync_with_stdio (true);
-	fs::path app{fs::canonical (fs::path (a_argv[0]))};
-	s_path = const_cast<const char*>(app.c_str ());
-	Lettvin::GreasedGrep gg (a_argc, a_argv);
-	gg ();
+	try
+	{
+		std::ios::sync_with_stdio (true);
+		fs::path app{fs::canonical (fs::path (a_argv[0]))};
+		s_path = const_cast<const char*>(app.c_str ());
+		Lettvin::GreasedGrep gg (a_argc, a_argv);
+		gg ();
+	}
+	catch (...)
+	{
+		Lettvin::synopsis ("Unexpected signal caught.");
+	}
 	return 0;
 } // main
 #endif

@@ -19,7 +19,10 @@ EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
 ################################################################################
 CC=g++
-COPTS=-O3 -Wextra -Wall -Werror -std=c++17
+COPTS_BOTH=-Wextra -Wall -Werror -std=c++17
+COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
+COPTS_FINAL=-O3  $(COPTS_BOTH)
+COPTS=$(COPTS_DEBUG)
 LOPTS=-lfmt -lstdc++fs
 COBJS=gg
 ################################################################################
@@ -61,6 +64,7 @@ before:    FORCE
 ################################################################################
 .PHONY:
 after:    FORCE
+	@echo "$ gede --args gg -d -n aa test   # to debug"
 	@echo $$(yes '-' | head -n 40)
 	@seq 3 | xargs -I -- echo $$(yes '^' | head -n 40)
 	@echo $$(yes '-' | head -n 40)

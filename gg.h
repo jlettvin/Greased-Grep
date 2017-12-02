@@ -40,12 +40,14 @@ _____________________________________________________________________________*/
 
 //..............................................................................
 #include <string_view>             // Improve performance on mmap of file
+#include <functional>              // support the interval function
 #include <iostream>                // sync_with_stdio (mix printf with cout)
 #include <iomanip>                 // setw and other cout formatting
 
 //..............................................................................
 #include <string>                  // container
 #include <vector>                  // container
+#include <chrono>                  // steady_clock
 #include <set>                     // container
 
 //..............................................................................
@@ -61,9 +63,8 @@ namespace Lettvin
 	using namespace std;  // No naming collisions in this small namespace
 
 	//--------------------------------------------------------------------------
-	/// @brief synopsis (document usage in case of failure)
-	void synopsis (const char* a_message);
-	void nibbles ();
+	void synopsis (const char* a_message); ///< report errors and exit
+	void nibbles ();                       ///< convert to nibbles not bytes
 	//--------------------------------------------------------------------------
 
 	typedef unsigned char u08_t;
@@ -73,6 +74,35 @@ namespace Lettvin
 	size_t s_prefill {1};
 	size_t s_mask    {0xffULL};
 	size_t s_size    {256};
+
+	//--------------------------------------------------------------------------
+	void noop () {}
+	//--------------------------------------------------------------------------
+
+	//--------------------------------------------------------------------------
+	/// @brief measure time to perform a function
+	template<typename T>
+	double interval (T a_fun, const char* a_message=nullptr)
+	//--------------------------------------------------------------------------
+	{
+		chrono::steady_clock::time_point t0 = chrono::steady_clock::now ();
+		a_fun ();
+		chrono::steady_clock::time_point t1 = chrono::steady_clock::now ();
+		chrono::duration<double> time_span =
+			chrono::duration_cast<chrono::duration<double>>(t1 - t0);
+
+		double seconds  = time_span.count();
+
+		if (a_message)
+		{
+			cout
+				<< " # gg interval: " << seconds
+				<< " seconds for " << a_message
+				<< endl;
+		}
+		return seconds;
+	}
+
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 	/// @brief Single state-transition element.
@@ -241,6 +271,7 @@ namespace Lettvin
 		bool m_caseless{true};               ///< turn on case insensitivity
 		bool m_nibbles {false};              ///< use small-plane nibble code
 		bool m_test    {false};              ///< run unit and timing tests
+		double m_overhead;                   ///< interval for noop
 
 		string_view m_directory;
 		string m_firsts;                     ///< string of {arg} first letters
