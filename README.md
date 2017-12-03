@@ -59,7 +59,7 @@ ARGUMENTS:
 
     -{str}        # add reject string
 
-    {path}        # top directory for recursive search
+    {path}        # file or top directory for recursive search
 
 OPTIONS:
 
@@ -72,6 +72,10 @@ OPTIONS:
     -s            # suppress permission denied errors
 
     -t            # test algorithms (unit and timing)
+
+OUTPUT:
+
+    canonical paths of files fulfilling the set conditions.
 
 EXAMPLES:
 

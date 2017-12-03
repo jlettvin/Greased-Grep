@@ -44,7 +44,7 @@ ARGUMENTS:
 
     -{str}        # add reject string
 
-    {path}        # top directory for recursive search
+    {path}        # file or top directory for recursive search
 
 OPTIONS:
 
@@ -57,6 +57,10 @@ OPTIONS:
     -s            # suppress permission denied errors
 
     -t            # test algorithms (unit and timing)
+
+OUTPUT:
+
+    canonical paths of files fulfilling the set conditions.
 
 EXAMPLES:
 
@@ -200,11 +204,16 @@ show_tables (ostream& a_os)
 	{
 		a_os << "\tPLANE: " << state << endl;
 		auto& plane{m_table[state]};
-		a_os << ' ' << string (5*COLS, '_') << '\n';
-		for (size_t row=0; row < ROWS*COLS; row+=COLS)
+		for (unsigned col=0; col < COLS; ++col)
+		{
+			printf ("   %2.2x", col);
+		}
+		a_os << endl;
+		a_os << ' ' << string (5*COLS, '_') << endl;
+		for (unsigned row=0; row < ROWS*COLS; row+=COLS)
 		{
 			a_os << '|';
-			for (size_t col=0; col < COLS; ++col)
+			for (unsigned col=0; col < COLS; ++col)
 			{
 				char id{static_cast<char>(row+col)};
 				Atom& entry{plane[id]};
@@ -213,7 +222,7 @@ show_tables (ostream& a_os)
 				if (tgt) a_os << gra << setw(3) << tgt << ' ';
 				else     a_os << ".....";
 			}
-			a_os << "|\n|";
+			printf ("|\n|");
 			for (size_t col=0; col < COLS; ++col)
 			{
 				Atom& entry{plane[row+col]};
@@ -221,9 +230,9 @@ show_tables (ostream& a_os)
 				if (str) a_os << setw(4) << str << ' ';
 				else     a_os << ".....";
 			}
-			a_os << "|\n";
+			printf ("|%2.2x\n", row);
 		}
-		a_os << '|' << string (5*COLS, '_') << "|\n";
+		a_os << '|' << string (5*COLS, '_') << "|" << endl;
 		a_os << '\n';
 	}
 	return a_os;
@@ -265,7 +274,7 @@ operator() ()
 	}
 
 	// Validate sufficient args.
-	if (m_directory.size () < 1 &&
+	if (m_target.size () < 1 &&
 		((m_accept.size () < 2) && (m_reject.size () < 2)))
 	{
 		Lettvin::synopsis ("A pattern and directory required.");
@@ -278,31 +287,39 @@ operator() ()
 	}
 
 	// Check for valid directory
-	if (!fs::is_directory (m_directory))
+	if (!fs::is_directory (m_target) &&
+		!fs::is_regular_file (m_target))
 	{
-		synopsis ("last arg must be dir");
+		synopsis ("last arg must be dir or file");
 	}
 
 	// Compile and check for collisions between accept and reject lists
 	compile ();
 
 	// Initialize firsts to enable buffer skipping
-	for (size_t i=0; i<256; ++i)
-	{
-		const Atom& element (m_state1[i]);
-		auto t{element.tgt ()};
-		if (t) m_firsts += static_cast<u08_t>(i);
-	}
+	debugf (1, "FIRSTS B: '%s'\n", m_firsts.c_str ());
+	sort (m_firsts.begin (), m_firsts.end ());
+	auto last = unique (m_firsts.begin (), m_firsts.end ());
+	m_firsts.erase (last, m_firsts.end ());
+	debugf (1, "FIRSTS A: '%s'\n", m_firsts.c_str ());
 
 	// Visually inspect planes
 	if (m_debug)
 	{
 		show_tables (cout);
 		show_tokens (cout);
-		cout << "\tFIRSTS: " << m_firsts << endl;
 	}
+	debugf (1, "FIRSTS: %s\n", m_firsts.c_str ());
+
 	// Find files and search contents
-	walk (m_directory);
+	if (fs::is_directory (m_target))
+	{
+		walk (m_target);
+	}
+	else
+	{
+		mapped_search (m_target.data ());
+	}
 
 } // operator ()
 
@@ -331,9 +348,9 @@ ingest (string_view a_str)
 		synopsis (a_str.data ());
 	}
 
-	if (m_directory.size ())
+	if (m_target.size ())
 	{
-		string_view candidate {m_directory};
+		string_view candidate {m_target};
 
 		char c0               {candidate[0]};
 		bool rejecting        {c0 == '-'};
@@ -352,7 +369,7 @@ ingest (string_view a_str)
 		compile (sign, candidate);
 #endif
 	}
-	m_directory = a_str;
+	m_target = a_str;
 } // ingest
 
 //----------------------------------------------------------------------
@@ -391,7 +408,6 @@ compile (int a_sign)
 /// @brief insert either case-sensitive or both case letters into tree
 ///
 /// Distribute characters into state tables for searching.
-/// TODO nibbles handling is under development and may not work yet.
 void
 Lettvin::GreasedGrep::
 insert (
@@ -404,7 +420,6 @@ insert (
 {
 	auto c0{a_chars[0]};
 	auto c1{a_chars[1]};
-	// TODO validate nibbles insertion
 	if (a_nibbles && m_nibbles)
 	{
 		auto upper00{ c0     & 0x0f};
@@ -422,11 +437,8 @@ insert (
 	}
 	else
 	{
-		if (m_debug)
-		{
-			printf ("\tINSERT %2.2x and %2.2x on plane %x\n",
-					a_chars[0], a_chars[1], a_from);
-		}
+		debugf (1, "INSERT %2.2x and %2.2x on plane %x\n",
+				a_chars[0], a_chars[1], a_from);
 		Atom& element{operator[] (a_from)[c0]};
 		auto to{element.tgt ()};
 		a_next = a_from;
@@ -435,15 +447,8 @@ insert (
 		}
 		else
 		{
-			//if (a_stop)
-			//{
-				//a_from = 0;
-			//}
-			//else
-			{
-				a_from = Table::size ();
-				operator++ ();
-			}
+			a_from = Table::size ();
+			operator++ ();
 		}
 		element.tgt (a_from);
 		if (c0 != c1)
@@ -462,10 +467,7 @@ Lettvin::GreasedGrep::
 compile (int a_sign, string_view a_str)
 //----------------------------------------------------------------------
 {
-	if (m_debug)
-	{
-		printf ("\tCOMPILE %+d: %s\n", a_sign, a_str.data ());
-	}
+	debugf (1, "COMPILE %+d: %s\n", a_sign, a_str.data ());
 	bool rejecting {a_sign == -1};
 	auto from      {m_root};
 	auto next      {from};
@@ -483,6 +485,16 @@ compile (int a_sign, string_view a_str)
 	// Insert variations into transition tree
 	for (auto& str: strs)
 	{
+		// Insert initial char of str for skipping.
+		if (m_caseless)
+		{
+			m_firsts += static_cast<char> (toupper (str[0]));
+			m_firsts += static_cast<char> (tolower (str[0]));
+		}
+		else
+		{
+			m_firsts += str[0];
+		}
 
 		// Insert a_str into state transition tree
 		for (size_t I=str.size () - 1, i=0; i <= I; ++i)
@@ -508,10 +520,7 @@ compile (int a_sign, string_view a_str)
 		}
 		else
 		{
-			if (m_debug)
-			{
-				printf ("\tLINK %x %lx %x\n", next, last[0]&s_mask, id);
-			}
+			debugf (1, "LINK %x %lx %x\n", next, last[0]&s_mask, id);
 			operator[] (next)[last[0]&s_mask].str (id);
 		}
 	}
@@ -527,6 +536,7 @@ Lettvin::GreasedGrep::
 search (void* a_pointer, auto a_bytecount, const char* a_label)
 //----------------------------------------------------------------------
 {
+	//debugf (1, "SEARCH %s\n", a_label);
 	set<i24_t> accepted  {0};
 	set<i24_t> rejected  {};
 	string_view contents (static_cast<char*> (a_pointer), a_bytecount);
@@ -535,22 +545,29 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 	// outer loop (skip optimization)
 	while (begin != string_view::npos && !done)
 	{
+		//debugf (1, "ANCHOR\n");
 		contents.remove_prefix (begin);
 		auto tgt{1}; // State
 		auto str{0}; // 
 		// inner loop (Finite State Machine optimization)
 		for (char c: contents)
 		{
-			char n00{c};
+			//debugf (1, "OFFSET\n");
+			auto n00{c};
 			if (s_nibbles)
 			{
 				// Two-step for nibbles
 				n00 = (c>>4) & 0xf;
-				Atom element{operator[] (tgt)[n00]};
+				//debugf (1, "NIBBLE H %2.2x %2.2x\n", n00, tgt);
+				auto element{operator[] (tgt)[n00]};
 				tgt = element.tgt ();
 				n00 = c & 0xf;
-				cout << "\t\tNIBBLE! " << s_nibbles << ' ' << tgt << endl;
+				//debugf (1, "NIBBLE L %2.2x %2.2x\n", n00, tgt);
 				if (!tgt) break;
+			}
+			else
+			{
+				//debugf (1, "BYTE %c\n", c);
 			}
 			auto element = operator[] (tgt)[n00];
 			tgt = element.tgt ();
@@ -605,7 +622,11 @@ mapped_search (const char* a_filename)
 				fd,
 				0);
 
-		if (contents != MAP_FAILED)
+		if (contents == MAP_FAILED)
+		{
+			debugf (1, "MAP FAILED: %s\n", a_filename);
+		}
+		else
 		{
 			search (contents, filesize, a_filename);
 			int rc = munmap (contents, filesize);
@@ -613,6 +634,10 @@ mapped_search (const char* a_filename)
 		}
 
 		close (fd);
+	}
+	else
+	{
+		debugf (1, "OPEN FAILED: %s\n", a_filename);
 	}
 } // mapped_search
 

@@ -43,6 +43,7 @@ _____________________________________________________________________________*/
 #include <functional>              // support the interval function
 #include <iostream>                // sync_with_stdio (mix printf with cout)
 #include <iomanip>                 // setw and other cout formatting
+#include <cstdarg>                 // vararg
 
 //..............................................................................
 #include <string>                  // container
@@ -217,6 +218,27 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief ingest inserts state-transition table data
+		int debugf (size_t a_debug, const char *fmt, ...)
+		//----------------------------------------------------------------------
+		{
+			int ret = 0;
+			if (m_debug >= a_debug)
+			{
+				va_list args;
+				va_start(args, fmt);
+				for (size_t i=0; i < a_debug; ++i)
+				{
+					printf ("\t");
+				}
+				printf ("DBG(%lu): ", a_debug);
+				ret = vprintf(fmt, args);
+				va_end(args);
+			}
+			return ret;
+		}
+
+		//----------------------------------------------------------------------
+		/// @brief ingest inserts state-transition table data
 		void ingest (string_view a_str);
 
 		//----------------------------------------------------------------------
@@ -227,7 +249,6 @@ namespace Lettvin
 		/// @brief insert either case-sensitive or both case letters into tree
 		///
 		/// Distribute characters into state tables for searching.
-		/// TODO nibbles handling is under development and may not work yet.
 		void insert (
 				char* a_chars,
 				auto& a_from,
@@ -273,7 +294,7 @@ namespace Lettvin
 		bool m_test    {false};              ///< run unit and timing tests
 		double m_overhead;                   ///< interval for noop
 
-		string_view m_directory;
+		string_view m_target;
 		string m_firsts;                     ///< string of {arg} first letters
 		State& m_state1{operator[] (m_root)};///< root state plane
 	}; // class GreasedGrep
