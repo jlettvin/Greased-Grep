@@ -79,6 +79,7 @@ EXAMPLES:
 // TODO measure performance against fgrep/ack/ag
 // TODO ingest args with ctor but compile strs at beginning of ftor
 // TODO use memcmp for unique final string
+// TODO run searches in threads for higher performance
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
