@@ -81,11 +81,27 @@ namespace Lettvin
 	typedef unsigned char u08_t;
 	typedef int           i24_t;
 
-	bool   s_nibbles{false};
-	size_t s_prefill {1};
-	size_t s_mask    {0xffULL};
-	size_t s_size    {256};
+	bool   s_caseless{true};             ///< turn on case insensitivity
+	bool   s_nibbles {false};            ///< nibble planes replace bute planes
+	bool   s_suppress{false};            ///< suppress error messages
+
+	bool   s_noreject{true};             ///< are there reject strings?
+	bool   s_test    {false};            ///< run unit and timing tests
+
+	u08_t  s_root    {1};                ///< syntax tree root plane number
+
 	size_t s_debug   {0};
+	size_t s_mask    {0xffULL};
+	size_t s_prefill {1};
+	size_t s_size    {256};
+
+	double s_overhead;                   ///< interval for noop
+
+	string s_firsts;                     ///< string of {arg} first letters
+	string_view s_target;
+
+	vector<string_view> s_accept {{""}}; ///< list of accept {str} args
+	vector<string_view> s_reject {{""}}; ///< list of reject {str} args
 
 	//--------------------------------------------------------------------------
 	void noop () {}
@@ -196,11 +212,39 @@ namespace Lettvin
 		/// @brief debug utility for displaying the entire table
 		ostream& show_tables (ostream& a_os);
 
+		//----------------------------------------------------------------------
+		/// @brief insert strings into tables
+		void insert (string_view a_str, i24_t id);
+
+		//----------------------------------------------------------------------
+		/// @brief find and report found strings
+		///
+		/// when reject list is empty, terminate on completion of accept list
+		/// when reject list is non-empty, terminate on first reject
+		void search (void* a_pointer, auto a_bytecount, const char* a_label="");
+
+	//--------
+	protected:
+	//--------
+
+		//dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+		vector<State> m_table;                       ///< State tables
+		State&        m_state1{operator[] (s_root)}; ///< root state plane
+
 	//------
 	private:
 	//------
 
-		vector<State> m_table; ///< State tables
+		//----------------------------------------------------------------------
+		/// @brief insert either case-sensitive or both case letters into tree
+		///
+		/// Distribute characters into state tables for searching.
+		void insert (
+				char* a_chars,
+				auto& a_from,
+				auto& a_next,
+				bool a_stop=false,
+				bool a_nibbles=false);
 
 	}; // class Table
 
@@ -211,6 +255,7 @@ namespace Lettvin
 	GreasedGrep : public Table
 	//__________________________________________________________________________
 	{
+		friend class Table;
 	//------
 	public:
 	//------
@@ -242,28 +287,10 @@ namespace Lettvin
 		void compile (int a_sign=0);
 
 		//----------------------------------------------------------------------
-		/// @brief insert either case-sensitive or both case letters into tree
-		///
-		/// Distribute characters into state tables for searching.
-		void insert (
-				char* a_chars,
-				auto& a_from,
-				auto& a_next,
-				bool a_stop=false,
-				bool a_nibbles=false);
-
-		//----------------------------------------------------------------------
 		/// @brief compile a single string argument
 		///
 		/// Distribute characters into state tables for searching.
 		void compile (int a_sign, string_view a_str);
-
-		//----------------------------------------------------------------------
-		/// @brief find and report found strings
-		///
-		/// when reject list is empty, terminate on completion of accept list
-		/// when reject list is non-empty, terminate on first reject
-		void search (void* a_pointer, auto a_bytecount, const char* a_label="");
 
 		//----------------------------------------------------------------------
 		/// @brief map file into memory and call search
@@ -278,20 +305,6 @@ namespace Lettvin
 		//----------------------------------------------------------------------
 		void show_tokens (ostream& a_os);
 
-		//dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
-		vector<string_view> m_accept {{""}}; ///< list of accept {str} args
-		vector<string_view> m_reject {{""}}; ///< list of reject {str} args
-		u08_t m_root{1};                     ///< syntax tree root plane number
-		bool m_noreject{true};               ///< are there reject strings?
-		bool m_suppress{false};              ///< suppress error messages
-		bool m_caseless{true};               ///< turn on case insensitivity
-		bool m_nibbles {false};              ///< use small-plane nibble code
-		bool m_test    {false};              ///< run unit and timing tests
-		double m_overhead;                   ///< interval for noop
-
-		string_view m_target;
-		string m_firsts;                     ///< string of {arg} first letters
-		State& m_state1{operator[] (m_root)};///< root state plane
 	}; // class GreasedGrep
 
 } // namespace Lettvin

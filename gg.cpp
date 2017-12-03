@@ -131,7 +131,7 @@ void Lettvin::synopsis (const char* a_message, ...)
 {
 	if (a_message != nullptr)
 	{
-		printf ("ERROR: %s\n\n", a_message);
+		printf (" # ERROR: ");
 	}
 	va_list args;
 	va_start(args, a_message);
@@ -179,7 +179,9 @@ Lettvin::debugf (size_t a_debug, const char *fmt, ...)
 		va_end(args);
 	}
 	return ret;
-}
+} // debugf
+
+//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 //------------------------------------------------------------------------------
 Lettvin::Table::
@@ -267,218 +269,12 @@ show_tables (ostream& a_os)
 	return a_os;
 } // show_tables
 
-
-//------------------------------------------------------------------------------
-/// @brief ctor
-Lettvin::GreasedGrep::
-GreasedGrep (int a_argc, char** a_argv) // ctor
-//------------------------------------------------------------------------------
-{
-	while (--a_argc)
-	{
-		ingest (*++a_argv);
-	}
-} // ctor
-
-//------------------------------------------------------------------------------
-/// @brief ftor
-void
-Lettvin::GreasedGrep::
-operator() ()
-//------------------------------------------------------------------------------
-{
-	// Run unit and timing tests.
-	if (m_test)
-	{
-		printf ("TESTS\n");
-		double minimized{1.0};
-		static const size_t overhead_loop_count{10};
-		for (size_t i=overhead_loop_count; i; --i)
-		{
-			minimized = min (minimized, interval (noop));
-		}
-		m_overhead = minimized;
-		cout << " # overhead min: " << m_overhead << endl;
-		return;
-	}
-
-	// Validate sufficient args.
-	if (m_target.size () < 1 &&
-		((m_accept.size () < 2) && (m_reject.size () < 2)))
-	{
-		Lettvin::synopsis ("A pattern and directory required.");
-	}
-
-	// Validate ingested args
-	if (m_accept.size () < 2 && m_reject.size () < 2)
-	{
-		synopsis ("specify at least one accept or reject str");
-	}
-
-	// Check for valid directory
-	if (!fs::is_directory (m_target) &&
-		!fs::is_regular_file (m_target))
-	{
-		synopsis ("last arg must be dir or file");
-	}
-
-	// Compile and check for collisions between accept and reject lists
-	compile ();
-
-	// Initialize firsts to enable buffer skipping
-	debugf (1, "FIRSTS B: '%s'\n", m_firsts.c_str ());
-	sort (m_firsts.begin (), m_firsts.end ());
-	auto last = unique (m_firsts.begin (), m_firsts.end ());
-	m_firsts.erase (last, m_firsts.end ());
-	debugf (1, "FIRSTS A: '%s'\n", m_firsts.c_str ());
-
-	// Visually inspect planes
-	if (s_debug)
-	{
-		show_tables (cout);
-		show_tokens (cout);
-	}
-	debugf (1, "FIRSTS: %s\n", m_firsts.c_str ());
-
-	// Find files and search contents
-	if (fs::is_directory (m_target))
-	{
-		walk (m_target);
-	}
-	else
-	{
-		mapped_search (m_target.data ());
-	}
-
-} // operator ()
-
-//------------------------------------------------------------------------------
-/// @brief ingest inserts state-transition table data
-bool
-Lettvin::GreasedGrep::
-option (string_view a_str)
-//------------------------------------------------------------------------------
-{
-	size_t size {a_str.size ()};
-	bool two    {size == 2};
-	bool more   {size >  2};
-	bool minus1 {a_str[0] == '-'};
-	bool opt    {two && minus1};
-	bool bad    {!(two || more)};
-	bool strs   {m_accept.size () > 1 || m_reject.size () > 1};
-	bool nbls   {m_nibbles};
-	char letter {two ? a_str[1] : '\0'};
-
-	if (!minus1)
-	{
-		return false;
-	}
-
-	if (strs)
-	{
-		synopsis ("(%s) options must precede other args", a_str.data ());
-	}
-	if (bad)
-	{
-		synopsis ("command-line options must be two or more chars");
-	}
-
-	if      (a_str == "--caseless" || (opt && letter == 'c')) m_caseless = true;
-	else if (a_str == "--debug"    || (opt && letter == 'd')) s_debug   += 1;
-	else if (a_str == "--nibbles"  || (opt && letter == 'n')) m_nibbles  = true;
-	else if (a_str == "--suppress" || (opt && letter == 's')) m_suppress = true;
-	else if (a_str == "--test"     || (opt && letter == 't')) m_test     = true;
-	else if (opt)
-	{
-		synopsis ("unknown arg");
-	}
-	else
-	{
-		return false;
-	}
-	if (m_nibbles && !nbls)
-	{
-		nibbles ();
-	}
-	return true;
-}
-
-//------------------------------------------------------------------------------
-/// @brief ingest inserts state-transition table data
-void
-Lettvin::GreasedGrep::
-ingest (string_view a_str)
-//------------------------------------------------------------------------------
-{
-	// Handle options
-	size_t size{a_str.size ()};
-	bool minus1{size == 2 && a_str[0] == '-'};
-	bool minus2{size >= 3 && a_str[0] == '-' && a_str[1] == '-'};
-
-	if ((minus1 || minus2) && option (a_str)) return;
-
-	if (m_target.size ())
-	{
-		string_view candidate {m_target};
-
-		char c0               {candidate[0]};
-		bool rejecting        {c0 == '-'};
-		auto& field           {rejecting ? m_reject : m_accept};
-
-		candidate.remove_prefix ((c0=='+' || c0=='-') ? 1 : 0);
-
-		if (candidate.size () < 2)
-		{
-			synopsis ("pattern strings must be longer than 1 byte");
-		}
-		field.push_back (candidate);
-#if !GG_COMPILE
-		// This compile passes
-		i24_t sign            {rejecting?-1:+1};
-		compile (sign, candidate);
-#endif
-	}
-	m_target = a_str;
-} // ingest
-
-//------------------------------------------------------------------------------
-/// @brief ingest inserts state-transition table data
-void
-Lettvin::GreasedGrep::
-compile (int a_sign)
-//------------------------------------------------------------------------------
-{
-	if (!a_sign)
-	{
-		compile (+1);
-		compile (-1);
-		return;
-	}
-	bool rejecting {a_sign == -1};
-	auto& field    {rejecting ? m_reject : m_accept};
-	size_t I       {field.size ()};
-
-	//< m_noreject optimizes inner loop
-	if (rejecting && I > 1)
-	{
-		m_noreject = false;
-	}
-
-#if GG_COMPILE
-		// This compile fails
-	for (size_t i = 1; i < I; ++i)
-	{
-		compile (a_sign, field[i]);
-	}
-#endif
-}
-
 //------------------------------------------------------------------------------
 /// @brief insert either case-sensitive or both case letters into tree
 ///
 /// Distribute characters into state tables for searching.
 void
-Lettvin::GreasedGrep::
+Lettvin::Table::
 insert (
 		char* a_chars,
 		auto& a_from,
@@ -489,7 +285,7 @@ insert (
 {
 	auto c0{a_chars[0]};
 	auto c1{a_chars[1]};
-	if (a_nibbles && m_nibbles)
+	if (a_nibbles && s_nibbles)
 	{
 		auto upper00{ c0     & 0x0f};
 		auto upper01{(c0>>4) & 0x0f};
@@ -528,70 +324,52 @@ insert (
 } // insert
 
 //------------------------------------------------------------------------------
-/// @brief compile a single string argument
-///
-/// Distribute characters into state tables for searching.
+/// @brief insert strings into tables
 void
-Lettvin::GreasedGrep::
-compile (int a_sign, string_view a_str)
-//------------------------------------------------------------------------------
+Lettvin::Table::
+insert (string_view a_str, i24_t id)
 {
-	debugf (1, "COMPILE %+d: %s\n", a_sign, a_str.data ());
-	bool rejecting {a_sign == -1};
-	auto from      {m_root};
+	auto from      {s_root};
 	auto next      {from};
 	char last[2]   {0,0};
-	auto& field    {rejecting ? m_reject : m_accept};
-	i24_t id       {a_sign*static_cast<i24_t> (field.size () - 1)};
 
-	// Initially, the string as given is searched
-	// TODO generate variations like soundex/levenshtein, fatfinger
-	// TODO handle collision for variations
-	// e.g. "than" and "then" are legitimate mutual variations.
-	vector<string> strs;
-	strs.emplace_back (string(a_str));
-
-	// Insert variations into transition tree
-	for (auto& str: strs)
+	// Insert initial char of str for skipping.
+	if (s_caseless)
 	{
-		// Insert initial char of str for skipping.
-		if (m_caseless)
-		{
-			m_firsts += static_cast<char> (toupper (str[0]));
-			m_firsts += static_cast<char> (tolower (str[0]));
-		}
-		else
-		{
-			m_firsts += str[0];
-		}
+		s_firsts += static_cast<char> (toupper (a_str[0]));
+		s_firsts += static_cast<char> (tolower (a_str[0]));
+	}
+	else
+	{
+		s_firsts += a_str[0];
+	}
 
-		// Insert a_str into state transition tree
-		for (size_t I=str.size () - 1, i=0; i <= I; ++i)
+	// Insert a_str into state transition tree
+	for (size_t I=a_str.size () - 1, i=0; i <= I; ++i)
 		//for (char u:str)
+	{
+		char u{a_str[i]};
+		bool stop{i==I};
+		if (s_caseless)
 		{
-			char u{str[i]};
-			bool stop{i==I};
-			if (m_caseless)
-			{
-				last[0] = static_cast<char> (toupper (u));
-				last[1] = static_cast<char> (tolower (u));
-				insert (last, from, next, stop, m_nibbles);
-			}
-			else
-			{
-				last[0] = last[1] = u;
-				insert (last, from, next, stop, m_nibbles);
-			}
-		}
-		if (m_caseless)
-		{
-			for (auto c:last) operator[] (next)[c&s_mask].str (id);
+			last[0] = static_cast<char> (toupper (u));
+			last[1] = static_cast<char> (tolower (u));
+			insert (last, from, next, stop, s_nibbles);
 		}
 		else
 		{
-			debugf (1, "LINK %x %lx %x\n", next, last[0]&s_mask, id);
-			operator[] (next)[last[0]&s_mask].str (id);
+			last[0] = last[1] = u;
+			insert (last, from, next, stop, s_nibbles);
 		}
+	}
+	if (s_caseless)
+	{
+		for (auto c:last) operator[] (next)[c&s_mask].str (id);
+	}
+	else
+	{
+		debugf (1, "LINK %x %lx %x\n", next, last[0]&s_mask, id);
+		operator[] (next)[last[0]&s_mask].str (id);
 	}
 }
 
@@ -601,7 +379,7 @@ compile (int a_sign, string_view a_str)
 /// when reject list is empty, terminate on completion of accept list
 /// when reject list is non-empty, terminate on first reject
 void
-Lettvin::GreasedGrep::
+Lettvin::Table::
 search (void* a_pointer, auto a_bytecount, const char* a_label)
 //------------------------------------------------------------------------------
 {
@@ -609,7 +387,7 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 	set<i24_t> accepted  {0};
 	set<i24_t> rejected  {};
 	string_view contents (static_cast<char*> (a_pointer), a_bytecount);
-	size_t begin = contents.find_first_of (m_firsts);
+	size_t begin = contents.find_first_of (s_firsts);
 	bool done{false};
 	// outer loop (skip optimization)
 	while (begin != string_view::npos && !done)
@@ -646,18 +424,18 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 				// If not immediate rejection, add to rejected list
 				auto& chose{(str>0)?accepted:rejected};
 				chose.insert (str);
-				bool full_accept{m_accept.size () == accepted.size ()};
+				bool full_accept{s_accept.size () == accepted.size ()};
 				// completion optimization
-				done = (m_noreject && full_accept);
+				done = (s_noreject && full_accept);
 			}
 			if (done || !tgt) break;
 		}
 		contents.remove_prefix (1);
-		begin = contents.find_first_of (m_firsts);
+		begin = contents.find_first_of (s_firsts);
 	}
 
 	// Report files having all accepteds and no rejecteds.
-	if (!rejected.size () && accepted.size () == m_accept.size ())
+	if (!rejected.size () && accepted.size () == s_accept.size ())
 	{
 		auto report{fmt::format ("{}\n", a_label)};
 		// Using the unix write primitive guarantees atomicity
@@ -667,6 +445,244 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 		if (wrote == -1) printf ("%s\n", a_label);
 	}
 } // search
+
+//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+//------------------------------------------------------------------------------
+/// @brief ctor
+Lettvin::GreasedGrep::
+GreasedGrep (int a_argc, char** a_argv) // ctor
+//------------------------------------------------------------------------------
+{
+	while (--a_argc)
+	{
+		ingest (*++a_argv);
+	}
+} // ctor
+
+//------------------------------------------------------------------------------
+/// @brief ftor
+void
+Lettvin::GreasedGrep::
+operator() ()
+//------------------------------------------------------------------------------
+{
+	// Run unit and timing tests.
+	if (s_test)
+	{
+		printf ("TESTS\n");
+		double minimized{1.0};
+		static const size_t overhead_loop_count{10};
+		for (size_t i=overhead_loop_count; i; --i)
+		{
+			minimized = min (minimized, interval (noop));
+		}
+		s_overhead = minimized;
+		cout << " # overhead min: " << s_overhead << endl;
+		return;
+	}
+
+	// Validate sufficient args.
+	if (s_target.size () < 1 &&
+		((s_accept.size () < 2) && (s_reject.size () < 2)))
+	{
+		Lettvin::synopsis ("A pattern and directory required.");
+	}
+
+	// Validate ingested args
+	if (s_accept.size () < 2 && s_reject.size () < 2)
+	{
+		synopsis ("specify at least one accept or reject str");
+	}
+
+	// Check for valid directory
+	if (!fs::is_directory (s_target) &&
+		!fs::is_regular_file (s_target))
+	{
+		synopsis ("last arg must be dir or file");
+	}
+
+	// Compile and check for collisions between accept and reject lists
+	compile ();
+
+	// Initialize firsts to enable buffer skipping
+	debugf (1, "FIRSTS B: '%s'\n", s_firsts.c_str ());
+	sort (s_firsts.begin (), s_firsts.end ());
+	auto last = unique (s_firsts.begin (), s_firsts.end ());
+	s_firsts.erase (last, s_firsts.end ());
+	debugf (1, "FIRSTS A: '%s'\n", s_firsts.c_str ());
+
+	// Visually inspect planes
+	if (s_debug)
+	{
+		show_tables (cout);
+		show_tokens (cout);
+	}
+	debugf (1, "FIRSTS: %s\n", s_firsts.c_str ());
+
+	// Find files and search contents
+	if (fs::is_directory (s_target))
+	{
+		walk (s_target);
+	}
+	else
+	{
+		mapped_search (s_target.data ());
+	}
+
+} // operator ()
+
+//------------------------------------------------------------------------------
+/// @brief ingest inserts state-transition table data
+bool
+Lettvin::GreasedGrep::
+option (string_view a_str)
+//------------------------------------------------------------------------------
+{
+	size_t size {a_str.size ()};
+	bool two    {size == 2};
+	bool more   {size >  2};
+	bool minus1 {a_str[0] == '-'};
+	bool opt    {two && minus1};
+	bool bad    {!(two || more)};
+	bool strs   {s_accept.size () > 1 || s_reject.size () > 1};
+	bool nbls   {s_nibbles};
+	char letter {two ? a_str[1] : '\0'};
+
+	if (!minus1)
+	{
+		return false;
+	}
+
+	if (strs)
+	{
+		synopsis ("(%s) options must precede other args", a_str.data ());
+	}
+	if (bad)
+	{
+		synopsis ("command-line options must be two or more chars");
+	}
+
+	if      (a_str == "--caseless" || (opt && letter == 'c')) s_caseless = true;
+	else if (a_str == "--debug"    || (opt && letter == 'd')) s_debug   += 1;
+	else if (a_str == "--nibbles"  || (opt && letter == 'n')) s_nibbles  = true;
+	else if (a_str == "--suppress" || (opt && letter == 's')) s_suppress = true;
+	else if (a_str == "--test"     || (opt && letter == 't')) s_test     = true;
+	else if (opt)
+	{
+		synopsis ("unknown arg");
+	}
+	else
+	{
+		return false;
+	}
+	if (s_nibbles && !nbls)
+	{
+		nibbles ();
+	}
+	return true;
+}
+
+//------------------------------------------------------------------------------
+/// @brief ingest inserts state-transition table data
+void
+Lettvin::GreasedGrep::
+ingest (string_view a_str)
+//------------------------------------------------------------------------------
+{
+	// Handle options
+	size_t size{a_str.size ()};
+	bool minus1{size == 2 && a_str[0] == '-'};
+	bool minus2{size >= 3 && a_str[0] == '-' && a_str[1] == '-'};
+
+	if ((minus1 || minus2) && option (a_str)) return;
+
+	if (s_target.size ())
+	{
+		string_view candidate {s_target};
+
+		char c0               {candidate[0]};
+		bool rejecting        {c0 == '-'};
+		auto& field           {rejecting ? s_reject : s_accept};
+
+		candidate.remove_prefix ((c0=='+' || c0=='-') ? 1 : 0);
+
+		if (candidate.size () < 2)
+		{
+			synopsis ("pattern strings must be longer than 1 byte");
+		}
+		field.push_back (candidate);
+#if !GG_COMPILE
+		// This compile passes
+		i24_t sign            {rejecting?-1:+1};
+		compile (sign, candidate);
+#endif
+	}
+	s_target = a_str;
+} // ingest
+
+//------------------------------------------------------------------------------
+/// @brief ingest inserts state-transition table data
+void
+Lettvin::GreasedGrep::
+compile (int a_sign)
+//------------------------------------------------------------------------------
+{
+	if (!a_sign)
+	{
+		compile (+1);
+		compile (-1);
+		return;
+	}
+	bool rejecting {a_sign == -1};
+	auto& field    {rejecting ? s_reject : s_accept};
+	size_t I       {field.size ()};
+
+	//< s_noreject optimizes inner loop
+	if (rejecting && I > 1)
+	{
+		s_noreject = false;
+	}
+
+#if GG_COMPILE
+		// This compile fails
+	for (size_t i = 1; i < I; ++i)
+	{
+		compile (a_sign, field[i]);
+	}
+#endif
+}
+
+//------------------------------------------------------------------------------
+/// @brief compile a single string argument
+///
+/// Distribute characters into state tables for searching.
+void
+Lettvin::GreasedGrep::
+compile (int a_sign, string_view a_str)
+//------------------------------------------------------------------------------
+{
+	debugf (1, "COMPILE %+d: %s\n", a_sign, a_str.data ());
+	bool rejecting {a_sign == -1};
+	auto from      {s_root};
+	auto next      {from};
+	char last[2]   {0,0};
+	auto& field    {rejecting ? s_reject : s_accept};
+	i24_t id       {a_sign*static_cast<i24_t> (field.size () - 1)};
+
+	// Initially, the string as given is searched
+	// TODO generate variations like soundex/levenshtein, fatfinger
+	// TODO handle collision for variations
+	// e.g. "than" and "then" are legitimate mutual variations.
+	vector<string> strs;
+	strs.emplace_back (string(a_str));
+
+	// Insert variations into transition tree
+	for (auto& str: strs)
+	{
+		insert (str, id);
+	}
+}
 
 //------------------------------------------------------------------------------
 /// @brief map file into memory and call search
@@ -732,7 +748,7 @@ walk (const fs::path& a_path)
 				}
 				catch (...)
 				{
-					if (!m_suppress)
+					if (!s_suppress)
 					{
 						printf ("gg: %s file Permission denied\n",
 								filename);
@@ -743,7 +759,7 @@ walk (const fs::path& a_path)
 	}
 	catch (...)
 	{
-		if (!m_suppress)
+		if (!s_suppress)
 		{
 			printf ("gg: %s dir Permission denied\n",
 					a_path.filename ().c_str ());
@@ -758,14 +774,14 @@ show_tokens (ostream& a_os)
 //------------------------------------------------------------------------------
 {
 	a_os << " # ACCEPT:" << endl;
-	for (size_t i=1; i < m_accept.size (); ++i)
+	for (size_t i=1; i < s_accept.size (); ++i)
 	{
-		a_os << " # " << setw (2) << i << ": " << m_accept[i] << endl;
+		a_os << " # " << setw (2) << i << ": " << s_accept[i] << endl;
 	}
 	a_os << " # REJECT:" << endl;
-	for (size_t i=1; i < m_reject.size (); ++i)
+	for (size_t i=1; i < s_reject.size (); ++i)
 	{
-		a_os << " # " << setw (2) << i << ": " << m_reject[i] << endl;
+		a_os << " # " << setw (2) << i << ": " << s_reject[i] << endl;
 	}
 } // show_tokens
 
