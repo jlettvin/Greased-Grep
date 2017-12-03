@@ -73,8 +73,8 @@ namespace Lettvin
 	using namespace std;  // No naming collisions in this small namespace
 
 	//--------------------------------------------------------------------------
-	void synopsis (const char* a_message); ///< report errors and exit
-	void nibbles ();                       ///< convert to nibbles not bytes
+	void synopsis (const char* a_message, ...); ///< report errors and exit
+	void nibbles ();                            ///< convert to nibbles not bytes
 	int debugf (size_t a_debug, const char *fmt, ...);
 	//--------------------------------------------------------------------------
 
@@ -228,11 +228,17 @@ namespace Lettvin
 	//------
 
 		//----------------------------------------------------------------------
-		/// @brief ingest inserts state-transition table data
+		/// @brief option handles command-line long options
+		///
+		/// @returns true for a successfully handled arg
+		bool option (string_view a_str);
+
+		//----------------------------------------------------------------------
+		/// @brief ingest handles command-line options and arguments.
 		void ingest (string_view a_str);
 
 		//----------------------------------------------------------------------
-		/// @brief ingest inserts state-transition table data
+		/// @brief compile inserts state-transition table data
 		void compile (int a_sign=0);
 
 		//----------------------------------------------------------------------

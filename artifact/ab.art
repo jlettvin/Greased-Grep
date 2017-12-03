@@ -170,8 +170,6 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171129001052.tgz
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/reversion.py
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/Makefile
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/refs/heads/master
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/refs/remotes/origin/master
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/applypatch-msg.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/update.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/prepare-commit-msg.sample
@@ -185,6 +183,7 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/d9/2e37bd2aa1b708e25c4069fa25ab32def3d810
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/ac/1b268facdcffcc4a37b9ebc9b7a0485ffac1c1
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/2f/ec95d4801a62d4762162679a07f9f3bef65adf
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/6e/e2e28985808e7a606e84bdfd3c796d41769ea1
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/2c/93e370ef609849f7e17053fc0582d8e94f563b
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/1c/a4043cf4500e08e133e189835be30c61cdcf54
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/72/8e0501f57857e72b09f72b9239c37bd6d4a8ca

@@ -53,7 +53,7 @@ Greased Grep search for files having (case insensitive):
         {str} are simple strings (no regex).
         {str} may be single-quoted to avoid shell interpretation.
 
-ARGUMENTS:
+ARGUMENTS:  all search strings must be 2 characters or more
 
     [+]{str}      # add accept string (+ optional)
 
@@ -63,15 +63,15 @@ ARGUMENTS:
 
 OPTIONS:
 
-    -c            # case sensitive search
+    -c, --caseless  # case sensitive search
 
-    -d            # turn on debugging output
+    -d, --debug     # turn on debugging output (multiple increases level)
 
-    -n            # use nibbles (lower memory use half-speed search)
+    -n, --nibbles   # use nibbles (lower memory use half-speed search)
 
-    -s            # suppress permission denied errors
+    -s, --suppress  # suppress permission denied errors
 
-    -t            # test algorithms (unit and timing)  TODO
+    -t, --test      # test algorithms (unit and timing)  TODO
 
 OUTPUT:
 

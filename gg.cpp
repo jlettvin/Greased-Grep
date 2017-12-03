@@ -40,23 +40,23 @@ Greased Grep search for files having (case insensitive):
 
 ARGUMENTS:
 
-    [+]{str}      # add accept string (+ optional)
+    [+]{str}        # add accept string (+ optional)
 
-    -{str}        # add reject string
+    -{str}          # add reject string
 
-    {path}        # file or top directory for recursive search
+    {path}          # file or top directory for recursive search
 
 OPTIONS:
 
-    -c            # case sensitive search
+    -c, --caseless  # case sensitive search
 
-    -d            # turn on debugging output
+    -d, --debug     # turn on debugging output
 
-    -n            # use nibbles (lower memory use half-speed search)
+    -n, --nibbles   # use nibbles (lower memory use half-speed search)
 
-    -s            # suppress permission denied errors
+    -s, --suppress  # suppress permission denied errors
 
-    -t            # test algorithms (unit and timing)  TODO
+    -t, --test      # test algorithms (unit and timing)  TODO
 
 OUTPUT:
 
@@ -126,13 +126,18 @@ using namespace std;  // No naming collisions in this small namespace
 
 //------------------------------------------------------------------------------
 /// @brief synopsis (document usage in case of failure)
-void Lettvin::synopsis (const char* a_message)
+void Lettvin::synopsis (const char* a_message, ...)
 //------------------------------------------------------------------------------
 {
 	if (a_message != nullptr)
 	{
 		printf ("ERROR: %s\n\n", a_message);
 	}
+	va_list args;
+	va_start(args, a_message);
+	vprintf(a_message, args);
+	va_end(args);
+	printf ("\n");
 	printf (s_synopsis,
 			s_version.major,
 			s_version.minor,
@@ -349,28 +354,68 @@ operator() ()
 
 //------------------------------------------------------------------------------
 /// @brief ingest inserts state-transition table data
+bool
+Lettvin::GreasedGrep::
+option (string_view a_str)
+//------------------------------------------------------------------------------
+{
+	size_t size {a_str.size ()};
+	bool two    {size == 2};
+	bool more   {size >  2};
+	bool minus1 {a_str[0] == '-'};
+	bool opt    {two && minus1};
+	bool bad    {!(two || more)};
+	bool strs   {m_accept.size () > 1 || m_reject.size () > 1};
+	bool nbls   {m_nibbles};
+	char letter {two ? a_str[1] : '\0'};
+
+	if (!minus1)
+	{
+		return false;
+	}
+
+	if (strs)
+	{
+		synopsis ("(%s) options must precede other args", a_str.data ());
+	}
+	if (bad)
+	{
+		synopsis ("command-line options must be two or more chars");
+	}
+
+	if      (a_str == "--caseless" || (opt && letter == 'c')) m_caseless = true;
+	else if (a_str == "--debug"    || (opt && letter == 'd')) s_debug   += 1;
+	else if (a_str == "--nibbles"  || (opt && letter == 'n')) m_nibbles  = true;
+	else if (a_str == "--suppress" || (opt && letter == 's')) m_suppress = true;
+	else if (a_str == "--test"     || (opt && letter == 't')) m_test     = true;
+	else if (opt)
+	{
+		synopsis ("unknown arg");
+	}
+	else
+	{
+		return false;
+	}
+	if (m_nibbles && !nbls)
+	{
+		nibbles ();
+	}
+	return true;
+}
+
+//------------------------------------------------------------------------------
+/// @brief ingest inserts state-transition table data
 void
 Lettvin::GreasedGrep::
 ingest (string_view a_str)
 //------------------------------------------------------------------------------
 {
 	// Handle options
-	if (a_str.size () == 2 && a_str[0] == '-')
-	{
-		if (m_accept.size () > 1 || m_reject.size () > 1)
-		{
-			synopsis ("command-line options must precede other args");
-		}
-		switch (a_str[1])
-		{
-			case 'c': m_caseless = false; return;
-			case 'd': s_debug    =     1; return;
-			case 'n': m_nibbles  =  true; nibbles (); return;
-			case 's': m_suppress =  true; return;
-			case 't': m_test     =  true; return;
-		}
-		synopsis (a_str.data ());
-	}
+	size_t size{a_str.size ()};
+	bool minus1{size == 2 && a_str[0] == '-'};
+	bool minus2{size >= 3 && a_str[0] == '-' && a_str[1] == '-'};
+
+	if ((minus1 || minus2) && option (a_str)) return;
 
 	if (m_target.size ())
 	{
