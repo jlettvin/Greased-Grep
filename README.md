@@ -71,7 +71,7 @@ OPTIONS:
 
     -s            # suppress permission denied errors
 
-    -t            # test algorithms (unit and timing)
+    -t            # test algorithms (unit and timing)  TODO
 
 OUTPUT:
 
@@ -196,6 +196,7 @@ but code simplification merits this choice.
 * TODO ingest args with ctor but compile strs at beginning of ftor
 * TODO use memcmp for unique final string
 * TODO run searches in threads for higher performance
+* TODO implement self-test (-t)
 
 <hr />
 
