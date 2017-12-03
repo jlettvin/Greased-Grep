@@ -75,6 +75,7 @@ namespace Lettvin
 	//--------------------------------------------------------------------------
 	void synopsis (const char* a_message); ///< report errors and exit
 	void nibbles ();                       ///< convert to nibbles not bytes
+	int debugf (size_t a_debug, const char *fmt, ...);
 	//--------------------------------------------------------------------------
 
 	typedef unsigned char u08_t;
@@ -84,6 +85,7 @@ namespace Lettvin
 	size_t s_prefill {1};
 	size_t s_mask    {0xffULL};
 	size_t s_size    {256};
+	size_t s_debug   {0};
 
 	//--------------------------------------------------------------------------
 	void noop () {}
@@ -227,27 +229,6 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief ingest inserts state-transition table data
-		int debugf (size_t a_debug, const char *fmt, ...)
-		//----------------------------------------------------------------------
-		{
-			int ret = 0;
-			if (m_debug >= a_debug)
-			{
-				va_list args;
-				va_start(args, fmt);
-				for (size_t i=0; i < a_debug; ++i)
-				{
-					printf ("\t");
-				}
-				printf ("DBG(%lu): ", a_debug);
-				ret = vprintf(fmt, args);
-				va_end(args);
-			}
-			return ret;
-		}
-
-		//----------------------------------------------------------------------
-		/// @brief ingest inserts state-transition table data
 		void ingest (string_view a_str);
 
 		//----------------------------------------------------------------------
@@ -295,7 +276,6 @@ namespace Lettvin
 		vector<string_view> m_accept {{""}}; ///< list of accept {str} args
 		vector<string_view> m_reject {{""}}; ///< list of reject {str} args
 		u08_t m_root{1};                     ///< syntax tree root plane number
-		size_t m_debug{0};                   ///< turns on verbosity
 		bool m_noreject{true};               ///< are there reject strings?
 		bool m_suppress{false};              ///< suppress error messages
 		bool m_caseless{true};               ///< turn on case insensitivity

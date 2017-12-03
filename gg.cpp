@@ -154,6 +154,29 @@ void Lettvin::nibbles ()
 } // nibbles
 
 //------------------------------------------------------------------------------
+int
+Lettvin::debugf (size_t a_debug, const char *fmt, ...)
+//------------------------------------------------------------------------------
+{
+	static const char* indent{"  "};
+	int ret = 0;
+	if (s_debug >= a_debug)
+	{
+		va_list args;
+		va_start(args, fmt);
+		printf (" #'");
+		for (size_t i=0; i < a_debug; ++i)
+		{
+			printf ("%s", indent);
+		}
+		printf ("DBG(%lu): ", a_debug);
+		ret = vprintf(fmt, args);
+		va_end(args);
+	}
+	return ret;
+}
+
+//------------------------------------------------------------------------------
 Lettvin::Table::
 Table ()
 //------------------------------------------------------------------------------
@@ -204,14 +227,14 @@ show_tables (ostream& a_os)
 	size_t ROWS{s_nibbles ? 4ULL : 16ULL};
 	for (size_t state=0; state < m_table.size (); ++state)
 	{
-		a_os << "\tPLANE: " << state << endl;
 		auto& plane{m_table[state]};
+		a_os << " # " << endl << " # ";
 		for (unsigned col=0; col < COLS; ++col)
 		{
 			printf ("   %2.2x", col);
 		}
-		a_os << endl;
-		a_os << ' ' << string (5*COLS, '_') << endl;
+		a_os << endl << " #  " << string (5*COLS, '_') << 
+			"     PLANE: " << state << endl << " # ";
 		for (unsigned row=0; row < ROWS*COLS; row+=COLS)
 		{
 			a_os << '|';
@@ -224,7 +247,7 @@ show_tables (ostream& a_os)
 				if (tgt) a_os << gra << setw(3) << tgt << ' ';
 				else     a_os << ".....";
 			}
-			printf ("|\n|");
+			printf ("|\n # |");
 			for (size_t col=0; col < COLS; ++col)
 			{
 				Atom& entry{plane[row+col]};
@@ -232,20 +255,19 @@ show_tables (ostream& a_os)
 				if (str) a_os << setw(4) << str << ' ';
 				else     a_os << ".....";
 			}
-			printf ("|%2.2x\n", row);
+			printf ("|%2.2x\n # ", row);
 		}
-		a_os << '|' << string (5*COLS, '_') << "|" << endl;
-		a_os << '\n';
+		a_os << "|" << string (5*COLS, '_') << "|" << endl;
 	}
 	return a_os;
 } // show_tables
 
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /// @brief ctor
 Lettvin::GreasedGrep::
 GreasedGrep (int a_argc, char** a_argv) // ctor
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	while (--a_argc)
 	{
@@ -253,12 +275,12 @@ GreasedGrep (int a_argc, char** a_argv) // ctor
 	}
 } // ctor
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /// @brief ftor
 void
 Lettvin::GreasedGrep::
 operator() ()
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	// Run unit and timing tests.
 	if (m_test)
@@ -306,7 +328,7 @@ operator() ()
 	debugf (1, "FIRSTS A: '%s'\n", m_firsts.c_str ());
 
 	// Visually inspect planes
-	if (m_debug)
+	if (s_debug)
 	{
 		show_tables (cout);
 		show_tokens (cout);
@@ -325,12 +347,12 @@ operator() ()
 
 } // operator ()
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /// @brief ingest inserts state-transition table data
 void
 Lettvin::GreasedGrep::
 ingest (string_view a_str)
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	// Handle options
 	if (a_str.size () == 2 && a_str[0] == '-')
@@ -342,7 +364,7 @@ ingest (string_view a_str)
 		switch (a_str[1])
 		{
 			case 'c': m_caseless = false; return;
-			case 'd': m_debug    =     1; return;
+			case 'd': s_debug    =     1; return;
 			case 'n': m_nibbles  =  true; nibbles (); return;
 			case 's': m_suppress =  true; return;
 			case 't': m_test     =  true; return;
@@ -374,12 +396,12 @@ ingest (string_view a_str)
 	m_target = a_str;
 } // ingest
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /// @brief ingest inserts state-transition table data
 void
 Lettvin::GreasedGrep::
 compile (int a_sign)
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	if (!a_sign)
 	{
@@ -406,7 +428,7 @@ compile (int a_sign)
 #endif
 }
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /// @brief insert either case-sensitive or both case letters into tree
 ///
 /// Distribute characters into state tables for searching.
@@ -418,7 +440,7 @@ insert (
 		auto& a_next,
 		bool a_stop,
 		bool a_nibbles)
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	auto c0{a_chars[0]};
 	auto c1{a_chars[1]};
@@ -460,14 +482,14 @@ insert (
 	}
 } // insert
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /// @brief compile a single string argument
 ///
 /// Distribute characters into state tables for searching.
 void
 Lettvin::GreasedGrep::
 compile (int a_sign, string_view a_str)
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	debugf (1, "COMPILE %+d: %s\n", a_sign, a_str.data ());
 	bool rejecting {a_sign == -1};
@@ -528,7 +550,7 @@ compile (int a_sign, string_view a_str)
 	}
 }
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /// @brief find and report found strings
 ///
 /// when reject list is empty, terminate on completion of accept list
@@ -536,7 +558,7 @@ compile (int a_sign, string_view a_str)
 void
 Lettvin::GreasedGrep::
 search (void* a_pointer, auto a_bytecount, const char* a_label)
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	//debugf (1, "SEARCH %s\n", a_label);
 	set<i24_t> accepted  {0};
@@ -601,14 +623,14 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 	}
 } // search
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /// @brief map file into memory and call search
 ///
 /// https://techoverflow.net/2013/08/21/a-simple-mmap-readonly-example/
 void
 Lettvin::GreasedGrep::
 mapped_search (const char* a_filename)
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	struct stat st;
 	stat (a_filename, &st);
@@ -643,12 +665,12 @@ mapped_search (const char* a_filename)
 	}
 } // mapped_search
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /// @brief walk organizes search for strings in memory-mapped file
 void
 Lettvin::GreasedGrep::
 walk (const fs::path& a_path)
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
 	try
 	{
@@ -684,21 +706,21 @@ walk (const fs::path& a_path)
 	}
 } // walk
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void
 Lettvin::GreasedGrep::
 show_tokens (ostream& a_os)
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
-	a_os << "\tACCEPT:" << endl;
+	a_os << " # ACCEPT:" << endl;
 	for (size_t i=1; i < m_accept.size (); ++i)
 	{
-		a_os << setw (2) << i << ": " << m_accept[i] << endl;
+		a_os << " # " << setw (2) << i << ": " << m_accept[i] << endl;
 	}
-	a_os << "\tREJECT:" << endl;
+	a_os << " # REJECT:" << endl;
 	for (size_t i=1; i < m_reject.size (); ++i)
 	{
-		a_os << setw (2) << i << ": " << m_reject[i] << endl;
+		a_os << " # " << setw (2) << i << ": " << m_reject[i] << endl;
 	}
 } // show_tokens
 
