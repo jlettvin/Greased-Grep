@@ -108,6 +108,7 @@ EXAMPLES:
 #include <string_view>             // Improve performance on mmap of file
 #include <iostream>                // sync_with_stdio (mix printf with cout)
 #include <iomanip>                 // setw and other cout formatting
+#include <thread>
 
 //..............................................................................
 #include <string>                  // container
@@ -735,6 +736,17 @@ walk (const fs::path& a_path)
 {
 	try
 	{
+		if (false)
+		{
+			// Account for existing main thread
+			unsigned int threads{thread::hardware_concurrency () - 1};
+			vector<thread> Pool;
+			for(unsigned int ii = 0; ii < threads; ii++)
+			{
+				Pool.push_back(thread(noop));
+			}
+		}
+
 		for (auto& element: fs::recursive_directory_iterator (a_path))
 		{
 			fs::path path{fs::canonical (fs::path (element.path ()))};

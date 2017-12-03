@@ -81,7 +81,7 @@ namespace Lettvin
 	typedef unsigned char u08_t;
 	typedef int           i24_t;
 
-	bool   s_caseless{true};             ///< turn on case insensitivity
+	bool   s_caseless{false};            ///< turn on case insensitivity
 	bool   s_nibbles {false};            ///< nibble planes replace bute planes
 	bool   s_suppress{false};            ///< suppress error messages
 
@@ -155,8 +155,11 @@ namespace Lettvin
 		union {
 			unsigned short integral;                   ///< unused name
 			struct { i24_t str:24; u08_t tgt; } state; ///< strtern/state ids
-		} m_the
-		{.integral=0};
+		}
+		m_the
+		{
+			.integral=0
+		};
 	}; // class Atom
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -229,7 +232,6 @@ namespace Lettvin
 
 		//dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
 		vector<State> m_table;                       ///< State tables
-		State&        m_state1{operator[] (s_root)}; ///< root state plane
 
 	//------
 	private:

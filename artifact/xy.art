@@ -1,8 +1,9 @@
  #'  DBG(1): COMPILE +1: xy
- #'  DBG(1): INSERT 58 and 78 on plane 1
- #'  DBG(1): INSERT 59 and 79 on plane 2
- #'  DBG(1): FIRSTS B: 'Xx'
- #'  DBG(1): FIRSTS A: 'Xx'
+ #'  DBG(1): INSERT 78 and 78 on plane 1
+ #'  DBG(1): INSERT 79 and 79 on plane 2
+ #'  DBG(1): LINK 2 79 1
+ #'  DBG(1): FIRSTS B: 'x'
+ #'  DBG(1): FIRSTS A: 'x'
  # 
  #    00   01   02   03   04   05   06   07   08   09   0a   0b   0c   0d   0e   0f
  #  ________________________________________________________________________________     PLANE: 0
@@ -52,7 +53,7 @@
  # |................................................................................|30
  # |................................................................................|
  # |................................................................................|40
- # |........................................X  2 ...................................|
+ # |................................................................................|
  # |................................................................................|50
  # |................................................................................|
  # |................................................................................|60
@@ -88,8 +89,8 @@
  # |................................................................................|30
  # |................................................................................|
  # |................................................................................|40
- # |.............................................Y  3 ..............................|
- # |.............................................   1 ..............................|50
+ # |................................................................................|
+ # |................................................................................|50
  # |................................................................................|
  # |................................................................................|60
  # |.............................................y  3 ..............................|
@@ -153,54 +154,27 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/catch.hpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171201202307.tgz
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171203053848.tgz
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171203121949.tgz
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171127042408.tgz
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171203055551.tgz
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171203121656.tgz
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171127044254.tgz
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171203052636.tgz
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/Makefile
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/db/68eb48cb3a28dcfd6f65bb175f15dca62e89a8
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/67/ecb04dada4ee1f614f832472ee8b48951d936c
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/99/1abaa2b545933e17ec5f24a8ff8e3881dfc833
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/b4/b9ede683783ead17bf8cccd41ab1d748f3ca2e
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/ac/1b268facdcffcc4a37b9ebc9b7a0485ffac1c1
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/6e/e2e28985808e7a606e84bdfd3c796d41769ea1
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/a8/d141b9a8fe2951e79d267a8266da5c7ca97f99
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/2c/93e370ef609849f7e17053fc0582d8e94f563b
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/1c/a4043cf4500e08e133e189835be30c61cdcf54
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/14/4ccb14f7bdcfcdd6faa3b92a512b5d9bb5ec80
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/77/a7e8f8c1eea3ecef49061f8e5d4c2d46ac1622
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/72/8e0501f57857e72b09f72b9239c37bd6d4a8ca
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/bb/f9a54f30621cff3981ddeb1d2d8139e0d0b7f5
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/26/44f755c54aa155d8080400930f9929938b9e91
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/d5/1bb099cc80ec339042ff6e4f169d875d4497e9
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/af/5712293f3c59a06c80b79b64994a2876c53ca2
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/c9/1ca09d67fff50ecd1e4cede25ff33173c6006b
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/c9/1db103ec22eb932245cf12b06484c63420d22d
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/57/05ae58856c0be4f566afe82695e3c0715a6423
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/46/5c648c945131a9bbb1f9daa31b9746c48e8029
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/cf/0348cc004641a631580c0c49d1d9e919bcec7e
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/9a/94d20debc5b11273dbe1ea8903c3d7e2f08b84
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/48/68546ea18b6f064ce728068d33ce428a3cf92a
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/5a/0e900522f79a03b867fe679262107ceb160956
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/05/26ee77ce22b2658698339724e82366f07cfe67
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/22/5b200d9c5041bfc4592e21655e841620a25b8a
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/28/9af5a9b61bae6167e0beb949577b9d3ae88e1a
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/e1/e2d4fb5eec0fcf76c01abf0e3aa7aed2fe9b79
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/4c/6b0cb2a7d870c3b7e509911b107993efe8cfb9
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/aa/bbc9eb62b2ccf42a6424e1e09de683122aab47
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/a4/eeae7f1036d5891ea540641dc6da3307df10b7
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/89/9c4bf40c0d0fc749609ce0dee5c683159a7d0c
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/a6/3a135118c7bcf0de4f5282b807ca89ffc7d2ef
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/39/2999950627df042189e921564602149e4de528
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/7f/234e5bcb26c63c3b6ddfe453821d63818354b2
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/be/8d78a8e485cfe0c33b02074fcb28a0296bc23c
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/5f/4fc65e8b12af4332afc41076273807ae760930
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/logs/refs/heads/master
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/logs/HEAD
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/index
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/artifact/xy.art
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/artifact/ab.art
- #'  DBG(1): FIRSTS: Xx
+ #'  DBG(1): FIRSTS: x
