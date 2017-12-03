@@ -24,6 +24,15 @@ _____________________________________________________________________________*/
 
 #pragma once
 
+/*
+ * A standard plane consumes 32 bits (4 bytes) * 256 = 1KiB/plane.
+ * A nibbles  plane consumes 32 bits (4 bytes) *  16 =  64B/plane.
+ * For a given unique character 2 nibbles planes are needed for each 1 standard.
+ * This means a standard place consumes memory at 8 times the rate of nibbles.
+ * Also, use of nibbles decreases search speed by a factor of 2.
+ * This is because 2 nibbles plane dereferences are needed.
+ */
+
 //..............................................................................
 #include <experimental/filesystem> // recursive directory walk
 
