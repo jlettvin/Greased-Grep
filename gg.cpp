@@ -30,7 +30,7 @@ PATH: %s
 
 USAGE: gg [-c] [-n] [-s] [-t] [+|-]{str} [[+|-]{str}...] {path} 
 
-Greased Grep search for files having (case insensitive):
+Greased Grep UTF8 search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in
 	files found along {path}
@@ -72,6 +72,8 @@ EXAMPLES:
 
     gg copyright -Lettvin .
         # Find all files with missing or other than Lettvin copyright.
+
+    gg 愚公移山 .
 )Synopsis";
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
