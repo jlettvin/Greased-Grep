@@ -195,11 +195,22 @@ but code simplification merits this choice.
 
 ### TODO
 * TODO find bug for when m_table is not reserved
+*      without reserving, the program crashes
 * TODO measure performance against fgrep/ack/ag
+*      publishing performance will make gg more attractive
 * TODO ingest args with ctor but compile strs at beginning of ftor
+*      compilation in ftor currently fails
 * TODO use memcmp for unique final string
+*      When the tail end of a search is unique memcmp is faster
 * TODO run searches in threads for higher performance
+*      thread-safe Table and atomic output: concurrent processing is possible
 * TODO implement self-test (-t)
+*      client-usable as opposed to unit-test and performance test
+* TODO translate UTF8->UnicodeCodepoint->NFKD->UnicodeCodepoint->UTF8
+*      strings with identical appearance should be comparable
+*      this could be done by decomposing and recomposing during compilation
+*      for instance; convert to Unicode Codepoints, and decompose, then
+*      recompose to canonical NKFD, then reconvert to UTF8
 
 <hr />
 
