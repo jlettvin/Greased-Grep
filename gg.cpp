@@ -94,7 +94,8 @@ EXAMPLES:
 //      strings with identical appearance should be comparable
 //      this could be done by decomposing and recomposing during compilation
 //      for instance; convert to Unicode Codepoints, and decompose, then
-//      recompose to canonical NKFD, then reconvert to UTF8
+//      recompose to canonical NFKD, then reconvert to UTF8, then
+//      strings so recomposed can be compared properly
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
