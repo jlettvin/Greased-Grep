@@ -74,6 +74,7 @@ EXAMPLES:
         # Find all files with missing or other than Lettvin copyright.
 
     gg 愚公移山 .
+        # Find the foolish old man who moved the mountains
 )Synopsis";
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
