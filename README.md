@@ -1,8 +1,8 @@
 # Greased-Grep (version 0.0.1)
 ## High performance case insensitive UTF8<br />recursive search for files having<br />all of one set and none of another set of strings
-### $ gg copyright -Lettvin .  # find files with copyright and without Lettvin
-### $ gg +smile +joy -frown -sad .
-### $ gg 愚公移山 .
+### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
+### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
+### $ gg 愚公移山 .                 # find the foolish old man who moved mountains
 
 "gg" name was chosen for this frequently-used command because it is easy to type.
 "gg" is the left-hand index-finger letter, and typing it twice is easy.
