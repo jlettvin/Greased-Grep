@@ -62,6 +62,22 @@ ARGUMENTS:  all search strings must be 2 characters or more
 
     {path}        # file or top directory for recursive search
 
+ARGUMENT OPTIONS: (TODO)
+
+    A {str} followed by a bracket-list triggers variant insertion
+    Examples:
+       gg copyright[acronym,c,f,soundex,nyssis] .
+    Available:
+       a or acronym           to insert variants like M.I.T.
+       c or contraction       to insert variants like MIT
+       f or fatfinger         to insert variants like NUR
+       l or levenshtein1      to insert variants like MTI
+       m or metaphone
+       n or nyssis
+       s or soundex
+       t or thesaurus         to insert synonyms
+       u or unicode           to insert NFKD variants
+
 OPTIONS:
 
     -c, --caseless  # case sensitive search
