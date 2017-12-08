@@ -1,5 +1,5 @@
 # Greased-Grep (version 0.0.314)
-## High performance case insensitive UTF8<br />recursive search for files having<br />all of one set and none of another set of strings
+## High performance O(N) case insensitive UTF8<br />threaded recursive search for files having<br />all of one set and none of another set of strings
 ### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
 ### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
 ### $ gg 愚公移山 .                 # find the foolish old man who moved mountains

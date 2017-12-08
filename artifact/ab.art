@@ -156,8 +156,8 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/old/gg1.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/old/gg2.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/old/gg2.h
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/thread_queue
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg_version.h
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/thread_queue
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/thread_queue.h
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/catch.hpp
@@ -178,8 +178,8 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine2
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread1.2
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread5
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread1.3
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine.cpp
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread1.3
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine4
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171203052233.tgz
@@ -194,13 +194,14 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-push.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-applypatch.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/commit-msg.sample
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-rebase.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/post-update.sample
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-rebase.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-commit.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/74/34ef85c62be3c3dcedcfce10619c2ae7f1756e
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/2c/93e370ef609849f7e17053fc0582d8e94f563b
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/72/8e0501f57857e72b09f72b9239c37bd6d4a8ca
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/9d/56dfce3d380470b445a6f8395122fa67f479ec
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/b9/c23a476fe143aa757297b8567383efa1a5f47e
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/cf/0348cc004641a631580c0c49d1d9e919bcec7e
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/36/c8aa3a72b7db0a7fc8ba85dacd16ed81c867d3
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/4c/6b0cb2a7d870c3b7e509911b107993efe8cfb9
