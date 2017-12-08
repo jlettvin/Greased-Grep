@@ -263,16 +263,6 @@ This optimization increases complexity considerably.
  </li>
 
  <li>
-run searches in threads for higher performance
-  <ul>
-   <li>
-thread-safe Table and atomic output: concurrent processing is possible.
-See thread_queue.cpp for producer/consumer pattern to be deployed.
-   </li>
-  </ul>
- </li>
-
- <li>
 implement self-test (-t)
   <ul>
    <li>
@@ -298,6 +288,6 @@ strings so recomposed can be compared properly
 <hr />
 
 ## GOALS
-Threads should be launched from a thread pool for each regular file.
+Search can be made fuzzy
 
 <hr />

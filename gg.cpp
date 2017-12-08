@@ -103,8 +103,6 @@ EXAMPLES:
 //      compilation in ftor currently fails
 // TODO use memcmp for unique final string
 //      When the tail end of a search is unique memcmp is faster
-// TODO run searches in threads for higher performance
-//      thread-safe Table and atomic output: concurrent processing is possible
 // TODO implement self-test (-t)
 //      client-usable as opposed to unit-test and performance test
 // TODO translate UTF8->UnicodeCodepoint->NFKD->UnicodeCodepoint->UTF8
