@@ -843,26 +843,72 @@ walk (const fs::path& a_path)
 {
 	try
 	{
-		if (false)
+#if true
+		// Account for existing main thread
+		unsigned int cpus{thread::hardware_concurrency ()};
+		vector<thread> threads;
+		Lettvin::ThreadedQueue<string> tq (cpus + 1);  // 1 ahead of workers
+		// Note worker threads are 1 less than cpus
+		for (unsigned int thid = 1; thid < cpus; thid++)
 		{
-			// Account for existing main thread
-			unsigned int threads{thread::hardware_concurrency () - 1};
-			vector<thread> Pool;
-			for (unsigned int ii = 0; ii < threads; ii++)
-			{
-				Pool.push_back (thread (noop));
-			}
+			threads.emplace_back (
+				thread{
+					[&] ()
+					{
+						string filename;
+						while ((filename = tq.pop ()).size () != 0)
+						{
+							mapped_search (filename.c_str ());
+						}
+					}
+				}
+			);
 		}
-
-		for (auto& element: fs::recursive_directory_iterator (a_path))
+		// Master thread
+		threads.emplace_back (
+			thread{
+				[&] ()
+				{
+					string filename;
+					for (auto& item:
+						fs::recursive_directory_iterator (a_path))
+					{
+						fs::path path{fs::canonical (fs::path (item.path ()))};
+						const char* filename{path.c_str ()};
+						if (fs::is_regular_file (item.status ()))
+						{
+							try
+							{
+								tq.push (path);
+							}
+							catch (...)
+							{
+								if (!s_suppress)
+								{
+									printf (
+										"gg: %s file Permission denied\n",
+										filename);
+								}
+							}
+						}
+					}
+					for (size_t cpu=1; cpu < cpus; ++cpu)
+					{
+						tq.push ("");
+					}
+				}
+			}
+		);
+		for (auto& thrd:threads) thrd.join ();
+#else
+		for (auto& item: fs::recursive_directory_iterator (a_path))
 		{
-			fs::path path{fs::canonical (fs::path (element.path ()))};
+			fs::path path{fs::canonical (fs::path (item.path ()))};
 			const char* filename{path.c_str ()};
-			if (fs::is_regular_file (element.status ()))
+			if (fs::is_regular_file (item.status ()))
 			{
 				try
 				{
-					// mapped_search should be launched as a thread
 					mapped_search (filename);
 				}
 				catch (...)
@@ -875,6 +921,7 @@ walk (const fs::path& a_path)
 				}
 			}
 		}
+#endif
 	}
 	catch (...)
 	{

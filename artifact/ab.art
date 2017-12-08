@@ -156,13 +156,13 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/old/gg1.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/old/gg2.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/old/gg2.h
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/thread_queue
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg_version.h
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/thread_queue
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/thread_queue.h
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/catch.hpp
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine3
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine2.cpp
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine3
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread3
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/ThreadPool.h
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine5
@@ -174,8 +174,8 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread6
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread2
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread1.4
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine2
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine5.cpp
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine2
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread1.2
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread5
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread1.3
@@ -190,8 +190,8 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/Makefile
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/applypatch-msg.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/update.sample
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/prepare-commit-msg.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-push.sample
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/prepare-commit-msg.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-applypatch.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/commit-msg.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-rebase.sample
@@ -210,8 +210,8 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/logs/refs/remotes/origin/master
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/logs/HEAD
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/index
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/artifact/xy.art
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/artifact/ab.art
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg.h
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/artifact/xy.art
  #'  DBG(1): FIRSTS: a
  #'  DBG(1): MAP FAILED: /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine5.out

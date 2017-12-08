@@ -152,7 +152,6 @@
  #  1: xy
  # REJECT:
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/catch.hpp
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171201202307.tgz
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171205131313.tgz
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171203121949.tgz
@@ -165,6 +164,8 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/b4/b9ede683783ead17bf8cccd41ab1d748f3ca2e
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/b7/4b6bd2199d012577067baaf5e8df1cccf140bc
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/20/c15a2d552b99f6aa3559c0528dc3b2814b0906
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/32/e7472bbc6708918266b27b70c8bc20365862a5
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/a8/d141b9a8fe2951e79d267a8266da5c7ca97f99
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/2c/93e370ef609849f7e17053fc0582d8e94f563b
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/1c/a4043cf4500e08e133e189835be30c61cdcf54
