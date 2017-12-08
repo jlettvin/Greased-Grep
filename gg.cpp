@@ -620,7 +620,7 @@ option (string_view a_str)
 	else if (a_str == "--nibbles"  || (opt && letter == 'n')) s_nibbles  = true;
 	else if (a_str == "--suppress" || (opt && letter == 's')) s_suppress = true;
 	else if (a_str == "--test"     || (opt && letter == 't')) s_test     = true;
-	else if (a_str == "--variant"|| (opt && letter == 'v')) s_variant= true;
+	else if (a_str == "--variant"  || (opt && letter == 'v')) s_variant  = true;
 	else if (opt)
 	{
 		synopsis ("unknown arg");

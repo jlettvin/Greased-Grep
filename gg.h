@@ -96,13 +96,13 @@ namespace Lettvin
 	};
 
 
-	bool   s_caseless {false};            ///< turn on case insensitivity
-	bool   s_nibbles  {false};            ///< nibble planes replace bute planes
-	bool   s_suppress {false};            ///< suppress error messages
+	bool   s_caseless {false};           ///< turn on case insensitivity
+	bool   s_nibbles  {false};           ///< nibble planes replace bute planes
+	bool   s_suppress {false};           ///< suppress error messages
 
-	bool   s_noreject {true};             ///< are there reject strings?
-	bool   s_test     {false};            ///< run unit and timing tests
-	bool   s_variation{false};            ///< enable variation syntax
+	bool   s_noreject {true};            ///< are there reject strings?
+	bool   s_test     {false};           ///< run unit and timing tests
+	bool   s_variant  {false};           ///< enable variant syntax
 
 	u08_t  s_root    {1};                ///< syntax tree root plane number
 
