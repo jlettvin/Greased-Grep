@@ -74,6 +74,7 @@ namespace Lettvin
 
 	//--------------------------------------------------------------------------
 	void synopsis (const char* a_message, ...); ///< report errors and exit
+	void syntax   (const char* a_message, ...); ///< report errors and exit
 	void nibbles ();                            ///< convert to nibbles not bytes
 	int debugf (size_t a_debug, const char *fmt, ...);
 	//--------------------------------------------------------------------------

@@ -120,12 +120,14 @@ EXAMPLES:
 //..............................................................................
 #include <string_view>             // Improve performance on mmap of file
 #include <iostream>                // sync_with_stdio (mix printf with cout)
+#include <sstream>                 // string_stream
 #include <iomanip>                 // setw and other cout formatting
 #include <thread>
 
 //..............................................................................
 #include <string>                  // container
 #include <vector>                  // container
+#include <map>                     // container
 #include <set>                     // container
 
 //..............................................................................
@@ -159,6 +161,25 @@ void Lettvin::synopsis (const char* a_message, ...)
 			s_path);
 	exit (1);
 } // synopsis
+
+//------------------------------------------------------------------------------
+/// @brief synopsis (document usage in case of failure)
+void Lettvin::syntax (const char* a_message, ...)
+//------------------------------------------------------------------------------
+{
+	printf (" # SYNTAX ERROR: ");
+	va_list args;
+	va_start(args, a_message);
+	vprintf(a_message, args);
+	va_end(args);
+	printf ("\n");
+	printf (s_synopsis,
+			s_version.major,
+			s_version.minor,
+			s_version.build,
+			s_path);
+	exit (1);
+}
 
 //------------------------------------------------------------------------------
 /// @brief nibbles converts algorithm from byte to nibble tables.
@@ -672,24 +693,76 @@ compile (int a_sign)
 /// Distribute characters into state tables for searching.
 void
 Lettvin::GreasedGrep::
-compile (int a_sign, string_view a_str)
+compile (int a_sign, string_view a_sv)
 //------------------------------------------------------------------------------
 {
-	debugf (1, "COMPILE %+d: %s\n", a_sign, a_str.data ());
-	bool rejecting {a_sign == -1};
-	auto from      {s_root};
-	auto next      {from};
-	char last[2]   {0,0};
-	auto& field    {rejecting ? s_reject : s_accept};
-	i24_t id       {a_sign*static_cast<i24_t> (field.size () - 1)};
+	debugf (1, "COMPILE %+d: %s\n", a_sign, a_sv.data ());
+	bool rejecting   {a_sign == -1};
+	auto from        {s_root};
+	auto next        {from};
+	char last[2]     {0,0};
+	auto& field      {rejecting ? s_reject : s_accept};
+	i24_t id         {a_sign*static_cast<i24_t> (field.size () - 1)};
+	string b_str     {};
+	string a_str     {a_sv};
+	vector<string> variation;
+	static const map<string, size_t> varname{
+		{"a", 0}, {"acronym"     , 0},
+		{"c", 1}, {"contraction" , 1},
+		{"f", 2}, {"fatfinger"   , 2},
+		{"l", 3}, {"levenshtein1", 3},
+		{"m", 4}, {"metaphone"   , 4},
+		{"n", 6}, {"nyssis"      , 6},
+		{"s", 5}, {"soundex"     , 5},
+		{"t", 7}, {"thesaurus"   , 7}   // synonym
+	};
+	map<string, size_t>::const_iterator citer;
+
+	size_t brace_init{a_sv.find_first_of ('[')};
+	if (brace_init != string_view::npos)
+	{
+		size_t brace_fini{a_sv.find_first_of (']', brace_init + 1)};
+		if (brace_fini == string_view::npos)
+		{
+			syntax ("braced variations");
+		}
+		debugf (1, "BR %zu %zu\n", brace_init, brace_fini);
+		b_str = a_sv.substr (brace_init + 1, brace_fini - brace_init - 1);
+		a_str = a_sv.substr (0, brace_init);
+		debugf (1, "Braced [%s][%s]\n", a_str.c_str (), b_str.c_str ());
+		size_t comma = b_str.find_first_of (',');
+		while (comma != string::npos)
+		{
+			string token = b_str.substr (0, comma);
+			b_str = b_str.substr (comma + 1);
+			comma = b_str.find_first_of (',');
+			variation.push_back (token);
+			citer = varname.find (token);
+			if (citer == varname.end ())
+			{
+				syntax ("BAD variation name [%s]\n", token.c_str ());
+			}
+			debugf (1, "variation: %s\n", token.c_str ());
+		}
+		if (b_str.size ())
+		{
+			variation.push_back (b_str);
+			citer = varname.find (b_str);
+			if (citer == varname.end ())
+			{
+				syntax ("BAD variation name [%s]\n", b_str.c_str ());
+			}
+			debugf (1, "variation: %s\n", b_str.c_str ());
+		}
+	}
 
 	// Initially, the string as given is searched
-	// TODO generate variations like soundex/levenshtein, fatfinger
+	// TODO generate variations
 	// TODO handle collision for variations
 	// TODO generate all NFKD variations for insertion
 	// e.g. "than" and "then" are legitimate mutual variations.
 	vector<string> strs;
-	strs.emplace_back (string(a_str));
+	strs.emplace_back (a_str);
 
 	// Insert variations into transition tree
 	for (auto& str: strs)
