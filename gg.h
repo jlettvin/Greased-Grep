@@ -135,7 +135,7 @@ namespace Lettvin
 		chrono::duration<double> time_span =
 			chrono::duration_cast<chrono::duration<double>>(t1 - t0);
 
-		double seconds  = time_span.count();
+		double seconds  = time_span.count ();
 
 		if (a_message)
 		{
@@ -284,7 +284,7 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief ftor
-		void operator() ();
+		void operator ()();
 
 	//------
 	private:

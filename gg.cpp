@@ -170,9 +170,9 @@ void Lettvin::synopsis (const char* a_message, ...)
 		printf (" # ERROR: ");
 	}
 	va_list args;
-	va_start(args, a_message);
-	vprintf(a_message, args);
-	va_end(args);
+	va_start (args, a_message);
+	vprintf (a_message, args);
+	va_end (args);
 	printf ("\n");
 	printf (s_synopsis,
 			s_version.major,
@@ -189,9 +189,9 @@ void Lettvin::syntax (const char* a_message, ...)
 {
 	printf (" # SYNTAX ERROR: ");
 	va_list args;
-	va_start(args, a_message);
-	vprintf(a_message, args);
-	va_end(args);
+	va_start (args, a_message);
+	vprintf (a_message, args);
+	va_end (args);
 	printf ("\n");
 	printf (s_synopsis,
 			s_version.major,
@@ -223,15 +223,15 @@ Lettvin::debugf (size_t a_debug, const char *fmt, ...)
 	if (s_debug >= a_debug)
 	{
 		va_list args;
-		va_start(args, fmt);
+		va_start (args, fmt);
 		printf (" #'");
 		for (size_t i=0; i < a_debug; ++i)
 		{
 			printf ("%s", indent);
 		}
 		printf ("DBG(%lu): ", a_debug);
-		ret = vprintf(fmt, args);
-		va_end(args);
+		ret = vprintf (fmt, args);
+		va_end (args);
 	}
 	return ret;
 } // debugf
@@ -305,7 +305,7 @@ show_tables (ostream& a_os)
 				Atom& entry{plane[id]};
 				int tgt{static_cast<int>(entry.tgt ())};
 				char gra{id>=' '&&id<='~'?id:'?'};
-				if (tgt) a_os << gra << setw(3) << tgt << ' ';
+				if (tgt) a_os << gra << setw (3) << tgt << ' ';
 				else     a_os << ".....";
 			}
 			printf ("|\n # |");
@@ -313,7 +313,7 @@ show_tables (ostream& a_os)
 			{
 				Atom& entry{plane[row+col]};
 				int str{static_cast<int>(entry.str ())};
-				if (str) a_os << setw(4) << str << ' ';
+				if (str) a_os << setw (4) << str << ' ';
 				else     a_os << ".....";
 			}
 			printf ("|%2.2x\n # ", row);
@@ -518,7 +518,7 @@ GreasedGrep (int a_argc, char** a_argv) // ctor
 /// @brief ftor
 void
 Lettvin::GreasedGrep::
-operator() ()
+operator ()()
 //------------------------------------------------------------------------------
 {
 	// Run unit and timing tests.
@@ -848,9 +848,9 @@ walk (const fs::path& a_path)
 			// Account for existing main thread
 			unsigned int threads{thread::hardware_concurrency () - 1};
 			vector<thread> Pool;
-			for(unsigned int ii = 0; ii < threads; ii++)
+			for (unsigned int ii = 0; ii < threads; ii++)
 			{
-				Pool.push_back(thread(noop));
+				Pool.push_back (thread (noop));
 			}
 		}
 
