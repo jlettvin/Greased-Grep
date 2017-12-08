@@ -689,6 +689,7 @@ compile (int a_sign, string_view a_str)
 	// Initially, the string as given is searched
 	// TODO generate variations like soundex/levenshtein, fatfinger
 	// TODO handle collision for variations
+	// TODO generate all NFKD variations for insertion
 	// e.g. "than" and "then" are legitimate mutual variations.
 	vector<string> strs;
 	strs.emplace_back (string(a_str));

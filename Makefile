@@ -36,7 +36,7 @@
 
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
-ARCHIVE=.gitignore LICENSE Makefile README.md gg.cpp test
+ARCHIVE=.gitignore LICENSE Makefile README.md gg.cpp Threaded.cpp test
 EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
 ################################################################################
@@ -45,12 +45,12 @@ COPTS_BOTH=-Wextra -Wall -Werror -std=c++17
 COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
 COPTS_FINAL=-O3  $(COPTS_BOTH)
 COPTS=$(COPTS_DEBUG)
-LOPTS=-lfmt -lstdc++fs
-COBJS=gg
+LOPTS=-pthread -lfmt -lstdc++fs
+CEXES=gg Threaded
 ################################################################################
 
 ################################################################################
-all: before gg test after
+all: before $(CEXES) test after
 
 ################################################################################
 .PHONY:
@@ -65,6 +65,12 @@ test: FORCE
 gg:	gg.cpp gg.h Makefile
 	@./reversion.py gg_version.h
 	$(CC) $(COPTS) -o gg gg.cpp $(LOPTS)
+
+################################################################################
+Threaded: Threaded.cpp
+	@echo "Test Threaded"
+	g++ -DMAIN $(COPTS) -o $@ $< $(LOPTS)
+	./$@
 
 ################################################################################
 #	g++ -O3 -Wextra -Wall -Werror -std=c++17 -o gg gg.cpp -lfmt -lstdc++fs
@@ -94,7 +100,7 @@ after:    FORCE
 ################################################################################
 .PHONY:
 clean:    FORCE
-	rm -fr $(COBJS)
+	rm -fr $(CEXES)
 	rm -f *.gcov *.gcda *.gcno
 
 ################################################################################
