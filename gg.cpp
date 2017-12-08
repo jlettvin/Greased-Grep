@@ -78,8 +78,6 @@ EXAMPLES:
 )Synopsis";
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-// TODO find bug for when m_table is not reserved
-//      without reserving, the program crashes
 // TODO measure performance against fgrep/ack/ag
 //      publishing performance will make gg more attractive
 // TODO ingest args with ctor but compile strs at beginning of ftor
@@ -204,7 +202,6 @@ Lettvin::Table::
 Table ()
 //------------------------------------------------------------------------------
 {
-	// TODO find bug for when m_table is not reserved
 	m_table.reserve (s_prefill*256);
 	for (size_t i=0; i < s_prefill; ++i)
 	{

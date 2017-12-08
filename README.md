@@ -196,14 +196,6 @@ but code simplification merits this choice.
 
 ### TODO
 <ul>
- <li> find bug for when m_table is not reserved
-  <ul>
-   <li>
-without reserving, the program crashes
-   </li>
-  </ul>
- </li>
-
  <li>
 measure performance against fgrep/ack/ag
   <ul>
@@ -226,7 +218,8 @@ compilation in ftor currently fails
 use memcmp for unique final string
   <ul>
    <li>
-When the tail end of a search is unique memcmp is faster
+When the tail end of a search is unique memcmp is faster.
+This optimization increases complexity considerably.
    </li>
   </ul>
  </li>
@@ -235,7 +228,8 @@ When the tail end of a search is unique memcmp is faster
 run searches in threads for higher performance
   <ul>
    <li>
-thread-safe Table and atomic output: concurrent processing is possible
+thread-safe Table and atomic output: concurrent processing is possible.
+See Threaded.cpp for producer/consumer pattern to be deployed.
    </li>
   </ul>
  </li>

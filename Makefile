@@ -60,6 +60,7 @@ test: FORCE
 	./gg -s abc def ghi jkl .
 	./gg -s -d +abc +def +ghi +jkl $(REJECT) .
 	./gg -c -d -n AA .
+	./Threaded
 
 ################################################################################
 gg:	gg.cpp gg.h Makefile
@@ -70,7 +71,6 @@ gg:	gg.cpp gg.h Makefile
 Threaded: Threaded.cpp
 	@echo "Test Threaded"
 	g++ -DMAIN $(COPTS) -o $@ $< $(LOPTS)
-	./$@
 
 ################################################################################
 #	g++ -O3 -Wextra -Wall -Werror -std=c++17 -o gg gg.cpp -lfmt -lstdc++fs
