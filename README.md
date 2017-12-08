@@ -196,6 +196,22 @@ but code simplification merits this choice.
 
 ### TODO
 <ul>
+
+ <li>
+implement variant generation/insertion
+ <table>
+  <tr><td>a or acronym</td>     <td>to insert variants like M.I.T.</td></tr>
+  <tr><td>c or contraction</td> <td>to insert variants like MIT</td></tr>
+  <tr><td>f or fatfinger</td>   <td>to insert variants like NUR</td></tr>
+  <tr><td>l or levenshtein1</td><td>to insert variants like MTI</td></tr>
+  <tr><td>m or metaphone</td></tr>
+  <tr><td>n or nyssis</td></tr>
+  <tr><td>s or soundex</td></tr>
+  <tr><td>t or thesaurus</td>   <td>to insert synonyms</td></tr>
+  <tr><td>u or unicode</td>     <td>to insert NFKD variants</td></tr>
+ </table>
+ </li>
+
  <li>
 measure performance against fgrep/ack/ag
   <ul>

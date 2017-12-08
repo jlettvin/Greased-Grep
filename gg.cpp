@@ -28,7 +28,7 @@ R"Synopsis(Greased Grep version %u.%u.%u
 
 PATH: %s
 
-USAGE: gg [-c] [-n] [-s] [-t] [+|-]{str} [[+|-]{str}...] {path} 
+USAGE: gg [-c] [-n] [-s] [-t] [-v] [+|-]{str} [[+|-]{str}...] {path} 
 
 Greased Grep UTF8 search for files having (case insensitive):
     all instances of +{str} or {str} and
@@ -48,7 +48,19 @@ ARGUMENTS:
 
 ARGUMENT OPTIONS:
 
-    {str}[
+    A {str} followed by a bracket-list triggers variant insertion
+    Examples:
+       gg copyright[acronym,c,f,soundex,nyssis] .
+    Available:
+       a or acronym           to insert variants like M.I.T.
+       c or contraction       to insert variants like MIT
+       f or fatfinger         to insert variants like NUR
+       l or levenshtein1      to insert variants like MTI
+       m or metaphone
+       n or nyssis
+       s or soundex
+       t or thesaurus         to insert synonyms
+       u or unicode           to insert NFKD variants
 
 OPTIONS:
 
@@ -61,6 +73,8 @@ OPTIONS:
     -s, --suppress  # suppress permission denied errors
 
     -t, --test      # test algorithms (unit and timing)  TODO
+
+    -v, --variant # enable variant syntax with [] brackets
 
 OUTPUT:
 
@@ -606,6 +620,7 @@ option (string_view a_str)
 	else if (a_str == "--nibbles"  || (opt && letter == 'n')) s_nibbles  = true;
 	else if (a_str == "--suppress" || (opt && letter == 's')) s_suppress = true;
 	else if (a_str == "--test"     || (opt && letter == 't')) s_test     = true;
+	else if (a_str == "--variant"|| (opt && letter == 'v')) s_variant= true;
 	else if (opt)
 	{
 		synopsis ("unknown arg");
@@ -709,56 +724,60 @@ compile (int a_sign, string_view a_sv)
 	i24_t id         {a_sign*static_cast<i24_t> (field.size () - 1)};
 	string b_str     {};
 	string a_str     {a_sv};
-	vector<string> variation;
-	map<string, size_t>::const_iterator citer;
 
-	size_t brace_init{a_sv.find_first_of ('[')};
-	if (brace_init != string_view::npos)
+	vector<string> variant;
+
+	if (s_variant)
 	{
-		size_t brace_fini{a_sv.find_first_of (']', brace_init + 1)};
-		if (brace_fini == string_view::npos)
+		map<string, size_t>::const_iterator citer;
+		size_t brace_init{a_sv.find_first_of ('[')};
+		if (brace_init != string_view::npos)
 		{
-			syntax ("braced variations");
-		}
-		debugf (1, "BR %zu %zu\n", brace_init, brace_fini);
-		b_str = a_sv.substr (brace_init + 1, brace_fini - brace_init - 1);
-		a_str = a_sv.substr (0, brace_init);
-		debugf (1, "Braced [%s][%s]\n", a_str.c_str (), b_str.c_str ());
-		size_t comma = b_str.find_first_of (',');
-		while (comma != string::npos)
-		{
-			string token = b_str.substr (0, comma);
-			b_str = b_str.substr (comma + 1);
-			comma = b_str.find_first_of (',');
-			variation.push_back (token);
-			citer = s_variation.find (token);
-			if (citer == s_variation.end ())
+			size_t brace_fini{a_sv.find_first_of (']', brace_init + 1)};
+			if (brace_fini == string_view::npos)
 			{
-				syntax ("BAD variation name [%s]\n", token.c_str ());
+				syntax ("braced variants");
 			}
-			debugf (1, "variation: %s\n", token.c_str ());
-		}
-		if (b_str.size ())
-		{
-			variation.push_back (b_str);
-			citer = s_variation.find (b_str);
-			if (citer == s_variation.end ())
+			debugf (1, "BR %zu %zu\n", brace_init, brace_fini);
+			b_str = a_sv.substr (brace_init + 1, brace_fini - brace_init - 1);
+			a_str = a_sv.substr (0, brace_init);
+			debugf (1, "Braced [%s][%s]\n", a_str.c_str (), b_str.c_str ());
+			size_t comma = b_str.find_first_of (',');
+			while (comma != string::npos)
 			{
-				syntax ("BAD variation name [%s]\n", b_str.c_str ());
+				string token = b_str.substr (0, comma);
+				b_str = b_str.substr (comma + 1);
+				comma = b_str.find_first_of (',');
+				variant.push_back (token);
+				citer = s_variants.find (token);
+				if (citer == s_variants.end ())
+				{
+					syntax ("BAD variant name [%s]\n", token.c_str ());
+				}
+				debugf (1, "variant: %s\n", token.c_str ());
 			}
-			debugf (1, "variation: %s\n", b_str.c_str ());
+			if (b_str.size ())
+			{
+				variant.push_back (b_str);
+				citer = s_variants.find (b_str);
+				if (citer == s_variants.end ())
+				{
+					syntax ("BAD variant name [%s]\n", b_str.c_str ());
+				}
+				debugf (1, "variant: %s\n", b_str.c_str ());
+			}
 		}
 	}
 
 	// Initially, the string as given is searched
-	// TODO generate variations like soundex/levenshtein, fatfinger
-	// TODO handle collision for variations
-	// TODO generate all NFKD variations for insertion
-	// e.g. "than" and "then" are legitimate mutual variations.
+	// TODO generate variants like soundex/levenshtein, fatfinger
+	// TODO handle collision for variants
+	// TODO generate all NFKD variants for insertion
+	// e.g. "than" and "then" are legitimate mutual variants.
 	vector<string> strs;
 	strs.emplace_back (a_str);
 
-	// Insert variations into transition tree
+	// Insert variants into transition tree
 	for (auto& str: strs)
 	{
 		insert (str, id);
