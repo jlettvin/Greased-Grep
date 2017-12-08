@@ -58,6 +58,7 @@ _____________________________________________________________________________*/
 #include <string>                  // container
 #include <vector>                  // container
 #include <chrono>                  // steady_clock
+#include <map>                     // container
 #include <set>                     // container
 
 //..............................................................................
@@ -81,6 +82,18 @@ namespace Lettvin
 
 	typedef unsigned char u08_t;
 	typedef int           i24_t;
+
+	static const map<string, size_t> s_variation{
+		{"a", 0}, {"acronym"     , 0},
+		{"c", 1}, {"contraction" , 1},
+		{"f", 2}, {"fatfinger"   , 2},
+		{"l", 3}, {"levenshtein1", 3},
+		{"m", 4}, {"metaphone"   , 4},
+		{"n", 6}, {"nyssis"      , 6},
+		{"s", 5}, {"soundex"     , 5},
+		{"t", 7}, {"thesaurus"   , 7}   // synonym
+	};
+
 
 	bool   s_caseless{false};            ///< turn on case insensitivity
 	bool   s_nibbles {false};            ///< nibble planes replace bute planes

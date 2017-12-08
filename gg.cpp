@@ -46,6 +46,10 @@ ARGUMENTS:
 
     {path}          # file or top directory for recursive search
 
+ARGUMENT OPTIONS:
+
+    {str}[
+
 OPTIONS:
 
     -c, --caseless  # case sensitive search
@@ -706,16 +710,6 @@ compile (int a_sign, string_view a_sv)
 	string b_str     {};
 	string a_str     {a_sv};
 	vector<string> variation;
-	static const map<string, size_t> varname{
-		{"a", 0}, {"acronym"     , 0},
-		{"c", 1}, {"contraction" , 1},
-		{"f", 2}, {"fatfinger"   , 2},
-		{"l", 3}, {"levenshtein1", 3},
-		{"m", 4}, {"metaphone"   , 4},
-		{"n", 6}, {"nyssis"      , 6},
-		{"s", 5}, {"soundex"     , 5},
-		{"t", 7}, {"thesaurus"   , 7}   // synonym
-	};
 	map<string, size_t>::const_iterator citer;
 
 	size_t brace_init{a_sv.find_first_of ('[')};
@@ -737,8 +731,8 @@ compile (int a_sign, string_view a_sv)
 			b_str = b_str.substr (comma + 1);
 			comma = b_str.find_first_of (',');
 			variation.push_back (token);
-			citer = varname.find (token);
-			if (citer == varname.end ())
+			citer = s_variation.find (token);
+			if (citer == s_variation.end ())
 			{
 				syntax ("BAD variation name [%s]\n", token.c_str ());
 			}
@@ -747,8 +741,8 @@ compile (int a_sign, string_view a_sv)
 		if (b_str.size ())
 		{
 			variation.push_back (b_str);
-			citer = varname.find (b_str);
-			if (citer == varname.end ())
+			citer = s_variation.find (b_str);
+			if (citer == s_variation.end ())
 			{
 				syntax ("BAD variation name [%s]\n", b_str.c_str ());
 			}
@@ -757,7 +751,7 @@ compile (int a_sign, string_view a_sv)
 	}
 
 	// Initially, the string as given is searched
-	// TODO generate variations
+	// TODO generate variations like soundex/levenshtein, fatfinger
 	// TODO handle collision for variations
 	// TODO generate all NFKD variations for insertion
 	// e.g. "than" and "then" are legitimate mutual variations.
