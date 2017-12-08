@@ -538,7 +538,7 @@ operator() ()
 	if (s_target.size () < 1 &&
 		((s_accept.size () < 2) && (s_reject.size () < 2)))
 	{
-		Lettvin::synopsis ("A pattern and directory required.");
+		Lettvin::synopsis ("pattern(s) and directory required.");
 	}
 
 	// Validate ingested args
