@@ -726,7 +726,7 @@ compile (int a_sign, string_view a_sv)
 	string b_str     {};
 	string a_str     {a_sv};
 
-	vector<string> variant;
+	vector<string> variant_names;
 
 	if (s_variant)
 	{
@@ -749,7 +749,7 @@ compile (int a_sign, string_view a_sv)
 				string token = b_str.substr (0, comma);
 				b_str = b_str.substr (comma + 1);
 				comma = b_str.find_first_of (',');
-				variant.push_back (token);
+				variant_names.push_back (token);
 				citer = s_variants.find (token);
 				if (citer == s_variants.end ())
 				{
@@ -759,7 +759,7 @@ compile (int a_sign, string_view a_sv)
 			}
 			if (b_str.size ())
 			{
-				variant.push_back (b_str);
+				variant_names.push_back (b_str);
 				citer = s_variants.find (b_str);
 				if (citer == s_variants.end ())
 				{
@@ -777,6 +777,12 @@ compile (int a_sign, string_view a_sv)
 	// e.g. "than" and "then" are legitimate mutual variants.
 	vector<string> strs;
 	strs.emplace_back (a_str);
+
+	for (auto& variant_name:variant_names)
+	{
+		// TODO for each variant_name, generate and strs.emplace_back (variant).
+		// Multiple variants are typical for each variant_name
+	}
 
 	// Insert variants into transition tree
 	for (auto& str: strs)
