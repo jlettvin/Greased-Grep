@@ -20,14 +20,14 @@ using namespace std;
 // https://juanchopanzacpp.wordpress.com/2013/02/26/concurrent-queue-c11/
 // modified from original by trivial renaming of members
 template <typename T>
-class Queue
+class ThreadedQueue
 {
 
 //------
 public:
 //------
 
-	Queue (size_t a_maximum=32) : m_maximum (a_maximum) {}
+	ThreadedQueue (size_t a_maximum=64) : m_maximum (a_maximum) {}
 
 	//--------------------------------------------------------------------------
 	T pop()
@@ -102,11 +102,13 @@ private:
 	std::mutex m_mutex;
 	std::condition_variable m_available;
 	std::condition_variable m_full;       // TODO prevent more than max
-	size_t m_maximum{32};                 // TODO prevent more than max
+	size_t m_maximum{64};                 // TODO prevent more than max
 
-}; // class Queue
+}; // class ThreadedQueue
 
+#ifdef MAIN
 //______________________________________________________________________________
+/// Demonstration use of ThreadedQueue
 class Distribute
 {
 
@@ -115,7 +117,7 @@ public:
 //------
 
 	//--------------------------------------------------------------------------
-	Distribute (size_t a_max=32) : m_cpus (a_max), m_queue (a_max) {}
+	Distribute (size_t a_max=64) : m_cpus (a_max), m_queue (a_max) {}
 
 	//--------------------------------------------------------------------------
 	void operator()(vector<string>& a_tokens)
@@ -162,11 +164,13 @@ public:
 private:
 //------
 
-	size_t         m_cpus;
-	vector<thread> m_threads;
-	Queue<string>  m_queue;
+	size_t                m_cpus;
+	vector<thread>        m_threads;
+	ThreadedQueue<string> m_queue;
 
 }; // class Distribute
+#endif
+
 }  // namespace Lettvin
 
 #ifdef MAIN

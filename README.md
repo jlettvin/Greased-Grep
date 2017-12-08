@@ -267,7 +267,7 @@ run searches in threads for higher performance
   <ul>
    <li>
 thread-safe Table and atomic output: concurrent processing is possible.
-See Threaded.cpp for producer/consumer pattern to be deployed.
+See thread_queue.cpp for producer/consumer pattern to be deployed.
    </li>
   </ul>
  </li>

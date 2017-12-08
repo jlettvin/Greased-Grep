@@ -1,5 +1,5 @@
 gede2.ini
-Threaded
+thread_queue
 gg
 tgz
 tgz/*

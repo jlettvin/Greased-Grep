@@ -36,7 +36,7 @@
 
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
-ARCHIVE=.gitignore LICENSE Makefile README.md gg.cpp Threaded.cpp test
+ARCHIVE=.gitignore LICENSE Makefile README.md gg.cpp thread_queue.cpp test
 EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
 ################################################################################
@@ -46,7 +46,7 @@ COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
 COPTS_FINAL=-O3  $(COPTS_BOTH)
 COPTS=$(COPTS_DEBUG)
 LOPTS=-pthread -lfmt -lstdc++fs
-CEXES=gg Threaded
+CEXES=gg thread_queue
 ################################################################################
 
 ################################################################################
@@ -60,7 +60,7 @@ test: FORCE
 	./gg -s abc def ghi jkl .
 	./gg -s -d +abc +def +ghi +jkl $(REJECT) .
 	./gg -c -d -n AA .
-	./Threaded
+	./thread_queue
 
 ################################################################################
 gg:	gg.cpp gg.h Makefile
@@ -68,8 +68,8 @@ gg:	gg.cpp gg.h Makefile
 	$(CC) $(COPTS) -o gg gg.cpp $(LOPTS)
 
 ################################################################################
-Threaded: Threaded.cpp
-	@echo "Test Threaded"
+thread_queue: thread_queue.cpp
+	@echo "Test thread_queue"
 	g++ -DMAIN $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
