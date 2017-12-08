@@ -56,6 +56,7 @@ ARGUMENT OPTIONS: (TODO)
        a or acronym           to insert variants like M.I.T.
        c or contraction       to insert variants like MIT
        f or fatfinger         to insert variants like NUR
+	   i or insensitive       to insert variants like mIt
        l or levenshtein1      to insert variants like MTI
        m or metaphone
        n or nyssis
