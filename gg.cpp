@@ -51,7 +51,7 @@ ARGUMENT OPTIONS: (TODO)
     When the --variant option is used
     A {str} followed by a bracket-list triggers variant insertion
     Examples:
-       $ gg copyright[acronym,c,f,soundex,nyssis] .
+       $ gg -v copyright[acronym,c,f,soundex,nyssis] .
     Available:
        a or acronym           to insert variants like M.I.T.
        c or contraction       to insert variants like MIT
