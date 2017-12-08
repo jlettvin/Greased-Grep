@@ -46,11 +46,12 @@ ARGUMENTS:
 
     {path}          # file or top directory for recursive search
 
-ARGUMENT OPTIONS:
+ARGUMENT OPTIONS: (TODO)
 
+    When the --variant option is used
     A {str} followed by a bracket-list triggers variant insertion
     Examples:
-       gg copyright[acronym,c,f,soundex,nyssis] .
+       $ gg copyright[acronym,c,f,soundex,nyssis] .
     Available:
        a or acronym           to insert variants like M.I.T.
        c or contraction       to insert variants like MIT
@@ -82,16 +83,16 @@ OUTPUT:
 
 EXAMPLES:
 
-    gg include /usr/local/src
+    $ gg include /usr/local/src
         # find all files having the string 'inlude' in /usr/local/src
 
-    gg '#include <experimental/filesystem>' /usr/local/src
+    $ gg '#include <experimental/filesystem>' /usr/local/src
         # find all files having the quoted string in /usr/local/src
 
-    gg copyright -Lettvin .
+    $ gg copyright -Lettvin .
         # Find all files with missing or other than Lettvin copyright.
 
-    gg 愚公移山 .
+    $ gg 愚公移山 .
         # Find the foolish old man who moved the mountains
 )Synopsis";
 
