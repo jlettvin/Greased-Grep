@@ -1,5 +1,5 @@
 # Greased-Grep (version 0.0.314)
-## High performance O(N) case insensitive UTF8<br />threaded recursive search for files having<br />all of one set and none of another set of strings
+## High performance O(N) case insensitive UTF8<br />threaded recursive fuzzy search for files having<br />all of one set and none of another set of strings
 ### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
 ### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
 ### $ gg 愚公移山 .                 # find the foolish old man who moved mountains
@@ -8,6 +8,8 @@
 "gg" is the left-hand index-finger letter, and typing it twice is easy.
 "gfg" (greased-fgrep) would be more accurate since fgrep is not regex.
 But "gfg" is harder to type than "gg" so this is the decided app name.
+
+Fuzzy searching is under development but is similar to case insensitivity.
 
 <hr />
 
