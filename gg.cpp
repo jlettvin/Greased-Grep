@@ -156,6 +156,9 @@ EXAMPLES:
 #include "gg.h"                    // declarations
 #include "thread_queue.h"          // filename distribution to threads
 
+//..............................................................................
+#include "acronym.h"
+
 namespace fs = std::experimental::filesystem;
 using namespace std;  // No naming collisions in this small namespace
 
@@ -728,6 +731,14 @@ compile (int a_sign, string_view a_sv)
 
 	vector<string> variant_names;
 
+	// Initially, the string as given is searched
+	// TODO generate variants like soundex/levenshtein, fatfinger
+	// TODO handle collision for variants
+	// TODO generate all NFKD variants for insertion
+	// e.g. "than" and "then" are legitimate mutual variants.
+	vector<string> strs;
+	strs.emplace_back (a_str);
+
 	if (s_variant)
 	{
 		map<string, size_t>::const_iterator citer;
@@ -768,15 +779,19 @@ compile (int a_sign, string_view a_sv)
 				debugf (1, "variant: %s\n", b_str.c_str ());
 			}
 		}
-	}
 
-	// Initially, the string as given is searched
-	// TODO generate variants like soundex/levenshtein, fatfinger
-	// TODO handle collision for variants
-	// TODO generate all NFKD variants for insertion
-	// e.g. "than" and "then" are legitimate mutual variants.
-	vector<string> strs;
-	strs.emplace_back (a_str);
+		for (auto& variant:variant_names)
+		{
+			// Call named functions
+			/*
+			auto& key{s_variants[variant]};
+			switch (key)
+			{
+				case 0: strs.append (acronym (a_str)); break;
+			}
+			*/
+		}
+	}
 
 	for (auto& variant_name:variant_names)
 	{

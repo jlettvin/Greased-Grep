@@ -46,7 +46,8 @@ COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
 COPTS_FINAL=-O3  $(COPTS_BOTH)
 COPTS=$(COPTS_DEBUG)
 LOPTS=-pthread -lfmt -lstdc++fs
-CEXES=gg thread_queue
+CEXES=gg
+#CEXES=gg thread_queue
 ################################################################################
 
 ################################################################################
@@ -60,7 +61,8 @@ test: FORCE
 	./gg -s abc def ghi jkl .
 	./gg -s -d +abc +def +ghi +jkl $(REJECT) .
 	./gg -c -d -n AA .
-	./thread_queue
+
+#	./thread_queue
 
 ################################################################################
 gg:	gg.cpp gg.h Makefile thread_queue.h
@@ -68,9 +70,9 @@ gg:	gg.cpp gg.h Makefile thread_queue.h
 	$(CC) $(COPTS) -o gg gg.cpp $(LOPTS)
 
 ################################################################################
-thread_queue: thread_queue.cpp thread_queue.h
-	@echo "Test thread_queue"
-	g++ -DMAIN $(COPTS) -o $@ $< $(LOPTS)
+#thread_queue: thread_queue.cpp thread_queue.h
+#	@echo "Test thread_queue"
+#	g++ -DMAIN $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
 #	g++ -O3 -Wextra -Wall -Werror -std=c++17 -o gg gg.cpp -lfmt -lstdc++fs
