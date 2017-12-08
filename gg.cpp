@@ -155,6 +155,7 @@ EXAMPLES:
 //..............................................................................
 #include "gg_version.h"            // version
 #include "gg.h"                    // declarations
+#include "thread_queue.h"          // filename distribution to threads
 
 namespace fs = std::experimental::filesystem;
 using namespace std;  // No naming collisions in this small namespace

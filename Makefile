@@ -63,12 +63,12 @@ test: FORCE
 	./thread_queue
 
 ################################################################################
-gg:	gg.cpp gg.h Makefile
+gg:	gg.cpp gg.h Makefile thread_queue.h
 	@./reversion.py gg_version.h
 	$(CC) $(COPTS) -o gg gg.cpp $(LOPTS)
 
 ################################################################################
-thread_queue: thread_queue.cpp
+thread_queue: thread_queue.cpp thread_queue.h
 	@echo "Test thread_queue"
 	g++ -DMAIN $(COPTS) -o $@ $< $(LOPTS)
 
