@@ -58,9 +58,9 @@ ARGUMENT OPTIONS: (TODO)
        f or fatfinger         to insert variants like NUR
        i or insensitive       to insert variants like mIt
        l or levenshtein1      to insert variants like MTI
-       m or metaphone
-       n or nyssis
-       s or soundex
+       m or metaphone         may dismiss as post-processing
+       n or nyssis            may dismiss as post-processing
+       s or soundex           may dismiss as post-processing
        t or thesaurus         to insert synonyms
        u or unicode           to insert NFKD variants
 
