@@ -1,4 +1,4 @@
-# Greased-Grep (version 0.0.1)
+# Greased-Grep (version 0.0.314)
 ## High performance case insensitive UTF8<br />recursive search for files having<br />all of one set and none of another set of strings
 ### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
 ### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
@@ -228,6 +228,10 @@ implement variant generation/insertion
   <tr><td>t or thesaurus</td>   <td>to insert synonyms</td></tr>
   <tr><td>u or unicode</td>     <td>to insert NFKD variants</td></tr>
  </table>
+ </li>
+
+ <li>
+Modify reversion.py to update README and gg_version.h to the same designation.
  </li>
 
  <li>
