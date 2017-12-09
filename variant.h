@@ -155,7 +155,7 @@ namespace Lettvin
 	typedef size_t (*variantp_t)(vector<string>&, string);
 	typedef map<string, variantp_t> mapvariant_t;
 
-	mapvariant_t s_function{
+	mapvariant_t s_variant_generator{
 		{"acronym"     , acronym}		,{"a", acronym},
 		{"contraction" , contraction}	,{"c", contraction},
 		{"ellipses"    , ellipses}		,{"e", ellipses},

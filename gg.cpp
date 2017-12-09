@@ -769,8 +769,8 @@ compile (int a_sign, string_view a_sv)
 				b_str = b_str.substr (comma + 1);
 				comma = b_str.find_first_of (',');
 				variant_names.push_back (token);
-				citer = s_function.find (token);
-				if (citer == s_function.end ())
+				citer = s_variant_generator.find (token);
+				if (citer == s_variant_generator.end ())
 				{
 					syntax ("BAD variant name [%s]\n", token.c_str ());
 				}
@@ -779,8 +779,8 @@ compile (int a_sign, string_view a_sv)
 			if (b_str.size ())
 			{
 				variant_names.push_back (b_str);
-				citer = s_function.find (b_str);
-				if (citer == s_function.end ())
+				citer = s_variant_generator.find (b_str);
+				if (citer == s_variant_generator.end ())
 				{
 					syntax ("BAD variant name [%s]\n", b_str.c_str ());
 				}
@@ -791,10 +791,10 @@ compile (int a_sign, string_view a_sv)
 		// Have all specified variant functions add to the alternatives.
 		for (auto& variant:variant_names)
 		{
-			const auto& iter = s_function.find (variant);
-			if (iter != s_function.end ())
+			const auto& generator_iter = s_variant_generator.find (variant);
+			if (generator_iter != s_variant_generator.end ())
 			{
-				iter->second (strs, a_str);
+				generator_iter->second (strs, a_str);
 			}
 		}
 	}
