@@ -72,8 +72,9 @@ ARGUMENT OPTIONS: (TODO)
     Examples:
        $ gg -v copyright[acronym,c,f,soundex,nyssis] .
     Available:
-       a or acronym           to insert variants like M.I.T.
-       c or contraction       to insert variants like MIT
+       a or acronym           to insert variants like M.I.T. or MIT
+       c or contraction       to insert variants like Mass. Inst. Techn.
+       e or ellipses          to insert variants like Massachus
        f or fatfinger         to insert variants like NUR
        i or insensitive       to insert variants like mIt
        l or levenshtein1      to insert variants like MTI
@@ -225,6 +226,7 @@ implement variant generation/insertion
  <table>
   <tr><td>a or acronym</td>     <td>to insert variants like M.I.T.</td></tr>
   <tr><td>c or contraction</td> <td>to insert variants like MIT</td></tr>
+  <tr><td>c or ellipses</td>    <td>to insert variants like Massachusetts Inst</td></tr>
   <tr><td>f or fatfinger</td>   <td>to insert variants like NUR</td></tr>
   <tr><td>l or levenshtein1</td><td>to insert variants like MTI</td></tr>
   <tr><td>m or metaphone</td></tr>
@@ -233,6 +235,11 @@ implement variant generation/insertion
   <tr><td>t or thesaurus</td>   <td>to insert synonyms</td></tr>
   <tr><td>u or unicode</td>     <td>to insert NFKD variants</td></tr>
  </table>
+ </li>
+
+ <li>
+Make targets indirect from search to support multiple matches.
+Currently the target is the direct index into the match array.
  </li>
 
  <li>

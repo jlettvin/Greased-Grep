@@ -46,7 +46,7 @@ ARGUMENTS:
 
     {path}          # file or top directory for recursive search
 
-ARGUMENT OPTIONS: (TODO)
+ARGUMENT OPTIONS:
 
     When the --variant option is used
     A {str} followed by a bracket-list triggers variant insertion
@@ -55,6 +55,7 @@ ARGUMENT OPTIONS: (TODO)
     Available:
        a or acronym           to insert variants like M.I.T.
        c or contraction       to insert variants like MIT
+       e or ellipses          to insert variants like MIT
        f or fatfinger         to insert variants like NUR
        i or insensitive       to insert variants like mIt
        l or levenshtein1      to insert variants like MTI
@@ -98,6 +99,10 @@ EXAMPLES:
 )Synopsis";
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+// TODO implement all variants algorithms
+//      the API exists, but code is undeveloped
+// TODO make targets indirect from search to support multiple matches
+//      currently the target is the direct index into the match array
 // TODO measure performance against fgrep/ack/ag
 //      publishing performance will make gg more attractive
 // TODO ingest args with ctor but compile strs at beginning of ftor
@@ -157,7 +162,7 @@ EXAMPLES:
 #include "thread_queue.h"          // filename distribution to threads
 
 //..............................................................................
-#include "acronym.h"
+#include "variant.h"
 
 namespace fs = std::experimental::filesystem;
 using namespace std;  // No naming collisions in this small namespace
@@ -783,15 +788,28 @@ compile (int a_sign, string_view a_sv)
 		for (auto& variant:variant_names)
 		{
 			// Call named functions
-			/*
-			auto& key{s_variants[variant]};
+			const auto& iter = s_variants.find (variant);
+			if (iter == s_variants.end ()) continue;
+			const auto& key = iter->second;
 			switch (key)
 			{
-				case 0: strs.append (acronym (a_str)); break;
+				case 0:      acronym (strs, a_str); break;
+				case 1:  contraction (strs, a_str); break;
+				case 2:     ellipses (strs, a_str); break;
+				case 3:    fatfinger (strs, a_str); break;
+				case 4: levenshtein1 (strs, a_str); break;
+				case 5:    metaphone (strs, a_str); break;
+				case 6:       nyssis (strs, a_str); break;
+				case 7:      soundex (strs, a_str); break;
+				case 8:    thesaurus (strs, a_str); break;
+				case 9:      unicode (strs, a_str); break;
 			}
-			*/
 		}
 	}
+	set<string> unique;
+	for (auto& item:strs) unique.insert (item);
+	strs.clear ();
+	for (auto& item:unique) strs.emplace_back (item);
 
 	for (auto& variant_name:variant_names)
 	{
