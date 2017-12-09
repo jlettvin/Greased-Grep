@@ -26,6 +26,9 @@ _____________________________________________________________________________*/
 
 #include <vector>
 #include <string>
+#include <map>
+
+#include <functional>
 
 #include <fmt/printf.h>            // modern printf
 
@@ -127,7 +130,7 @@ namespace Lettvin
 
 	size_t  misspelling (vector<string>& a_target, string a_phrase)
 	{
-		debugf (1, "METAPHONE[%s] %s\n", 
+		debugf (1, "MISSPELLING[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
 		size_t count{0};
 		return count;
@@ -143,10 +146,24 @@ namespace Lettvin
 
 	size_t      unicode (vector<string>& a_target, string a_phrase)
 	{
-		debugf (1, "NFKD[%s] %s\n", 
+		debugf (1, "UNICODE[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
 		size_t count{0};
 		return count;
 	}
+
+	typedef size_t (*variantp_t)(vector<string>&, string);
+	typedef map<string, variantp_t> mapvariant_t;
+
+	mapvariant_t s_function{
+		{"acronym"     , acronym}		,{"a", acronym},
+		{"contraction" , contraction}	,{"c", contraction},
+		{"ellipses"    , ellipses}		,{"e", ellipses},
+		{"fatfinger"   , fatfinger}		,{"f", fatfinger},
+		{"levenshtein1", levenshtein1}	,{"l", levenshtein1},
+		{"misspelling" , misspelling}	,{"m", misspelling},
+		{"thesaurus"   , thesaurus}		,{"t", thesaurus},
+		{"unicode"     , unicode}		,{"u", unicode}
+	};
 
 }

@@ -749,7 +749,7 @@ compile (int a_sign, string_view a_sv)
 
 	if (s_variant)
 	{
-		map<string, size_t>::const_iterator citer;
+		mapvariant_t::const_iterator citer;
 		size_t brace_init{a_sv.find_first_of ('[')};
 		if (brace_init != string_view::npos)
 		{
@@ -769,8 +769,8 @@ compile (int a_sign, string_view a_sv)
 				b_str = b_str.substr (comma + 1);
 				comma = b_str.find_first_of (',');
 				variant_names.push_back (token);
-				citer = s_variants.find (token);
-				if (citer == s_variants.end ())
+				citer = s_function.find (token);
+				if (citer == s_function.end ())
 				{
 					syntax ("BAD variant name [%s]\n", token.c_str ());
 				}
@@ -779,8 +779,8 @@ compile (int a_sign, string_view a_sv)
 			if (b_str.size ())
 			{
 				variant_names.push_back (b_str);
-				citer = s_variants.find (b_str);
-				if (citer == s_variants.end ())
+				citer = s_function.find (b_str);
+				if (citer == s_function.end ())
 				{
 					syntax ("BAD variant name [%s]\n", b_str.c_str ());
 				}
@@ -788,36 +788,22 @@ compile (int a_sign, string_view a_sv)
 			}
 		}
 
+		// Have all specified variant functions add to the alternatives.
 		for (auto& variant:variant_names)
 		{
-			// Call named functions
-			const auto& iter = s_variants.find (variant);
-			if (iter == s_variants.end ()) continue;
-			const auto& key = iter->second;
-			// TODO map directly from name to function
-			switch (key)
+			const auto& iter = s_function.find (variant);
+			if (iter != s_function.end ())
 			{
-				case 0:      acronym (strs, a_str); break;
-				case 1:  contraction (strs, a_str); break;
-				case 2:     ellipses (strs, a_str); break;
-				case 3:    fatfinger (strs, a_str); break;
-				case 4: levenshtein1 (strs, a_str); break;
-				case 5:  misspelling (strs, a_str); break;
-				case 6:    thesaurus (strs, a_str); break;
-				case 7:      unicode (strs, a_str); break;
+				iter->second (strs, a_str);
 			}
 		}
 	}
+
+	// Reduce the alternatives to the set of uniques
 	set<string> unique;
 	for (auto& item:strs) unique.insert (item);
 	strs.clear ();
 	for (auto& item:unique) strs.emplace_back (item);
-
-	for (auto& variant_name:variant_names)
-	{
-		// TODO for each variant_name, generate and strs.emplace_back (variant).
-		// Multiple variants are typical for each variant_name
-	}
 
 	// Insert variants into transition tree
 	for (auto& str: strs)

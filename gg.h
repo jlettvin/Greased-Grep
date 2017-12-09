@@ -83,6 +83,7 @@ namespace Lettvin
 	typedef unsigned char u08_t;
 	typedef int           i24_t;
 
+	/*
 	static const map<string, size_t> s_variants{
 		{"a", 0}, {"acronym"     , 0},
 		{"c", 1}, {"contraction" , 1},
@@ -93,6 +94,7 @@ namespace Lettvin
 		{"t", 6}, {"thesaurus"   , 6},  // synonym
 		{"u", 7}, {"unicode"     , 7}   // NFKD
 	};
+	*/
 
 
 	bool   s_caseless {false};           ///< turn on case insensitivity
