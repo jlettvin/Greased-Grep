@@ -86,13 +86,12 @@ namespace Lettvin
 	static const map<string, size_t> s_variants{
 		{"a", 0}, {"acronym"     , 0},
 		{"c", 1}, {"contraction" , 1},
-		{"f", 2}, {"fatfinger"   , 2},
-		{"l", 3}, {"levenshtein1", 3},
-		{"m", 4}, {"metaphone"   , 4},
-		{"n", 6}, {"nyssis"      , 6},
-		{"s", 5}, {"soundex"     , 5},
-		{"t", 7}, {"thesaurus"   , 7},  // synonym
-		{"u", 8}, {"unicode"     , 8}   // NFKD
+		{"e", 2}, {"ellipses"    , 2},
+		{"f", 3}, {"fatfinger"   , 3},
+		{"l", 4}, {"levenshtein1", 4},
+		{"m", 5}, {"misspelling" , 5},
+		{"t", 6}, {"thesaurus"   , 6},  // synonym
+		{"u", 7}, {"unicode"     , 7}   // NFKD
 	};
 
 

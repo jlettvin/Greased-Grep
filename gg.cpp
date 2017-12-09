@@ -51,7 +51,7 @@ ARGUMENT OPTIONS:
     When the --variant option is used
     A {str} followed by a bracket-list triggers variant insertion
     Examples:
-       $ gg -v copyright[acronym,c,f,soundex,nyssis] .
+       $ gg -v copyright[acronym,c,f,misspelling] .
     Available:
        a or acronym           to insert variants like M.I.T.
        c or contraction       to insert variants like MIT
@@ -59,9 +59,7 @@ ARGUMENT OPTIONS:
        f or fatfinger         to insert variants like NUR
        i or insensitive       to insert variants like mIt
        l or levenshtein1      to insert variants like MTI
-       m or metaphone         may dismiss as post-processing
-       n or nyssis            may dismiss as post-processing
-       s or soundex           may dismiss as post-processing
+       m or misspelling       to insert variants like releive
        t or thesaurus         to insert synonyms
        u or unicode           to insert NFKD variants
 
@@ -97,6 +95,11 @@ EXAMPLES:
     $ gg 愚公移山 .
         # Find the foolish old man who moved the mountains
 )Synopsis";
+
+// Industry standard post-processing algorithms are not applicable
+//       m or metaphone         may dismiss as post-processing
+//       n or nyssis            may dismiss as post-processing
+//       s or soundex           may dismiss as post-processing
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 // TODO implement all variants algorithms
@@ -737,7 +740,7 @@ compile (int a_sign, string_view a_sv)
 	vector<string> variant_names;
 
 	// Initially, the string as given is searched
-	// TODO generate variants like soundex/levenshtein, fatfinger
+	// TODO generate variants like levenshtein, fatfinger
 	// TODO handle collision for variants
 	// TODO generate all NFKD variants for insertion
 	// e.g. "than" and "then" are legitimate mutual variants.
@@ -791,6 +794,7 @@ compile (int a_sign, string_view a_sv)
 			const auto& iter = s_variants.find (variant);
 			if (iter == s_variants.end ()) continue;
 			const auto& key = iter->second;
+			// TODO map directly from name to function
 			switch (key)
 			{
 				case 0:      acronym (strs, a_str); break;
@@ -798,11 +802,9 @@ compile (int a_sign, string_view a_sv)
 				case 2:     ellipses (strs, a_str); break;
 				case 3:    fatfinger (strs, a_str); break;
 				case 4: levenshtein1 (strs, a_str); break;
-				case 5:    metaphone (strs, a_str); break;
-				case 6:       nyssis (strs, a_str); break;
-				case 7:      soundex (strs, a_str); break;
-				case 8:    thesaurus (strs, a_str); break;
-				case 9:      unicode (strs, a_str); break;
+				case 5:  misspelling (strs, a_str); break;
+				case 6:    thesaurus (strs, a_str); break;
+				case 7:      unicode (strs, a_str); break;
 			}
 		}
 	}

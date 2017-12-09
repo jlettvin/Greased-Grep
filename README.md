@@ -78,9 +78,7 @@ ARGUMENT OPTIONS: (TODO)
        f or fatfinger         to insert variants like NUR
        i or insensitive       to insert variants like mIt
        l or levenshtein1      to insert variants like MTI
-       m or metaphone         may dismiss as post-processing
-       n or nyssis            may dismiss as post-processing
-       s or soundex           may dismiss as post-processing
+       m or misspelling       to insert variants like releive
        t or thesaurus         to insert synonyms
        u or unicode           to insert NFKD variants
 
@@ -229,9 +227,7 @@ implement variant generation/insertion
   <tr><td>c or ellipses</td>    <td>to insert variants like Massachusetts Inst</td></tr>
   <tr><td>f or fatfinger</td>   <td>to insert variants like NUR</td></tr>
   <tr><td>l or levenshtein1</td><td>to insert variants like MTI</td></tr>
-  <tr><td>m or metaphone</td></tr>
-  <tr><td>n or nyssis</td></tr>
-  <tr><td>s or soundex</td></tr>
+  <tr><td>m or misspelling</td> <td>to insert variants like releive</td></tr>
   <tr><td>t or thesaurus</td>   <td>to insert synonyms</td></tr>
   <tr><td>u or unicode</td>     <td>to insert NFKD variants</td></tr>
  </table>

@@ -125,25 +125,9 @@ namespace Lettvin
 		return count;
 	}
 
-	size_t    metaphone (vector<string>& a_target, string a_phrase)
+	size_t  misspelling (vector<string>& a_target, string a_phrase)
 	{
 		debugf (1, "METAPHONE[%s] %s\n", 
-				a_phrase.c_str (), a_target[0].c_str ());
-		size_t count{0};
-		return count;
-	}
-
-	size_t       nyssis (vector<string>& a_target, string a_phrase)
-	{
-		debugf (1, "NYSSIS[%s] %s\n", 
-				a_phrase.c_str (), a_target[0].c_str ());
-		size_t count{0};
-		return count;
-	}
-
-	size_t      soundex (vector<string>& a_target, string a_phrase)
-	{
-		debugf (1, "SOUNDEX[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
 		size_t count{0};
 		return count;
