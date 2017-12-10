@@ -104,7 +104,7 @@ EXAMPLES:
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 // TODO implement all variants algorithms
 //      the API exists, but code is undeveloped
-// TODO make targets indirect from search to support multiple matches
+// DONE make targets indirect from search to support multiple matches
 //      currently the target is the direct index into the match array
 // TODO measure performance against fgrep/ack/ag
 //      publishing performance will make gg more attractive
@@ -511,10 +511,6 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 					if (done) break;
 				}
 #else
-				// TODO SET convert this to retrieving from s_set
-				// and operate on every member of the set
-				// so where str is singular here,
-				// this should become a loop over set members.
 				if (str < 0) return; ///< Immediate rejection
 				// If not immediate rejection, add to rejected list
 				auto& chose{(str>0)?accepted:rejected};
@@ -769,7 +765,7 @@ compile (int a_sign, string_view a_sv)
 	string b_str     {};
 	string a_str     {a_sv};
 
-	// TODO setindex will be used as an indirect forward reference from an Atom.
+	// TODO setindex is used as an indirect forward reference from an Atom.
 	// s_set[setindex] are the direct forward references of candidates which
 	// terminate on a particular Atom.
 	// When using variants, the probability of token identity drops with

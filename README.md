@@ -234,11 +234,6 @@ implement variant generation/insertion
  </li>
 
  <li>
-Make targets indirect from search to support multiple matches.
-Currently the target is the direct index into the match array.
- </li>
-
- <li>
 Modify reversion.py to update README and gg_version.h to the same designation.
  </li>
 
