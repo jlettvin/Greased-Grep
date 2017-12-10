@@ -84,7 +84,7 @@ ARGUMENT OPTIONS: (TODO)
 
 OPTIONS:
 
-    -c, --caseless  # case sensitive search
+    -c, --case      # case sensitive search
 
     -d, --debug     # turn on debugging output (multiple increases level)
 
