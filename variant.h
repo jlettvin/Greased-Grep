@@ -40,6 +40,7 @@ namespace Lettvin
 {
 	using namespace std;
 
+	//__________________________________________________________________________
 	size_t acronym (vector<string>& a_target, string a_phrase)
 	{
 		debugf (1, "ACRONYM[%s] %s\n",
@@ -96,14 +97,32 @@ namespace Lettvin
 		return count;
 	}
 
+	//__________________________________________________________________________
 	size_t  contraction (vector<string>& a_target, string a_phrase)
 	{
 		debugf (1, "CONTRACTION[%s] %s\n",
 				a_phrase.c_str (), a_target[0].c_str ());
+#if false
+    def bool_algorithm_contraction(self, canon, rough):
+        # Handle identity.
+        if canon == rough:
+            return self.bool_report(True, 'contraction', rough, canon)
+        self.generate_head_tail_indices(canon, rough)
+        rlen = len(rough)
+        less = rlen - 2
+        if rlen == self.head:
+            return self.bool_report(True, 'contraction', rough, canon)
+        if self.head >= 2:
+            return self.bool_report(True, 'contraction', rough, canon)
+        if self.both > less:
+            return self.bool_report(True, 'contraction', rough, canon)
+        return False
+#endif
 		size_t count{0};
 		return count;
 	}
 
+	//__________________________________________________________________________
 	size_t     ellipses (vector<string>& a_target, string a_phrase)
 	{
 		debugf (1, "ELLIPSES[%s] %s\n", 
@@ -112,22 +131,119 @@ namespace Lettvin
 		return count;
 	}
 
+	//__________________________________________________________________________
 	size_t    fatfinger (vector<string>& a_target, string a_phrase)
 	{
+#if false
+# Map qwerty keyboard to possible fat_fingerings.
+    QWERTY = {
+            # These are lists of all keys within a one key radius of center.
+            # Only alphabetics are considered for centers and
+            # only uppercase are considered for matching (by using .upper()).
+            'A': 'AaQWSXZqwsxz',
+            'B': 'BbVGHNvghn',
+            'C': 'CcXDFVxdfv',
+            'D': 'DdSERFCXserfcx',
+            'E': 'EeWSDR34#$wsdr',
+            'F': 'FfDRTGVCdrtgvc',
+            'G': 'GgFTYHBVftyhbv',
+            'H': 'HhGYUJNBgyujnb',
+            'I': 'IiUJKO89(*ujko',
+            'J': 'JjHUIKMNhuikmn',
+            'K': 'KkJIOL<Mjiol,m',
+            'L': 'LlKOP:><kop;.,',
+            'M': 'MmNJKL< jkl,',
+            'N': 'NnBHJM bhjm',
+            'O': 'OoI90PLK()iplk',
+            'P': 'PpO0-[;Lo)_{:l',
+            'Q': 'Qq  12WA!@wa',
+            'R': 'Rr45TFDE$%tfde',
+            'S': 'SsAWEDXZawedxz',
+            'T': 'TtR56YGFr%^ygf',
+            'U': 'UuY78IJH&*ijh',
+            'V': 'VvCFGB cfgb',
+            'W': 'WwQ23ESAq@#esa',
+            'X': 'XxZSDC zsdc',
+            'Y': 'YyT67UHGt^&uhg',
+            'Z': 'ZzASXasx',
+    }
+
+    # Map Dvorak keyboard to possible fat_fingerings.
+    DVORAK = {
+            'A': 'Aa?:,Oo;\'',
+            'B': 'BbXxDdHhMm ',
+            'C': 'CcGg24$$4TtHh',
+            'D': 'DdIiFfGgHhBbXx',
+            'E': 'EeOo.PpUuJjQq',
+            'F': 'FfYy9%0_GgDdIi',
+            'G': 'GgFf0_2CcHhDd',
+            'H': 'HhDdGgCcTtMmBb',
+            'I': 'IiUuYyFfDdXxKk',
+            'J': 'JjQqEeUuKk ',
+            'K': 'KkJjUuIiXx ',
+            'L': 'LlRr6@8*/&SsNn',
+            'M': 'MmBbHhTtWw ',
+            'N': 'NnTtRrLlSsVvWw',
+            'O': 'OoAa,.EeQq;\'',
+            'P': 'Pp.3)1"YyUuEe',
+            'Q': 'Qq\':OoEeJj ',
+            'R': 'RrCc4$6@LlNnTt',
+            'S': 'SsNnLl&/-ZzVv',
+            'T': 'TtHhCcRrNnWwMm',
+            'U': 'UuEePpYyIiKkJj',
+            'V': 'VvWwNnSsZz',
+            'W': 'Ww MmTtNnVv',
+            'X': 'Xx KkIiDdBb',
+            'Y': 'YyPp1"9%FfIiUu',
+            'Z': 'ZzVvSs-',
+    }
+
+    keyboard = {
+            # This dictionary enables consideration of alternate keyboards.
+            'QWERTY': QWERTY,
+            'DVORAK': DVORAK
+            }
+
+    stopwords = [u'THE', u'OF', u'AND', u'FOR', u'INC', u'--']
+#endif
 		debugf (1, "FATFINGER[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
 		size_t count{0};
 		return count;
 	}
 
+	//__________________________________________________________________________
 	size_t levenshtein1 (vector<string>& a_target, string a_phrase)
 	{
 		debugf (1, "LEVENSHTEIN1[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
+#if false
+    def bool_algorithm_Levenshtein1(self, canon, rough):
+        # Handle identity.
+        if canon == rough:
+            return self.bool_report(True, 'Levenshtein1', rough, canon)
+        self.generate_head_tail_indices(canon, rough)
+        # Handle length difference out-of-range.
+        if abs(self.Clen-self.Rlen) > 1:
+            return False
+        # Handle deletion and insertion.
+        if self.Clen != self.Rlen:
+            return self.Nmin == self.both
+        # Handle a single typo.
+        if self.diff == 1:
+            return self.bool_report(True, 'Levenshtein1', rough, canon)
+        # Handle 1 swapped pair.
+        diagonal1 = canon[   self.head] == rough[-1-self.tail]
+        diagonal2 = canon[-1-self.tail] == rough[   self.head]
+        if diagonal1 and diagonal2:
+            return self.bool_report(True, 'Levenshtein1', rough, canon)
+        return False
+#endif
 		size_t count{0};
 		return count;
 	}
 
+	//__________________________________________________________________________
 	size_t  misspelling (vector<string>& a_target, string a_phrase)
 	{
 		debugf (1, "MISSPELLING[%s] %s\n", 
@@ -136,6 +252,7 @@ namespace Lettvin
 		return count;
 	}
 
+	//__________________________________________________________________________
 	size_t    thesaurus (vector<string>& a_target, string a_phrase)
 	{
 		debugf (1, "THESAURUS[%s] %s\n", 
@@ -144,6 +261,7 @@ namespace Lettvin
 		return count;
 	}
 
+	//__________________________________________________________________________
 	size_t      unicode (vector<string>& a_target, string a_phrase)
 	{
 		debugf (1, "UNICODE[%s] %s\n", 
@@ -152,6 +270,7 @@ namespace Lettvin
 		return count;
 	}
 
+	//__________________________________________________________________________
 	typedef size_t (*variantp_t)(vector<string>&, string);
 	typedef map<string, variantp_t> mapvariant_t;
 
