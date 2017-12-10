@@ -60,7 +60,7 @@ ARGUMENT OPTIONS:
        i or insensitive       to insert variants like mIt
        l or levenshtein1      to insert variants like MTI
        m or misspelling       to insert variants like releive
-       t or thesaurus         to insert synonyms
+       t or thesaurus         to insert synonyms like "quick" for "fast"
        u or unicode           to insert NFKD variants
 
 OPTIONS:
