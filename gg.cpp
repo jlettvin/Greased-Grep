@@ -391,11 +391,14 @@ insert (
 /// @brief insert strings into tables
 void
 Lettvin::Table::
-insert (string_view a_str, i24_t id)
+insert (string_view a_str, i24_t id, size_t setindex)
 {
 	auto from      {s_root};
 	auto next      {from};
 	char last[2]   {0,0};
+
+	// Cardinal setindex retrieves this terminal set
+	set<int>& setitem{s_set[setindex]};
 
 	// Insert initial char of str for skipping.
 	if (s_caseless)
@@ -428,12 +431,22 @@ insert (string_view a_str, i24_t id)
 	}
 	if (s_caseless)
 	{
+#if SETINDIRECT
+		setitem.insert (id);
+		for (auto c:last) operator[] (next)[c&s_mask].str (setindex);
+#else
 		for (auto c:last) operator[] (next)[c&s_mask].str (id);
+#endif
 	}
 	else
 	{
 		debugf (1, "LINK %x %lx %x\n", next, last[0]&s_mask, id);
+#if SETINDIRECT
+		setitem.insert (id);
+		operator[] (next)[last[0]&s_mask].str (setindex);
+#else
 		operator[] (next)[last[0]&s_mask].str (id);
+#endif
 	}
 }
 
@@ -484,6 +497,24 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 			tgt = element.tgt ();
 			str = element.str ();
 			if (str) {
+#if SETINDIRECT
+				set<int>& setitem{s_set[str]};
+				for (auto item:setitem)
+				{
+					if (item < 0) return; ///< Immediate rejection
+					// If not immediate rejection, add to rejected list
+					auto& chose{(item>0)?accepted:rejected};
+					chose.insert (item);
+					bool full_accept{s_accept.size () == accepted.size ()};
+					// completion optimization
+					done = (s_noreject && full_accept);
+					if (done) break;
+				}
+#else
+				// TODO SET convert this to retrieving from s_set
+				// and operate on every member of the set
+				// so where str is singular here,
+				// this should become a loop over set members.
 				if (str < 0) return; ///< Immediate rejection
 				// If not immediate rejection, add to rejected list
 				auto& chose{(str>0)?accepted:rejected};
@@ -491,6 +522,7 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 				bool full_accept{s_accept.size () == accepted.size ()};
 				// completion optimization
 				done = (s_noreject && full_accept);
+#endif
 			}
 			if (done || !tgt) break;
 		}
@@ -737,6 +769,15 @@ compile (int a_sign, string_view a_sv)
 	string b_str     {};
 	string a_str     {a_sv};
 
+	// TODO setindex will be used as an indirect forward reference from an Atom.
+	// s_set[setindex] are the direct forward references of candidates which
+	// terminate on a particular Atom.
+	// When using variants, the probability of token identity drops with
+	// each addition to the set.
+	size_t setindex = s_set.size ();
+	s_set.resize (setindex + 1);
+	set<int>& setterminal{s_set[setindex]};  ///< insert 1st & variant terminals
+
 	vector<string> variant_names;
 
 	// Initially, the string as given is searched
@@ -808,7 +849,7 @@ compile (int a_sign, string_view a_sv)
 	// Insert variants into transition tree
 	for (auto& str: strs)
 	{
-		insert (str, id);
+		insert (str, id, setindex);
 	}
 }
 

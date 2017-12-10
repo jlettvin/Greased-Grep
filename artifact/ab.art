@@ -157,15 +157,15 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/old/gg1.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/old/gg2.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/old/gg2.h
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg_version.h
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/thread_queue
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg_version.h
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/thread_queue.h
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/catch.hpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/ggtest.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/variant.h
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine2.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine3
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine2.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread3
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/ThreadPool.h
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine5
@@ -181,8 +181,8 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine5.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread1.2
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread5
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/thread1.3
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine.cpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/experiment/mine4
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/gg
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171203052233.tgz
@@ -197,8 +197,8 @@
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-push.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-applypatch.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/commit-msg.sample
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/post-update.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-rebase.sample
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/post-update.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/hooks/pre-commit.sample
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/20/6b43bfc134940f55484f93e2e3075f651565be
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/.git/objects/70/ff7b720d74c18abc2c969264774b28f7d1c3f3

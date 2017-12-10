@@ -67,6 +67,8 @@ _____________________________________________________________________________*/
 //..............................................................................
 #include "gg_version.h"            // version
 
+#define SETINDIRECT true
+
 namespace fs = std::experimental::filesystem;
 
 namespace Lettvin
@@ -119,6 +121,7 @@ namespace Lettvin
 
 	vector<string_view> s_accept {{""}}; ///< list of accept {str} args
 	vector<string_view> s_reject {{""}}; ///< list of reject {str} args
+	vector< set<int> >  s_set    {{ 0}}; ///< per-candidate sets
 
 	//--------------------------------------------------------------------------
 	void noop () {}
@@ -234,7 +237,7 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief insert strings into tables
-		void insert (string_view a_str, i24_t id);
+		void insert (string_view a_str, i24_t id, size_t setindex);
 
 		//----------------------------------------------------------------------
 		/// @brief find and report found strings
