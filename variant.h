@@ -215,31 +215,38 @@ namespace Lettvin
 	//__________________________________________________________________________
 	size_t levenshtein1 (vector<string>& a_target, string a_phrase)
 	{
-		debugf (1, "LEVENSHTEIN1[%s] %s\n", 
-				a_phrase.c_str (), a_target[0].c_str ());
-#if false
-    def bool_algorithm_Levenshtein1(self, canon, rough):
-        # Handle identity.
-        if canon == rough:
-            return self.bool_report(True, 'Levenshtein1', rough, canon)
-        self.generate_head_tail_indices(canon, rough)
-        # Handle length difference out-of-range.
-        if abs(self.Clen-self.Rlen) > 1:
-            return False
-        # Handle deletion and insertion.
-        if self.Clen != self.Rlen:
-            return self.Nmin == self.both
-        # Handle a single typo.
-        if self.diff == 1:
-            return self.bool_report(True, 'Levenshtein1', rough, canon)
-        # Handle 1 swapped pair.
-        diagonal1 = canon[   self.head] == rough[-1-self.tail]
-        diagonal2 = canon[-1-self.tail] == rough[   self.head]
-        if diagonal1 and diagonal2:
-            return self.bool_report(True, 'Levenshtein1', rough, canon)
-        return False
-#endif
+		//debugf (1, "LEVENSHTEIN1[%s] %s\n", 
+				//a_phrase.c_str (), a_target[0].c_str ());
 		size_t count{0};
+		size_t I0{a_target.size ()};
+		size_t N{a_phrase.size () - 1};
+		// Missing terminal chars
+		if (N > 3)
+		{
+			a_target.emplace_back (a_phrase.substr (1));
+			a_target.emplace_back (a_phrase.substr (0, N-1));
+			// Missing character doubled character, and flipped characters
+			for (size_t n=1; n <= N; ++n)
+			{
+				a_target.emplace_back ( // missing
+						a_phrase.substr (0,n) +
+						a_phrase.substr (n+1));
+				a_target.emplace_back ( // doubled
+						a_phrase.substr (0,n+1) +
+						a_phrase.substr (n));
+				a_target.emplace_back ( // flipped
+						a_phrase.substr (0,n-1) +
+						a_phrase.substr (n, 1) +
+						a_phrase.substr (n-1, 1) +
+						a_phrase.substr (n+1));
+			}
+		}
+		for (size_t I1=a_target.size (), i=I0; i < I1; ++i)
+		{
+			debugf (1, "LEVENSHTEIN1[%s] %s\n",
+					a_phrase.c_str (),
+					a_target[i].c_str ());
+		}
 		return count;
 	}
 

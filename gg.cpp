@@ -102,10 +102,9 @@ EXAMPLES:
 //       s or soundex           may dismiss as post-processing
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+// TODO fix final "MAP FAILED" in -d mode
 // TODO implement all variants algorithms
 //      the API exists, but code is undeveloped
-// DONE make targets indirect from search to support multiple matches
-//      currently the target is the direct index into the match array
 // TODO measure performance against fgrep/ack/ag
 //      publishing performance will make gg more attractive
 // TODO ingest args with ctor but compile strs at beginning of ftor
@@ -120,6 +119,8 @@ EXAMPLES:
 //      for instance; convert to Unicode Codepoints, and decompose, then
 //      recompose to canonical NFKD, then reconvert to UTF8, then
 //      strings so recomposed can be compared properly
+// DONE make targets indirect from search to support multiple matches
+//      currently the target is the direct index into the match array
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC

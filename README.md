@@ -234,6 +234,10 @@ implement variant generation/insertion
  </li>
 
  <li>
+fix final "MAP FAILED" in -d mode
+ </li>
+
+ <li>
 Modify reversion.py to update README and gg_version.h to the same designation.
  </li>
 
