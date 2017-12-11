@@ -102,6 +102,8 @@ EXAMPLES:
 //       s or soundex           may dismiss as post-processing
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+// TODO catch filesystem error (No such file or dir) without termination
+// TODO debug fatal error doing ~/bin/gg from ~/Desktop/github
 // TODO fix final "MAP FAILED" in -d mode
 // TODO implement all variants algorithms
 //      the API exists, but code is undeveloped
@@ -928,7 +930,17 @@ mapped_search (const char* a_filename)
 	struct stat st;
 	stat (a_filename, &st);
 	auto filesize{st.st_size};
-	int fd = open (a_filename, O_RDONLY, 0);
+	int fd;
+	try
+	{
+		fd = open (a_filename, O_RDONLY, 0);
+	}
+	catch (...)
+	{
+		debugf (1, "MAPPED_SEARCH: file open failed\n", a_filename);
+		return;
+	}
+
 	if (fd >= 0)
 	{
 		void* contents = mmap (
@@ -997,7 +1009,18 @@ walk (const fs::path& a_path)
 					for (auto& item:
 						fs::recursive_directory_iterator (a_path))
 					{
-						fs::path path{fs::canonical (fs::path (item.path ()))};
+						fs::path path (item.path ());
+						try
+						{
+							path = fs::canonical (path);
+						}
+						catch (...)
+						{
+							debugf (1,
+									"WALK CANONICAL failed (%s)\n",
+									path.c_str ());
+							continue;
+						}
 						const char* filename{path.c_str ()};
 						if (fs::is_regular_file (item.status ()))
 						{
