@@ -294,6 +294,6 @@ strings so recomposed can be compared properly
 <hr />
 
 ## GOALS
-Search can be made fuzzy
-
+RESTful interface to permit paging states for persistent searches
+such as regular rescraping of web-pages.
 <hr />

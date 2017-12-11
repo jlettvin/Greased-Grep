@@ -91,6 +91,7 @@ Home page: https://github.com/jlettvin/Greased-Grep
 //       s or soundex           may dismiss as post-processing
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+// TODO allow recursive web page target in place of directory (no memmap).
 // TODO fix final "MAP FAILED" in -d mode
 // TODO implement all variants algorithms
 //      the API exists, but code is undeveloped
