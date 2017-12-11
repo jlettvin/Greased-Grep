@@ -720,7 +720,7 @@ option (string_view a_str)
 		synopsis ("command-line options must be two or more chars");
 	}
 
-	if      (a_str == "--case"     || (opt && letter == 'c')) s_caseless = true;
+	if      (a_str == "--case"     || (opt && letter == 'c')) s_caseless = false;
 	else if (a_str == "--debug"    || (opt && letter == 'd')) s_debug   += 1;
 	else if (a_str == "--nibbles"  || (opt && letter == 'n')) s_nibbles  = true;
 	else if (a_str == "--suppress" || (opt && letter == 's')) s_suppress = true;
