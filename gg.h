@@ -85,20 +85,6 @@ namespace Lettvin
 	typedef unsigned char u08_t;
 	typedef int           i24_t;
 
-	/*
-	static const map<string, size_t> s_variants{
-		{"a", 0}, {"acronym"     , 0},
-		{"c", 1}, {"contraction" , 1},
-		{"e", 2}, {"ellipses"    , 2},
-		{"f", 3}, {"fatfinger"   , 3},
-		{"l", 4}, {"levenshtein1", 4},
-		{"m", 5}, {"misspelling" , 5},
-		{"t", 6}, {"thesaurus"   , 6},  // synonym
-		{"u", 7}, {"unicode"     , 7}   // NFKD
-	};
-	*/
-
-
 	bool   s_caseless {false};           ///< turn on case insensitivity
 	bool   s_nibbles  {false};           ///< nibble planes replace bute planes
 	bool   s_suppress {false};           ///< suppress error messages
@@ -113,6 +99,18 @@ namespace Lettvin
 	size_t s_mask    {0xffULL};
 	size_t s_prefill {1};
 	size_t s_size    {256};
+
+	// This union gives a guaranteed order for little and big endian bytes.
+	// It is used in Table dump/load functions.
+	// In data written to a file, either endian refers to the same byte when
+	// s_order.u08[i] for i between 0 and 7.
+	// Files may be written in either endian order.
+	static const union {
+		unsigned long long                  u64;
+		struct { unsigned long  array[2]; } u32;
+		struct { unsigned short array[4]; } u16;
+		struct { unsigned char  array[8]; } u08;
+	} s_order { .u64=0x0001020304050607 };
 
 	double s_overhead;                   ///< interval for noop
 
@@ -169,11 +167,12 @@ namespace Lettvin
 		i24_t str (         ) const { return  m_the.state.str; } ///< str getter
 		void  tgt (u08_t a_tgt)     { m_the.state.tgt = a_tgt; } ///< tgt setter
 		void  str (i24_t a_str)     { m_the.state.str = a_str; } ///< str setter
+		unsigned integral ()  const { return  m_the.integral;  }
 	//------
 	private:
 	//------
 		union {
-			unsigned short integral;                   ///< unused name
+			unsigned integral;                         ///< unused name
 			struct { i24_t str:24; u08_t tgt; } state; ///< strtern/state ids
 		}
 		m_the
@@ -196,6 +195,7 @@ namespace Lettvin
 	//------
 		State () : m_handle (s_size)      {                         } ///< ctor
 		Atom& operator[] (u08_t a_off)    { return m_handle[a_off]; } ///< index
+		vector<Atom>& handle ()           { return m_handle;        }
 	//------
 	private:
 	//------
@@ -245,6 +245,14 @@ namespace Lettvin
 		/// when reject list is empty, terminate on completion of accept list
 		/// when reject list is non-empty, terminate on first reject
 		void search (void* a_pointer, auto a_bytecount, const char* a_label="");
+
+		//----------------------------------------------------------------------
+		/// @brief dump tree to file
+		void dump (const char* filename);
+
+		//----------------------------------------------------------------------
+		/// @brief load tree from file
+		void load (const char* filename);
 
 	//--------
 	protected:

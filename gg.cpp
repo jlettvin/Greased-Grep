@@ -539,6 +539,44 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 	}
 } // search
 
+//------------------------------------------------------------------------------
+// @brief dump tree to file
+//
+// TODO must output state size and table size
+// TODO best practice read entire, then swap if needed
+// TODO output s_order.u64 to file to establish file order
+void Lettvin::Table::dump (const char* a_filename)
+{
+	int fd = open (a_filename, O_RDWR, 0);
+	if (fd >= 0)
+	{
+		for (auto& state:m_table)
+		{
+			for (auto& atom: state.handle ())
+			{
+				union { unsigned integral; u08_t u08[4]; } datum{
+					.integral = atom.integral ()};
+				write (fd, &datum.u08[s_order.u08.array[0]], 1);
+				write (fd, &datum.u08[s_order.u08.array[1]], 1);
+				write (fd, &datum.u08[s_order.u08.array[2]], 1);
+				write (fd, &datum.u08[s_order.u08.array[3]], 1);
+			}
+		}
+	}
+	close (fd);
+}
+
+//------------------------------------------------------------------------------
+// @brief load tree from file
+void Lettvin::Table::load (const char* a_filename)
+{
+	int fd = open (a_filename, O_RDONLY, 0);
+	if (fd >= 0)
+	{
+	}
+	close (fd);
+}
+
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 //------------------------------------------------------------------------------
