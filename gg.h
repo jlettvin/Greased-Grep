@@ -85,7 +85,7 @@ namespace Lettvin
 	typedef unsigned char u08_t;
 	typedef int           i24_t;
 
-	bool   s_caseless {true};            ///< turn on case insensitivity
+	bool   s_caseless {true};            ///< case sensitivity initially false
 	bool   s_nibbles  {false};           ///< nibble planes replace bute planes
 	bool   s_suppress {false};           ///< suppress error messages
 
