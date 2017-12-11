@@ -105,6 +105,8 @@ EXAMPLES:
 // TODO fix final "MAP FAILED" in -d mode
 // TODO implement all variants algorithms
 //      the API exists, but code is undeveloped
+// TODO implement m_raw tree as Atom[] and enable search sensitivity to it.
+//      This will enable dump/load to bring in synonym tree.
 // TODO measure performance against fgrep/ack/ag
 //      publishing performance will make gg more attractive
 // TODO ingest args with ctor but compile strs at beginning of ftor

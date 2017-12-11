@@ -242,6 +242,11 @@ Modify reversion.py to update README and gg_version.h to the same designation.
  </li>
 
  <li>
+implement m_raw tree as Atom[] and enable search sensitivity to it.
+This will enable dump/load to bring in synonym tree.
+ </li>
+
+ <li>
 measure performance against fgrep/ack/ag
   <ul>
    <li>
