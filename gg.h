@@ -100,6 +100,8 @@ namespace Lettvin
 	size_t s_prefill {1};
 	size_t s_size    {256};
 
+	unsigned int s_oversize{1};
+
 	// This union gives a guaranteed order for little and big endian bytes.
 	// It is used in Table dump/load functions.
 	// In data written to a file, either endian refers to the same byte when

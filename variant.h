@@ -100,24 +100,23 @@ namespace Lettvin
 	//__________________________________________________________________________
 	size_t  contraction (vector<string>& a_target, string a_phrase)
 	{
+		static string vowel{"AaEeIiOoUu"};
+		static size_t limit{2}; // Am, Amer, but not Americ for America
 		debugf (1, "CONTRACTION[%s] %s\n",
 				a_phrase.c_str (), a_target[0].c_str ());
-#if false
-    def bool_algorithm_contraction(self, canon, rough):
-        # Handle identity.
-        if canon == rough:
-            return self.bool_report(True, 'contraction', rough, canon)
-        self.generate_head_tail_indices(canon, rough)
-        rlen = len(rough)
-        less = rlen - 2
-        if rlen == self.head:
-            return self.bool_report(True, 'contraction', rough, canon)
-        if self.head >= 2:
-            return self.bool_report(True, 'contraction', rough, canon)
-        if self.both > less:
-            return self.bool_report(True, 'contraction', rough, canon)
-        return False
-#endif
+		size_t syllables{0};
+		for (size_t N=a_phrase.size (), n=1;n < N; ++n)
+		{
+			auto found{vowel.find (a_phrase[n])};
+			if (found == string::npos) continue;
+			if (++syllables > limit) break;
+			a_target.emplace_back (a_phrase.substr (0, n));  // Amer
+			debugf (1, "CONTRACTION PLAIN  '%s'\n", a_target.back ().c_str ());
+			a_target.emplace_back (a_phrase.substr (0, n));  // Amer. (period)
+			auto& token{a_target.back ()};
+			token += '.';
+			debugf (1, "CONTRACTION DOTTED '%s'\n", a_target.back ().c_str ());
+		}
 		size_t count{0};
 		return count;
 	}
@@ -127,6 +126,15 @@ namespace Lettvin
 	{
 		debugf (1, "ELLIPSES[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
+		size_t limit{8};  // smallest string for ellipses cut
+		for (size_t N=a_phrase.size () - 1, n=1;n < N; ++n)
+		{
+			if (n >= limit)
+			{
+				a_target.emplace_back (a_phrase.substr (0, n));
+				debugf (1, "ELLIPSES '%s'\n", a_target.back ().c_str ());
+			}
+		}
 		size_t count{0};
 		return count;
 	}
@@ -208,6 +216,7 @@ namespace Lettvin
 #endif
 		debugf (1, "FATFINGER[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
+		synopsis ("FATFINGER unimplemented");
 		size_t count{0};
 		return count;
 	}
@@ -231,14 +240,17 @@ namespace Lettvin
 				a_target.emplace_back ( // missing
 						a_phrase.substr (0,n) +
 						a_phrase.substr (n+1));
+				debugf (1, "LEV1 missing '%s'\n", a_target.back ().c_str ());
 				a_target.emplace_back ( // doubled
 						a_phrase.substr (0,n+1) +
 						a_phrase.substr (n));
+				debugf (1, "LEV1 double '%s'\n", a_target.back ().c_str ());
 				a_target.emplace_back ( // flipped
 						a_phrase.substr (0,n-1) +
 						a_phrase.substr (n, 1) +
 						a_phrase.substr (n-1, 1) +
 						a_phrase.substr (n+1));
+				debugf (1, "LEV1 flipped '%s'\n", a_target.back ().c_str ());
 			}
 		}
 		for (size_t I1=a_target.size (), i=I0; i < I1; ++i)
@@ -251,10 +263,13 @@ namespace Lettvin
 	}
 
 	//__________________________________________________________________________
-	size_t  misspelling (vector<string>& a_target, string a_phrase)
+	size_t    sensitive (vector<string>& a_target, string a_phrase)
 	{
-		debugf (1, "MISSPELLING[%s] %s\n", 
+		// This flips global case sensitivity for the individual phrase.
+		// It gets turned back on again, if the global flag was on.
+		debugf (1, "CASE SENSITIVE[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
+		s_caseless ^= true; // GreasedGrep::compile saves and restores this flag.
 		size_t count{0};
 		return count;
 	}
@@ -264,6 +279,7 @@ namespace Lettvin
 	{
 		debugf (1, "THESAURUS[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
+		synopsis ("THESAURUS SYNONYMS unimplemented");
 		size_t count{0};
 		return count;
 	}
@@ -273,6 +289,7 @@ namespace Lettvin
 	{
 		debugf (1, "UNICODE[%s] %s\n", 
 				a_phrase.c_str (), a_target[0].c_str ());
+		synopsis ("UNICODE NFKD unimplemented");
 		size_t count{0};
 		return count;
 	}
@@ -287,7 +304,7 @@ namespace Lettvin
 		{"ellipses"    , ellipses}		,{"e", ellipses},
 		{"fatfinger"   , fatfinger}		,{"f", fatfinger},
 		{"levenshtein1", levenshtein1}	,{"l", levenshtein1},
-		{"misspelling" , misspelling}	,{"m", misspelling},
+		{"sensitive"   , sensitive}	,    {"s", sensitive},
 		{"thesaurus"   , thesaurus}		,{"t", thesaurus},
 		{"unicode"     , unicode}		,{"u", unicode}
 	};

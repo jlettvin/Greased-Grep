@@ -36,7 +36,7 @@
 
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
-CSRC=gg.cpp thread_queue.cpp gg_test.cpp
+CSRC=gg.cpp thread_queue.cpp ggtest.cpp
 CHDR=catch.hpp gg.h gg_version.h thread_queue.h variant.h
 ARCHIVE=.gitignore LICENSE Makefile README.md $(CSRC) $(CHDR) test
 EMPTY=

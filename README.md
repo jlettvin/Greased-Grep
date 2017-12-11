@@ -6,10 +6,12 @@
 
 "gg" name was chosen for this frequently-used command because it is easy to type.
 "gg" is the left-hand index-finger letter, and typing it twice is easy.
-"gfg" (greased-fgrep) would be more accurate since fgrep is not regex.
-But "gfg" is harder to type than "gg" so this is the decided app name.
 
-Fuzzy searching is under development but is similar to case insensitivity.
+In initial timing experiments gg is between 5% and 40% faster than grep
+for combinations of simple accept/reject tokens.
+It also finds matches despite misspellings, acronyms, and typos
+without reductions in speed.
+The search algorithm speed is independent from token count and complexity.
 
 <hr />
 
@@ -46,9 +48,9 @@ SOFTWARE.
 ```
 Greased Grep version 0.0.1
 
-USAGE: gg [-c] [-n] [-s] [-t] [+|-]{str} [[+|-]{str}...] {path} 
+USAGE: gg [-{N}] [-c] [-d] [-n] [-s] [-t] [-v] [+|-]{str} [[+|-]{str}...] {path} 
 
-Greased Grep UTF8 search for files having (case insensitive):
+Greased Grep UTF8 fuzzy search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in
 	files found along {path}
@@ -56,63 +58,51 @@ Greased Grep UTF8 search for files having (case insensitive):
         {str} are simple strings (no regex).
         {str} may be single-quoted to avoid shell interpretation.
 
-ARGUMENTS:  all search strings must be 2 characters or more
+ARGUMENTS:
+    [+]{str}[options]  # add accept string (+ optional)
+    -{str}[options]    # add reject string
+    {path}             # file or top directory for recursive search
 
-    [+]{str}      # add accept string (+ optional)
-
-    -{str}        # add reject string
-
-    {path}        # file or top directory for recursive search
-
-ARGUMENT OPTIONS: (TODO)
-
+ARGUMENTS OPTIONS:
     When the --variant option is used
     A {str} followed by a bracket-list triggers variant insertion
-
     Examples:
-       $ gg -v copyright[acronym,c,f,soundex,nyssis] .
+       $ gg -v copyright[acronym,c,f,misspelling] .
     Available:
-       a or acronym           to insert variants like M.I.T. or MIT
-       c or contraction       to insert variants like Mass. Inst. Techn.
-       e or ellipses          to insert variants like Massachus
+       a or acronym        *  to insert variants like M.I.T.
+       c or contraction    *  to insert variants like Mass Inst Tech
+       e or ellipses       *  to insert variants like Massachu
        f or fatfinger         to insert variants like NUR
-       i or insensitive       to insert variants like mIt
-       l or levenshtein1      to insert variants like MTI
-       m or misspelling       to insert variants like releive
-       t or thesaurus         to insert synonyms
+       l or levenshtein1   *  to insert variants like MTI
+       s or sensitive      *  to insert required variants like mit
+       t or thesaurus         to insert synonyms like "quick" for "fast"
        u or unicode           to insert NFKD variants
+    Options marked with    *  are implemented
 
 OPTIONS:
-
-    -c, --case      # case sensitive search
-
-    -d, --debug     # turn on debugging output (multiple increases level)
-
-    -n, --nibbles   # use nibbles (lower memory use half-speed search)
-
-    -s, --suppress  # suppress permission denied errors
-
-    -t, --test      # test algorithms (unit and timing)  TODO
-
-    -v, --variant   # enable variant syntax with [] brackets  TODO
+    -{N}               # threadcount to cpu core ratio (1-9) (deprecate)
+    -c, --case         # case sensitive search
+    -d, --debug        # turn on debugging output
+    -n, --nibbles      # use nibbles (lower memory use half-speed search)
+    -s, --suppress     # suppress permission denied errors
+    -t, --test         # test algorithms (unit and timing)  TODO
+    -v, --variant      # enable variant syntax with [] brackets
 
 OUTPUT:
-
     canonical paths of files fulfilling the set conditions.
 
 EXAMPLES:
-
     $ gg include /usr/local/src
         # find all files having the string 'inlude' in /usr/local/src
-
     $ gg '#include <experimental/filesystem>' /usr/local/src
         # find all files having the quoted string in /usr/local/src
-
     $ gg copyright -Lettvin .
         # Find all files with missing or other than Lettvin copyright.
-
     $ gg 愚公移山 .
         # Find the foolish old man who moved the mountains
+
+Report bugs to: jlettvin@gmail.com
+Home page: https://github.com/jlettvin/Greased-Grep
 ```
 
 <hr />
@@ -153,6 +143,10 @@ This code has been tested on:
 
 * ubuntu linux 16.04 with kernel version 4.10.0-38
 * g++ version 7.1.0
+
+Through experiment (see [-{N}]) it became apparent that
+having more threads than cpu cores yields no advantage.
+This option should be deprecated.
 
 Contributors are welcome to port this to different systems
 and offer pushes for me to pull.
@@ -224,10 +218,10 @@ implement variant generation/insertion
  <table>
   <tr><td>a or acronym</td>     <td>to insert variants like M.I.T.</td></tr>
   <tr><td>c or contraction</td> <td>to insert variants like MIT</td></tr>
-  <tr><td>c or ellipses</td>    <td>to insert variants like Massachusetts Inst</td></tr>
+  <tr><td>e or ellipses</td>    <td>to insert variants like Massachu</td></tr>
   <tr><td>f or fatfinger</td>   <td>to insert variants like NUR</td></tr>
   <tr><td>l or levenshtein1</td><td>to insert variants like MTI</td></tr>
-  <tr><td>m or misspelling</td> <td>to insert variants like releive</td></tr>
+  <tr><td>m or sensitive</td>   <td>to avoid variants like massachusetts</td></tr>
   <tr><td>t or thesaurus</td>   <td>to insert synonyms</td></tr>
   <tr><td>u or unicode</td>     <td>to insert NFKD variants</td></tr>
  </table>

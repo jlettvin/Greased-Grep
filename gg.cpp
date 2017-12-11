@@ -28,9 +28,9 @@ R"Synopsis(Greased Grep version %u.%u.%u
 
 PATH: %s
 
-USAGE: gg [-c] [-n] [-s] [-t] [-v] [+|-]{str} [[+|-]{str}...] {path} 
+USAGE: gg [-{N}] [-c] [-d] [-n] [-s] [-t] [-v] [+|-]{str} [[+|-]{str}...] {path} 
 
-Greased Grep UTF8 search for files having (case insensitive):
+Greased Grep UTF8 fuzzy search for files having (case insensitive):
     all instances of +{str} or {str} and
 	no  instances of -{str} instances in
 	files found along {path}
@@ -39,61 +39,50 @@ Greased Grep UTF8 search for files having (case insensitive):
         {str} may be single-quoted to avoid shell interpretation.
 
 ARGUMENTS:
+    [+]{str}[options]  # add accept string (+ optional)
+    -{str}[options]    # add reject string
+    {path}             # file or top directory for recursive search
 
-    [+]{str}        # add accept string (+ optional)
-
-    -{str}          # add reject string
-
-    {path}          # file or top directory for recursive search
-
-ARGUMENT OPTIONS:
-
+ARGUMENTS OPTIONS:
     When the --variant option is used
     A {str} followed by a bracket-list triggers variant insertion
     Examples:
        $ gg -v copyright[acronym,c,f,misspelling] .
     Available:
-       a or acronym           to insert variants like M.I.T.
-       c or contraction       to insert variants like MIT
-       e or ellipses          to insert variants like MIT
+       a or acronym        *  to insert variants like M.I.T.
+       c or contraction    *  to insert variants like Mass Inst Tech
+       e or ellipses       *  to insert variants like Massachu
        f or fatfinger         to insert variants like NUR
-       i or insensitive       to insert variants like mIt
-       l or levenshtein1      to insert variants like MTI
-       m or misspelling       to insert variants like releive
+       l or levenshtein1   *  to insert variants like MTI
+       s or sensitive      *  to insert required variants like mit
        t or thesaurus         to insert synonyms like "quick" for "fast"
        u or unicode           to insert NFKD variants
+    Options marked with    *  are implemented
 
 OPTIONS:
-
-    -c, --case      # case sensitive search
-
-    -d, --debug     # turn on debugging output
-
-    -n, --nibbles   # use nibbles (lower memory use half-speed search)
-
-    -s, --suppress  # suppress permission denied errors
-
-    -t, --test      # test algorithms (unit and timing)  TODO
-
-    -v, --variant # enable variant syntax with [] brackets
+    -{N}               # threadcount to cpu core ratio (1-9) (deprecate)
+    -c, --case         # case sensitive search
+    -d, --debug        # turn on debugging output
+    -n, --nibbles      # use nibbles (lower memory use half-speed search)
+    -s, --suppress     # suppress permission denied errors
+    -t, --test         # test algorithms (unit and timing)  TODO
+    -v, --variant      # enable variant syntax with [] brackets
 
 OUTPUT:
-
     canonical paths of files fulfilling the set conditions.
 
 EXAMPLES:
-
     $ gg include /usr/local/src
         # find all files having the string 'inlude' in /usr/local/src
-
     $ gg '#include <experimental/filesystem>' /usr/local/src
         # find all files having the quoted string in /usr/local/src
-
     $ gg copyright -Lettvin .
         # Find all files with missing or other than Lettvin copyright.
-
     $ gg 愚公移山 .
         # Find the foolish old man who moved the mountains
+
+Report bugs to: jlettvin@gmail.com
+Home page: https://github.com/jlettvin/Greased-Grep
 )Synopsis";
 
 // Industry standard post-processing algorithms are not applicable
@@ -102,11 +91,10 @@ EXAMPLES:
 //       s or soundex           may dismiss as post-processing
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-// TODO catch filesystem error (No such file or dir) without termination
-// TODO debug fatal error doing ~/bin/gg from ~/Desktop/github
 // TODO fix final "MAP FAILED" in -d mode
 // TODO implement all variants algorithms
 //      the API exists, but code is undeveloped
+//      Missing: fatfinger, thesaurus, unicode
 // TODO implement m_raw tree as Atom[] and enable search sensitivity to it.
 //      This will enable dump/load to bring in synonym tree.
 // TODO measure performance against fgrep/ack/ag
@@ -125,6 +113,13 @@ EXAMPLES:
 //      strings so recomposed can be compared properly
 // DONE make targets indirect from search to support multiple matches
 //      currently the target is the direct index into the match array
+// DONE make variant case sensitive locally.
+// DONE catch filesystem error (No such file or dir) without termination
+// DONE debug fatal error doing ~/bin/gg from ~/Desktop/github
+// DONE variants: acronym, contraction, ellipses, levenshtein1, sensitive
+// DONE multithread: 1 manager, N-1 workers where N=cpu count
+// DONE oversize multiplier on cpu count yields no speed advantage
+// DONE enable choice between state planes of size 16 and 256.
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -724,6 +719,14 @@ option (string_view a_str)
 		synopsis ("command-line options must be two or more chars");
 	}
 
+	if (a_str.size () == 2 && isdigit(a_str[1]))
+	{
+		s_oversize = (size_t)(a_str[1] - '0');
+		s_oversize = s_oversize ? s_oversize : 1;
+		debugf (1, "CORE MULTIPLIER (%u)\n", s_oversize);
+		return true;
+	}
+
 	if      (a_str == "--case"     || (opt && letter == 'c')) s_caseless = false;
 	else if (a_str == "--debug"    || (opt && letter == 'd')) s_debug   += 1;
 	else if (a_str == "--nibbles"  || (opt && letter == 'n')) s_nibbles  = true;
@@ -732,7 +735,7 @@ option (string_view a_str)
 	else if (a_str == "--variant"  || (opt && letter == 'v')) s_variant  = true;
 	else if (opt)
 	{
-		synopsis ("unknown arg");
+		synopsis ("unknown arg '%s'", a_str.data ());
 	}
 	else
 	{
@@ -851,6 +854,7 @@ compile (int a_sign, string_view a_sv)
 	// TODO generate all NFKD variants for insertion
 	// e.g. "than" and "then" are legitimate mutual variants.
 	vector<string> strs;
+	bool caseless{s_caseless};
 	strs.emplace_back (a_str);
 
 	if (s_variant)
@@ -916,6 +920,7 @@ compile (int a_sign, string_view a_sv)
 	{
 		insert (str, id, setindex);
 	}
+	s_caseless = caseless;
 }
 
 //------------------------------------------------------------------------------
@@ -981,7 +986,7 @@ walk (const fs::path& a_path)
 	{
 #if true
 		// Account for existing main thread
-		unsigned int cpus{thread::hardware_concurrency ()};
+		unsigned int cpus{thread::hardware_concurrency () * s_oversize};
 		vector<thread> threads;
 		Lettvin::ThreadedQueue<string> tq (cpus + 1);  // 1 ahead of workers
 		// Note worker threads are 1 less than cpus
@@ -1110,14 +1115,16 @@ main (int a_argc, char** a_argv)
 	try
 	{
 		std::ios::sync_with_stdio (true);
-		fs::path app{fs::canonical (fs::path (a_argv[0]))};
+		//fs::path app{fs::canonical (fs::path (a_argv[0]))};
+		fs::path app{fs::path (a_argv[0])};
 		s_path = const_cast<const char*>(app.c_str ());
 		Lettvin::GreasedGrep gg (a_argc, a_argv);
 		gg ();
 	}
-	catch (...)
+	catch (const std::exception &e)
+	//catch (...)
 	{
-		Lettvin::synopsis ("Unexpected signal caught.");
+		Lettvin::synopsis ("Unexpected signal caught (%s).", e.what ());
 	}
 	return 0;
 } // main
