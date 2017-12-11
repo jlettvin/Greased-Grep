@@ -545,11 +545,32 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 // TODO must output state size and table size
 // TODO best practice read entire, then swap if needed
 // TODO output s_order.u64 to file to establish file order
-void Lettvin::Table::dump (const char* a_filename)
+void Lettvin::Table::dump (const char* a_filename, const char* a_title)
 {
-	int fd = open (a_filename, O_RDWR, 0);
-	if (fd >= 0)
+	int fd = open (
+			a_filename,
+			O_RDWR|O_CREAT,
+			S_IRWXU|S_IRWXG|S_IRWXO);
+	if (fd > 0)
 	{
+		debugf (1, "dump PASS: %s: %s\n", a_filename, a_title);
+		char   zero{0};
+		size_t endian{0x3736353433323130};
+		const char* cdcz{"\x04\x1a"};
+		size_t consumed{34+strlen (a_title)};
+		size_t needed{256-consumed};
+
+		write (fd, "gg dump:", 8);
+		write (fd, "endian: ", 8);
+		write (fd, &endian   , 8);
+		write (fd, " title: ", 8);
+		write (fd, a_title   , strlen (a_title));
+		write (fd, cdcz      , 2);
+		for (size_t i=0; i<needed; ++i)
+		{
+			write (fd, &zero, 1);
+		}
+		
 		for (auto& state:m_table)
 		{
 			for (auto& atom: state.handle ())
@@ -562,6 +583,10 @@ void Lettvin::Table::dump (const char* a_filename)
 				write (fd, &datum.u08[s_order.u08.array[3]], 1);
 			}
 		}
+	}
+	else
+	{
+		debugf (1, "dump FAIL: %s: %s\n", a_filename, a_title);
 	}
 	close (fd);
 }
@@ -646,6 +671,7 @@ operator ()()
 	// Visually inspect planes
 	if (s_debug)
 	{
+		dump ("temp.dump", "Trial dump");
 		show_tables (cout);
 		show_tokens (cout);
 	}

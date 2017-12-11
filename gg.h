@@ -111,7 +111,7 @@ namespace Lettvin
 		struct { unsigned long  array[2]; } u32;
 		struct { unsigned short array[4]; } u16;
 		struct { unsigned char  array[8]; } u08;
-	} s_order { .u64=0x0001020304050607 };
+	} s_order { .u64=0x0706050403020100 };
 
 	double s_overhead;                   ///< interval for noop
 
@@ -249,7 +249,7 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief dump tree to file
-		void dump (const char* filename);
+		void dump (const char* filename, const char* a_title="");
 
 		//----------------------------------------------------------------------
 		/// @brief load tree from file

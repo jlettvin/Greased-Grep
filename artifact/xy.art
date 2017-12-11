@@ -4,6 +4,7 @@
  #'  DBG(1): LINK 2 79 1
  #'  DBG(1): FIRSTS B: 'x'
  #'  DBG(1): FIRSTS A: 'x'
+ #'  DBG(1): dump PASS: temp.dump: Trial dump
  # 
  #    00   01   02   03   04   05   06   07   08   09   0a   0b   0c   0d   0e   0f
  #  ________________________________________________________________________________     PLANE: 0
@@ -152,8 +153,8 @@
  #  1: xy
  # REJECT:
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/data/pg10681.txt
-/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/data/pg22.txt
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/data/words.txt
+/home/jlettvin/Desktop/github/jlettvin/Greased-Grep/data/pg22.txt
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/catch.hpp
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171201202307.tgz
 /home/jlettvin/Desktop/github/jlettvin/Greased-Grep/tgz/gg.20171205131313.tgz
