@@ -105,6 +105,7 @@ namespace Lettvin
 	// In data written to a file, either endian refers to the same byte when
 	// s_order.u08[i] for i between 0 and 7.
 	// Files may be written in either endian order.
+	// To dump/load is requirement for thesaurus which will be stored as Table.
 	static const union {
 		unsigned long long                  u64;
 		struct { unsigned long  array[2]; } u32;
