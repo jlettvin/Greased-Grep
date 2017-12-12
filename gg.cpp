@@ -677,9 +677,16 @@ operator ()()
 	}
 	debugf (1, "FIRSTS: %s\n", s_firsts.c_str ());
 
-	// Find files and search contents
-	if (fs::is_directory (s_target))
+	bool https {s_target.substr (0, 8) == "https://"};
+	bool http  {s_target.substr (0, 7) == "http://"};
+	bool ftp   {s_target.substr (0, 6) == "ftp://"};
+	if (https || http || ftp)
 	{
+		netsearch (s_target);
+	}
+	else if (fs::is_directory (s_target))
+	{
+		// Find files and search contents
 		walk (s_target);
 	}
 	else
@@ -975,6 +982,15 @@ mapped_search (const char* a_filename)
 		debugf (1, "OPEN FAILED: %s\n", a_filename);
 	}
 } // mapped_search
+
+//------------------------------------------------------------------------------
+/// @brief run search on incoming packets
+void
+Lettvin::GreasedGrep::
+netsearch (string_view a_URL)
+{
+	a_URL = a_URL;
+}
 
 //------------------------------------------------------------------------------
 /// @brief walk organizes search for strings in memory-mapped file

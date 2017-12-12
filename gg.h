@@ -326,6 +326,10 @@ namespace Lettvin
 		void compile (int a_sign, string_view a_str);
 
 		//----------------------------------------------------------------------
+		/// @brief run search on incoming packets
+		void netsearch (string_view a_URL);
+
+		//----------------------------------------------------------------------
 		/// @brief map file into memory and call search
 		///
 		/// https://techoverflow.net/2013/08/21/a-simple-mmap-readonly-example/
