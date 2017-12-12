@@ -7,7 +7,7 @@
 "gg" name was chosen for this frequently-used command because it is easy to type.
 "gg" is the left-hand index-finger letter, and typing it twice is easy.
 
-In initial timing experiments gg is between 5% and 40% faster than grep
+Initial gg/grep performance shows gg is 10% to 100% faster than grep
 for combinations of simple accept/reject tokens.
 It also finds matches despite misspellings, acronyms, and typos
 without reductions in speed.
