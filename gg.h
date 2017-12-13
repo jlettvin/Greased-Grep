@@ -53,6 +53,7 @@ _____________________________________________________________________________*/
 #include <iostream>                // sync_with_stdio (mix printf with cout)
 #include <iomanip>                 // setw and other cout formatting
 #include <cstdarg>                 // vararg
+#include <regex>                   // filename matching
 
 //..............................................................................
 #include <string>                  // container
@@ -79,28 +80,28 @@ namespace Lettvin
 	void synopsis (const char* a_message, ...); ///< report errors and exit
 	void syntax   (const char* a_message, ...); ///< report errors and exit
 	void nibbles ();                            ///< convert to nibbles not bytes
-	int debugf (size_t a_debug, const char *fmt, ...);
+	int32_t debugf (size_t a_debug, const char *fmt, ...);
 	//--------------------------------------------------------------------------
 
-	typedef unsigned char u08_t;
-	typedef int           i24_t;
+	typedef int32_t       i24_t;
+	static_assert (sizeof(int32_t) == 4);
 
-	bool   s_caseless {true};            ///< case sensitivity initially false
-	bool   s_nibbles  {false};           ///< nibble planes replace bute planes
-	bool   s_suppress {false};           ///< suppress error messages
+	bool    s_caseless {true};            ///< case sensitivity initially false
+	bool    s_nibbles  {false};           ///< nibble planes replace bute planes
+	bool    s_suppress {false};           ///< suppress error messages
 
-	bool   s_noreject {true};            ///< are there reject strings?
-	bool   s_test     {false};           ///< run unit and timing tests
-	bool   s_variant  {false};           ///< enable variant syntax
+	bool    s_noreject {true};            ///< are there reject strings?
+	bool    s_test     {false};           ///< run unit and timing tests
+	bool    s_variant  {false};           ///< enable variant syntax
 
-	u08_t  s_root    {1};                ///< syntax tree root plane number
+	uint8_t s_root    {1};                ///< syntax tree root plane number
 
 	size_t s_debug   {0};
 	size_t s_mask    {0xffULL};
 	size_t s_prefill {1};
 	size_t s_size    {256};
 
-	unsigned int s_oversize{1};
+	uint32_t s_oversize{1};
 
 	// This union gives a guaranteed order for little and big endian bytes.
 	// It is used in Table dump/load functions.
@@ -120,9 +121,11 @@ namespace Lettvin
 	string s_firsts;                     ///< string of {arg} first letters
 	string_view s_target;
 
-	vector<string_view> s_accept {{""}}; ///< list of accept {str} args
-	vector<string_view> s_reject {{""}}; ///< list of reject {str} args
-	vector< set<int> >  s_set    {{ 0}}; ///< per-candidate sets
+	vector<regex>           s_regex;         ///< filename match regexes
+	vector<string_view>     s_accept {{""}}; ///< list of accept {str} args
+	vector<string_view>     s_reject {{""}}; ///< list of reject {str} args
+	vector<string_view>     s_filesx {{""}}; ///< list of filename regex patterns
+	vector< set<int32_t> >  s_set    {{ 0}}; ///< per-candidate sets
 
 	//--------------------------------------------------------------------------
 	void noop () {}
@@ -156,6 +159,74 @@ namespace Lettvin
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 	/// @brief Single state-transition element.
 	///
+	/// This class will contain the compiled and optimized state tables.
+	//__________________________________________________________________________
+	template<typename T=unsigned, size_t S=256>
+	class
+	FSM
+	{
+	//------
+	public:
+	//------
+
+		//----------------------------------------------------------------------
+		/// @brief FSM ctor
+		FSM (size_t state_count)
+			: m_count (state_count)
+		{
+		}
+
+		//----------------------------------------------------------------------
+		/// @brief FSM dtor
+		~FSM ()
+		{
+			if (nullptr != m_element)
+			{
+				delete [] m_element;
+			}
+		}
+
+		//----------------------------------------------------------------------
+		/// @brief FSM ftor
+		void operator ()(
+				size_t  a_state,
+				size_t  a_element,
+				uint8_t a_target,
+				size_t  a_symbol)
+		{
+			if (nullptr == m_element)
+			{
+				// allocate
+				m_element = new state_t[m_count];
+			}
+			size_t index = (a_state * S) + a_element;
+			auto& element{m_element [index]};
+			element.named.target = a_target;
+			element.named.symbol = a_symbol;
+		}
+
+	//------
+	private:
+	//------
+		static const size_t bits{8*sizeof(T)};
+		typedef union {
+			T integral;
+			struct
+			{
+				uint8_t target ;
+				T       symbol : bits;
+			} named;
+		} element_t, *element_p;
+		typedef element_t state_t[S];
+
+		element_p m_element = nullptr;
+		size_t m_count;
+	};
+
+
+	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+	/// @brief Single state-transition element.
+	///
 	/// constructor/getters/setters for atomic element unit.
 	//__________________________________________________________________________
 	class
@@ -166,9 +237,9 @@ namespace Lettvin
 	public:
 	//------
 		Atom () {}                                               ///< ctor
-		u08_t tgt (         ) const { return  m_the.state.tgt; } ///< tgt getter
+		uint8_t tgt (       ) const { return  m_the.state.tgt; } ///< tgt getter
 		i24_t str (         ) const { return  m_the.state.str; } ///< str getter
-		void  tgt (u08_t a_tgt)     { m_the.state.tgt = a_tgt; } ///< tgt setter
+		void  tgt (uint8_t a_tgt)   { m_the.state.tgt = a_tgt; } ///< tgt setter
 		void  str (i24_t a_str)     { m_the.state.str = a_str; } ///< str setter
 		unsigned integral ()  const { return  m_the.integral;  }
 	//------
@@ -176,7 +247,7 @@ namespace Lettvin
 	//------
 		union {
 			unsigned integral;                         ///< unused name
-			struct { i24_t str:24; u08_t tgt; } state; ///< strtern/state ids
+			struct { i24_t str:24; uint8_t tgt; } state; ///< strtern/state ids
 		}
 		m_the
 		{
@@ -197,7 +268,7 @@ namespace Lettvin
 	public:
 	//------
 		State () : m_handle (s_size)      {                         } ///< ctor
-		Atom& operator[] (u08_t a_off)    { return m_handle[a_off]; } ///< index
+		Atom& operator[] (uint8_t a_off)    { return m_handle[a_off]; } ///< index
 		vector<Atom>& handle ()           { return m_handle;        }
 	//------
 	private:
@@ -224,7 +295,7 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief indexer
-		State& operator[] (u08_t a_offset);
+		State& operator[] (uint8_t a_offset);
 
 		//----------------------------------------------------------------------
 		/// @brief add State planes to vector
@@ -295,7 +366,7 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief ctor
-		GreasedGrep (int a_argc, char** a_argv); // ctor
+		GreasedGrep (int32_t a_argc, char** a_argv); // ctor
 
 		//----------------------------------------------------------------------
 		/// @brief ftor
@@ -317,13 +388,13 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief compile inserts state-transition table data
-		void compile (int a_sign=0);
+		void compile (int32_t a_sign=0);
 
 		//----------------------------------------------------------------------
 		/// @brief compile a single string argument
 		///
 		/// Distribute characters into state tables for searching.
-		void compile (int a_sign, string_view a_str);
+		void compile (int32_t a_sign, string_view a_str);
 
 		//----------------------------------------------------------------------
 		/// @brief run search on incoming packets

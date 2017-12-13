@@ -291,6 +291,40 @@ strings so recomposed can be compared properly
  </li>
 </ul>
 
+```
+// TODO debug filename regex options.
+// TODO allow recursive web page target in place of directory (no memmap).
+// TODO fix final "MAP FAILED" in -d mode
+// TODO implement all variants algorithms
+//      the API exists, but code is undeveloped
+//      Missing: fatfinger, thesaurus, unicode
+// TODO implement m_raw tree as Atom[] and enable search sensitivity to it.
+//      This will enable dump/load to bring in synonym tree.
+// TODO measure performance against fgrep/ack/ag
+//      publishing performance will make gg more attractive
+// TODO ingest args with ctor but compile strs at beginning of ftor
+//      compilation in ftor currently fails
+// TODO use memcmp for unique final string
+//      When the tail end of a search is unique memcmp is faster
+// TODO implement self-test (-t)
+//      client-usable as opposed to unit-test and performance test
+// TODO translate UTF8->UnicodeCodepoint->NFKD->UnicodeCodepoint->UTF8
+//      strings with identical appearance should be comparable
+//      this could be done by decomposing and recomposing during compilation
+//      for instance; convert to Unicode Codepoints, and decompose, then
+//      recompose to canonical NFKD, then reconvert to UTF8, then
+//      strings so recomposed can be compared properly
+// DONE make targets indirect from search to support multiple matches
+//      currently the target is the direct index into the match array
+// DONE make variant case sensitive locally.
+// DONE catch filesystem error (No such file or dir) without termination
+// DONE debug fatal error doing ~/bin/gg from ~/Desktop/github
+// DONE variants: acronym, contraction, ellipses, levenshtein1, sensitive
+// DONE multithread: 1 manager, N-1 workers where N=cpu count
+// DONE oversize multiplier on cpu count yields no speed advantage
+// DONE enable choice between state planes of size 16 and 256.
+```
+
 <hr />
 
 ## GOALS

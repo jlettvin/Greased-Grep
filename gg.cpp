@@ -41,7 +41,7 @@ Greased Grep UTF8 fuzzy search for files having (case insensitive):
 ARGUMENTS:
     [+]{str}[options]  # add accept string (+ optional)
     -{str}[options]    # add reject string
-    {path}             # file or top directory for recursive search
+    {path}[include]    # file or top directory for recursive search
 
 ARGUMENTS OPTIONS:
     When the --variant option is used
@@ -58,6 +58,13 @@ ARGUMENTS OPTIONS:
        t or thesaurus         to insert synonyms like "quick" for "fast"
        u or unicode           to insert NFKD variants
     Options marked with    *  are implemented
+
+PATH INCLUDE:
+    When the {path} is followd by a brace list only filenames matching the list
+    will be included in the search.
+    Examples:
+       $ gg copyright .[.cpp,.md]  # Only search files with these extensions
+       $ gg copyright .['*gg*']    # Only search files with 'gg' in filename
 
 OPTIONS:
     -{N}               # threadcount to cpu core ratio (1-9) (deprecate)
@@ -91,6 +98,7 @@ Home page: https://github.com/jlettvin/Greased-Grep
 //       s or soundex           may dismiss as post-processing
 
 //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+// TODO debug filename regex options.
 // TODO allow recursive web page target in place of directory (no memmap).
 // TODO fix final "MAP FAILED" in -d mode
 // TODO implement all variants algorithms
@@ -150,6 +158,7 @@ Home page: https://github.com/jlettvin/Greased-Grep
 #include <sstream>                 // string_stream
 #include <iomanip>                 // setw and other cout formatting
 #include <thread>
+#include <regex>
 
 //..............................................................................
 #include <string>                  // container
@@ -230,7 +239,7 @@ Lettvin::debugf (size_t a_debug, const char *fmt, ...)
 //------------------------------------------------------------------------------
 {
 	static const char* indent{"  "};
-	int ret = 0;
+	int32_t ret = 0;
 	if (s_debug >= a_debug)
 	{
 		va_list args;
@@ -265,7 +274,7 @@ Table ()
 //------------------------------------------------------------------------------
 Lettvin::State&
 Lettvin::Table::
-operator[] (u08_t a_offset)
+operator[] (uint8_t a_offset)
 //------------------------------------------------------------------------------
 {
 	return m_table[a_offset & s_mask];
@@ -314,7 +323,7 @@ show_tables (ostream& a_os)
 			{
 				char id{static_cast<char>(row+col)};
 				Atom& entry{plane[id]};
-				int tgt{static_cast<int>(entry.tgt ())};
+				int32_t tgt{static_cast<int32_t>(entry.tgt ())};
 				char gra{id>=' '&&id<='~'?id:'?'};
 				if (tgt) a_os << gra << setw (3) << tgt << ' ';
 				else     a_os << ".....";
@@ -323,7 +332,7 @@ show_tables (ostream& a_os)
 			for (size_t col=0; col < COLS; ++col)
 			{
 				Atom& entry{plane[row+col]};
-				int str{static_cast<int>(entry.str ())};
+				int32_t str{static_cast<int32_t>(entry.str ())};
 				if (str) a_os << setw (4) << str << ' ';
 				else     a_os << ".....";
 			}
@@ -399,7 +408,7 @@ insert (string_view a_str, i24_t id, size_t setindex)
 	char last[2]   {0,0};
 
 	// Cardinal setindex retrieves this terminal set
-	set<int>& setitem{s_set[setindex]};
+	set<int32_t>& setitem{s_set[setindex]};
 
 	// Insert initial char of str for skipping.
 	if (s_caseless)
@@ -499,7 +508,7 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 			str = element.str ();
 			if (str) {
 #if SETINDIRECT
-				set<int>& setitem{s_set[str]};
+				set<int32_t>& setitem{s_set[str]};
 				for (auto item:setitem)
 				{
 					if (item < 0) return; ///< Immediate rejection
@@ -547,7 +556,7 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 // TODO output s_order.u64 to file to establish file order
 void Lettvin::Table::dump (const char* a_filename, const char* a_title)
 {
-	int fd = open (
+	int32_t fd = open (
 			a_filename,
 			O_RDWR|O_CREAT,
 			S_IRWXU|S_IRWXG|S_IRWXO);
@@ -575,7 +584,7 @@ void Lettvin::Table::dump (const char* a_filename, const char* a_title)
 		{
 			for (auto& atom: state.handle ())
 			{
-				union { unsigned integral; u08_t u08[4]; } datum{
+				union { unsigned integral; uint8_t u08[4]; } datum{
 					.integral = atom.integral ()};
 				write (fd, &datum.u08[s_order.u08.array[0]], 1);
 				write (fd, &datum.u08[s_order.u08.array[1]], 1);
@@ -595,7 +604,7 @@ void Lettvin::Table::dump (const char* a_filename, const char* a_title)
 // @brief load tree from file
 void Lettvin::Table::load (const char* a_filename)
 {
-	int fd = open (a_filename, O_RDONLY, 0);
+	int32_t fd = open (a_filename, O_RDONLY, 0);
 	if (fd >= 0)
 	{
 	}
@@ -607,7 +616,7 @@ void Lettvin::Table::load (const char* a_filename)
 //------------------------------------------------------------------------------
 /// @brief ctor
 Lettvin::GreasedGrep::
-GreasedGrep (int a_argc, char** a_argv) // ctor
+GreasedGrep (int32_t a_argc, char** a_argv) // ctor
 //------------------------------------------------------------------------------
 {
 	while (--a_argc)
@@ -643,6 +652,25 @@ operator ()()
 		((s_accept.size () < 2) && (s_reject.size () < 2)))
 	{
 		Lettvin::synopsis ("pattern(s) and directory required.");
+	}
+
+	// Find filename regexes
+	size_t bracket = s_target.find_first_of ('[');
+	if (bracket != string_view::npos)
+	{
+		string_view patterns = s_target;
+		patterns.remove_prefix (bracket + 1);
+		size_t comma = patterns.find_first_of (',');
+		while (comma != string_view::npos)
+		{
+			s_filesx.emplace_back (patterns.substr (0, comma));
+			s_regex.emplace_back (regex (s_filesx.back ().data ()));
+			patterns.remove_prefix (comma + 1);
+			comma = patterns.find_first_of (',');
+		}
+		s_filesx.emplace_back (patterns);
+		s_regex.emplace_back (regex (s_filesx.back ().data ()));
+		s_target = s_target.substr (0, bracket);
 	}
 
 	// Validate ingested args
@@ -798,7 +826,7 @@ ingest (string_view a_str)
 /// @brief ingest inserts state-transition table data
 void
 Lettvin::GreasedGrep::
-compile (int a_sign)
+compile (int32_t a_sign)
 //------------------------------------------------------------------------------
 {
 	if (!a_sign)
@@ -832,7 +860,7 @@ compile (int a_sign)
 /// Distribute characters into state tables for searching.
 void
 Lettvin::GreasedGrep::
-compile (int a_sign, string_view a_sv)
+compile (int32_t a_sign, string_view a_sv)
 //------------------------------------------------------------------------------
 {
 	debugf (1, "COMPILE %+d: %s\n", a_sign, a_sv.data ());
@@ -852,7 +880,7 @@ compile (int a_sign, string_view a_sv)
 	// each addition to the set.
 	size_t setindex = s_set.size ();
 	s_set.resize (setindex + 1);
-	set<int>& setterminal{s_set[setindex]};  ///< insert 1st & variant terminals
+	set<int32_t>& setterminal{s_set[setindex]};  ///< insert 1st & variant terminals
 
 	vector<string> variant_names;
 
@@ -943,7 +971,22 @@ mapped_search (const char* a_filename)
 	struct stat st;
 	stat (a_filename, &st);
 	auto filesize{st.st_size};
-	int fd;
+	int32_t fd;
+
+	if (s_regex.size ())
+	{
+		// TODO return if filename pattern does not match a filesx
+		bool matched{false};
+		for (auto& matcher:s_regex)
+		{
+			matched |= regex_search (a_filename, matcher);
+		}
+		if (!matched)
+		{
+			return;
+		}
+	}
+
 	try
 	{
 		fd = open (a_filename, O_RDONLY, 0);
@@ -971,7 +1014,7 @@ mapped_search (const char* a_filename)
 		else
 		{
 			search (contents, filesize, a_filename);
-			int rc = munmap (contents, filesize);
+			int32_t rc = munmap (contents, filesize);
 			if (rc != 0) synopsis ("munmap failed");
 		}
 
@@ -1003,11 +1046,11 @@ walk (const fs::path& a_path)
 	{
 #if true
 		// Account for existing main thread
-		unsigned int cpus{thread::hardware_concurrency () * s_oversize};
+		uint32_t cpus{thread::hardware_concurrency () * s_oversize};
 		vector<thread> threads;
 		Lettvin::ThreadedQueue<string> tq (cpus + 1);  // 1 ahead of workers
 		// Note worker threads are 1 less than cpus
-		for (unsigned int thid = 1; thid < cpus; thid++)
+		for (uint32_t thid = 1; thid < cpus; thid++)
 		{
 			threads.emplace_back (
 				thread{
@@ -1126,7 +1169,7 @@ show_tokens (ostream& a_os)
 //------------------------------------------------------------------------------
 /// @brief main (program execution entrypoint)
 int
-main (int a_argc, char** a_argv)
+main (int32_t a_argc, char** a_argv)
 //------------------------------------------------------------------------------
 {
 	try
