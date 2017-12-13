@@ -219,87 +219,8 @@ Tests have shown ambiguous time optimization
 but code simplification merits this choice.
 
 ### TODO
-<ul>
-
- <li>
-implement variant generation/insertion
- <table>
-  <tr><td>a or acronym</td>     <td>to insert variants like M.I.T.</td></tr>
-  <tr><td>c or contraction</td> <td>to insert variants like MIT</td></tr>
-  <tr><td>e or ellipses</td>    <td>to insert variants like Massachu</td></tr>
-  <tr><td>f or fatfinger</td>   <td>to insert variants like NUR</td></tr>
-  <tr><td>l or levenshtein1</td><td>to insert variants like MTI</td></tr>
-  <tr><td>m or sensitive</td>   <td>to avoid variants like massachusetts</td></tr>
-  <tr><td>t or thesaurus</td>   <td>to insert synonyms</td></tr>
-  <tr><td>u or unicode</td>     <td>to insert NFKD variants</td></tr>
- </table>
- </li>
-
- <li>
-fix final "MAP FAILED" in -d mode
- </li>
-
- <li>
-Modify reversion.py to update README and gg_version.h to the same designation.
- </li>
-
- <li>
-implement m_raw tree as Atom[] and enable search sensitivity to it.
-This will enable dump/load to bring in synonym tree.
- </li>
-
- <li>
-measure performance against fgrep/ack/ag
-  <ul>
-   <li>
-publishing performance will make gg more attractive
-   </li>
-  </ul>
- </li>
-
- <li>
-ingest args with ctor but compile strs at beginning of ftor
-  <ul>
-   <li>
-compilation in ftor currently fails
-   </li>
-  </ul>
- </li>
-
- <li>
-use memcmp for unique final string
-  <ul>
-   <li>
-When the tail end of a search is unique memcmp is faster.
-This optimization increases complexity considerably.
-   </li>
-  </ul>
- </li>
-
- <li>
-implement self-test (-t)
-  <ul>
-   <li>
-client-usable as opposed to unit-test and performance test
-   </li>
-  </ul>
- </li>
-
- <li>
-translate UTF8->UnicodeCodepoint->NFKD->UnicodeCodepoint->UTF8
-  <ul>
-   <li>
-strings with identical appearance should be comparable
-this could be done by decomposing and recomposing during compilation
-for instance; convert to Unicode Codepoints, and decompose, then
-recompose to canonical NFKD, then reconvert to UTF8, then
-strings so recomposed can be compared properly
-   </li>
-  </ul>
- </li>
-</ul>
-
 ```
+// TODO embed FSM interpreter to enable specialized programming within C++
 // TODO debug filename regex options.
 // TODO allow recursive web page target in place of directory (no memmap).
 // TODO fix final "MAP FAILED" in -d mode
@@ -338,4 +259,5 @@ strings so recomposed can be compared properly
 ## GOALS
 RESTful interface to permit paging states for persistent searches
 such as regular rescraping of web-pages.
+FSM graphviz.dot syntax reader and code generator
 <hr />
