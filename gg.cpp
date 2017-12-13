@@ -172,6 +172,7 @@ Home page: https://github.com/jlettvin/Greased-Grep
 //..............................................................................
 #include "gg_version.h"            // version
 #include "gg.h"                    // declarations
+#include "state_table.h"           // Mechanism for finite state machine
 #include "thread_queue.h"          // filename distribution to threads
 
 //..............................................................................
@@ -179,6 +180,17 @@ Home page: https://github.com/jlettvin/Greased-Grep
 
 namespace fs = std::experimental::filesystem;
 using namespace std;  // No naming collisions in this small namespace
+
+// Stroustrup recommends returning multiple like this.
+tuple <string, int> experiment1_source ()
+{
+	return tuple<string, int> ("hello", 1);
+}
+
+void experiment1_target ()
+{
+	auto [hello, code] = experiment1_source ();
+}
 
 //------------------------------------------------------------------------------
 /// @brief synopsis (document usage in case of failure)
@@ -256,7 +268,87 @@ Lettvin::debugf (size_t a_debug, const char *fmt, ...)
 	return ret;
 } // debugf
 
-//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+//------------------------------------------------------------------------------
+Lettvin::Atom::
+Atom ()
+//------------------------------------------------------------------------------
+{}
+
+//------------------------------------------------------------------------------
+Lettvin::integral_t
+Lettvin::Atom::
+integral () const
+{
+	return m_the.integral;
+} // integral
+
+//------------------------------------------------------------------------------
+uint8_t
+Lettvin::Atom::
+tgt () const
+//------------------------------------------------------------------------------
+{
+	return m_the.state.tgt;
+} // tgt
+
+//------------------------------------------------------------------------------
+Lettvin::i24_t
+Lettvin::Atom::
+str () const
+//------------------------------------------------------------------------------
+{
+	return m_the.state.str;
+} // str
+
+//------------------------------------------------------------------------------
+void
+Lettvin::Atom::
+tgt (uint8_t a_tgt)
+//------------------------------------------------------------------------------
+{
+	m_the.state.tgt = a_tgt;
+} // tgt
+
+//------------------------------------------------------------------------------
+void
+Lettvin::Atom::
+str (i24_t a_str)
+//------------------------------------------------------------------------------
+{
+	m_the.state.str = a_str;
+} // str
+
+//SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+
+//------------------------------------------------------------------------------
+Lettvin::State::
+State ()
+//------------------------------------------------------------------------------
+	: m_handle (s_size)
+{
+} // State
+
+//------------------------------------------------------------------------------
+Lettvin::Atom&
+Lettvin::State::
+operator[] (uint8_t a_off)
+//------------------------------------------------------------------------------
+{
+	return m_handle[a_off];
+} ///< operator[]
+
+//------------------------------------------------------------------------------
+vector<Lettvin::Atom>&
+Lettvin::State::
+handle ()
+//------------------------------------------------------------------------------
+{
+	return m_handle;
+}
+
+//TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
 //------------------------------------------------------------------------------
 Lettvin::Table::
