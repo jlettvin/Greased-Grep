@@ -64,7 +64,7 @@ PATH INCLUDE:
     will be included in the search.
     Examples:
        $ gg copyright .[.cpp,.md]  # Only search files with these extensions
-       $ gg copyright .['*gg*']    # Only search files with 'gg' in filename
+       $ gg copyright .['gg.*ion'] # Only files with 'gg' then 'ion' in filename
 
 OPTIONS:
     -{N}               # threadcount to cpu core ratio (1-9) (deprecate)

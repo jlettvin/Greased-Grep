@@ -3,6 +3,7 @@
 ### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
 ### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
 ### $ gg 愚公移山 .                 # find the foolish old man who moved mountains
+### $ gg case .[.cpp,.h,'gg.*ion']  # find in filenamess with these patterns
 
 "gg" name was chosen for this frequently-used command because it is easy to type.
 "gg" is the left-hand index-finger letter, and typing it twice is easy.
@@ -61,7 +62,7 @@ Greased Grep UTF8 fuzzy search for files having (case insensitive):
 ARGUMENTS:
     [+]{str}[options]  # add accept string (+ optional)
     -{str}[options]    # add reject string
-    {path}             # file or top directory for recursive search
+    {path}[includes]   # file or top directory for recursive search
 
 ARGUMENTS OPTIONS:
     When the --variant option is used
@@ -78,6 +79,13 @@ ARGUMENTS OPTIONS:
        t or thesaurus         to insert synonyms like "quick" for "fast"
        u or unicode           to insert NFKD variants
     Options marked with    *  are implemented
+
+PATH INCLUDE:
+    When the {path} is followd by a brace list only filenames matching the list
+    will be included in the search.
+    Examples:
+       $ gg copyright .[.cpp,.md]  # Only files with these extensions
+       $ gg copyright .['gg.*ion'] # Only files with 'gg' then 'ion' in filename
 
 OPTIONS:
     -{N}               # threadcount to cpu core ratio (1-9) (deprecate)
