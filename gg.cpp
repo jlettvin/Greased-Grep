@@ -45,9 +45,9 @@ ARGUMENTS:
 
 ARGUMENTS OPTIONS:
     When the --variant option is used
-    A {str} followed by a bracket-list triggers variant insertion
+    A [str] followed by a bracket-list triggers variant insertion
     Examples:
-       $ gg -v copyright[acronym,c,f,misspelling] .
+       $ gg -v copyright{acronym,c,f,misspelling} .
     Available:
        a or acronym        *  to insert variants like M.I.T.
        c or contraction    *  to insert variants like Mass Inst Tech
@@ -60,11 +60,11 @@ ARGUMENTS OPTIONS:
     Options marked with    *  are implemented
 
 PATH INCLUDE:
-    When the {path} is followd by a brace list only filenames matching the list
+    When {path} is followd by a brace list only filenames matching the list
     will be included in the search.
     Examples:
-       $ gg copyright .[.cpp,.md]  # Only search files with these extensions
-       $ gg copyright .['gg.*ion'] # Only files with 'gg' then 'ion' in filename
+       $ gg copyright .{.cpp,.md}  # Only search files with these extensions
+       $ gg copyright .{'gg.*ion'} # Only files with 'gg' then 'ion' in filename
 
 OPTIONS:
     -{N}               # threadcount to cpu core ratio (1-9) (deprecate)
@@ -73,7 +73,7 @@ OPTIONS:
     -n, --nibbles      # use nibbles (lower memory use half-speed search)
     -s, --suppress     # suppress permission denied errors
     -t, --test         # test algorithms (unit and timing)  TODO
-    -v, --variant      # enable variant syntax with [] brackets
+    -v, --variant      # enable variant syntax with {} braces
 
 OUTPUT:
     canonical paths of files fulfilling the set conditions.
@@ -175,6 +175,7 @@ Home page: https://github.com/jlettvin/Greased-Grep
 #include "gg.h"                    // declarations
 #include "state_table.h"           // Mechanism for finite state machine
 #include "thread_queue.h"          // filename distribution to threads
+#include "utility.h"
 
 //..............................................................................
 #include "variant.h"
@@ -411,7 +412,21 @@ show_tables (ostream& a_os)
 			"     PLANE: " << state << endl << " # ";
 		for (unsigned row=0; row < ROWS*COLS; row+=COLS)
 		{
+			bool content{false};
+			for (unsigned col=0; col < COLS; ++col)
+			{
+				Atom& entry{plane[static_cast<char>(row+col)]};
+				int32_t tgt{static_cast<int32_t>(entry.tgt ())};
+				int32_t str{static_cast<int32_t>(entry.str ())};
+				content |= !!tgt;
+				content |= !!str;
+			}
+			if (!content)
+			{
+				continue;
+			}
 			a_os << '|';
+
 			for (unsigned col=0; col < COLS; ++col)
 			{
 				char id{static_cast<char>(row+col)};
@@ -748,23 +763,20 @@ operator ()()
 	}
 
 	// Find filename regexes
-	size_t bracket = s_target.find_first_of ('[');
-	if (bracket != string_view::npos)
+	debugf (1, "Initial target: %s\n", s_target.data ());
+	size_t brace = s_target.find_first_of ('{');
+	if (brace != string_view::npos)
 	{
-		string_view patterns = s_target;
-		patterns.remove_prefix (bracket + 1);
-		size_t comma = patterns.find_first_of (',');
-		while (comma != string_view::npos)
+		string patterns{s_target.substr (brace)};
+		s_target = s_target.substr (0, brace);
+		tokenize (s_filesx, patterns, ',', "{}");
+		for (auto& pattern: s_filesx)
 		{
-			s_filesx.emplace_back (patterns.substr (0, comma));
-			s_regex.emplace_back (regex (s_filesx.back ().data ()));
-			patterns.remove_prefix (comma + 1);
-			comma = patterns.find_first_of (',');
+			s_regex.emplace_back (regex (pattern.data ()));
+			debugf (1, "Target restriction: '%s'\n", pattern.data ());
 		}
-		s_filesx.emplace_back (patterns);
-		s_regex.emplace_back (regex (s_filesx.back ().data ()));
-		s_target = s_target.substr (0, bracket);
 	}
+	debugf (1, "Final target: %s\n", s_target.data ());
 
 	// Validate ingested args
 	if (s_accept.size () < 2 && s_reject.size () < 2)
@@ -989,18 +1001,19 @@ compile (int32_t a_sign, string_view a_sv)
 	if (s_variant)
 	{
 		mapvariant_t::const_iterator citer;
-		size_t brace_init{a_sv.find_first_of ('[')};
-		if (brace_init != string_view::npos)
+		size_t bracket_init{a_sv.find_first_of ('[')};
+		if (bracket_init != string_view::npos)
 		{
-			size_t brace_fini{a_sv.find_first_of (']', brace_init + 1)};
-			if (brace_fini == string_view::npos)
+			size_t bracket_fini{a_sv.find_first_of (']', bracket_init + 1)};
+			if (bracket_fini == string_view::npos)
 			{
-				syntax ("braced variants");
+				syntax ("bracketd variants");
 			}
-			debugf (1, "BR %zu %zu\n", brace_init, brace_fini);
-			b_str = a_sv.substr (brace_init + 1, brace_fini - brace_init - 1);
-			a_str = a_sv.substr (0, brace_init);
+			debugf (1, "BR %zu %zu\n", bracket_init, bracket_fini);
+			b_str = a_sv.substr (bracket_init + 1, bracket_fini - bracket_init - 1);
+			a_str = a_sv.substr (0, bracket_init);
 			debugf (1, "Braced [%s][%s]\n", a_str.c_str (), b_str.c_str ());
+			// TODO use utilit.h tokenize here
 			size_t comma = b_str.find_first_of (',');
 			while (comma != string::npos)
 			{

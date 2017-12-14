@@ -120,12 +120,12 @@ namespace Lettvin
 	double s_overhead;                   ///< interval for noop
 
 	string s_firsts;                     ///< string of {arg} first letters
-	string_view s_target;
+	string s_target;
 
 	vector<regex>           s_regex;         ///< filename match regexes
 	vector<string_view>     s_accept {{""}}; ///< list of accept {str} args
 	vector<string_view>     s_reject {{""}}; ///< list of reject {str} args
-	vector<string_view>     s_filesx {{""}}; ///< list of filename regex patterns
+	vector<string>          s_filesx {{""}}; ///< list of filename regex patterns
 	vector< set<int32_t> >  s_set    {{ 0}}; ///< per-candidate sets
 
 	//--------------------------------------------------------------------------

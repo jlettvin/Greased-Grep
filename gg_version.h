@@ -24,4 +24,4 @@ _____________________________________________________________________________*/
 
 #pragma once
 
-static const struct { unsigned major, minor, build; } s_version{0,0,557};
+static const struct { unsigned major, minor, build; } s_version{0,0,590};

@@ -37,7 +37,7 @@
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
 CSRC=gg.cpp thread_queue.cpp ggtest.cpp
-CHDR=catch.hpp gg.h gg_version.h thread_queue.h variant.h
+CHDR=catch.hpp gg.h gg_version.h thread_queue.h utility.h variant.h
 ARCHIVE=.gitignore LICENSE Makefile README.md $(CSRC) $(CHDR) test
 EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
@@ -67,7 +67,7 @@ test: FORCE
 #	./thread_queue
 
 ################################################################################
-gg:	gg.cpp gg.h Makefile thread_queue.h variant.h
+gg:	gg.cpp Makefile $(CHDR)
 	@./reversion.py gg_version.h
 	$(CC) $(COPTS) -o gg gg.cpp $(LOPTS)
 
