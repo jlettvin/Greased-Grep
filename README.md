@@ -3,7 +3,7 @@
 ### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
 ### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
 ### $ gg 愚公移山 .                 # find the foolish old man who moved mountains
-### $ gg case .[.cpp,.h,'gg.*ion']  # find in filenames with these patterns
+### $ gg case .{.cpp,.h,'gg.*ion'}  # find in filenames with these patterns
 
 "gg" name was chosen for this frequently-used command because it is easy to type.
 "gg" is the left-hand index-finger letter, and typing it twice is easy.
@@ -47,7 +47,7 @@ SOFTWARE.
 ### Usage
 
 ```
-Greased Grep version 0.0.1
+R"Synopsis(Greased Grep version %u.%u.%u
 
 USAGE: gg [-{N}] [-c] [-d] [-n] [-s] [-t] [-v] [+|-]{str} [[+|-]{str}...] {path} 
 
@@ -62,13 +62,13 @@ Greased Grep UTF8 fuzzy search for files having (case insensitive):
 ARGUMENTS:
     [+]{str}[options]  # add accept string (+ optional)
     -{str}[options]    # add reject string
-    {path}[includes]   # file or top directory for recursive search
+    {path}[include]    # file or top directory for recursive search
 
 ARGUMENTS OPTIONS:
     When the --variant option is used
-    A {str} followed by a bracket-list triggers variant insertion
+    A [str] followed by a bracket-list triggers variant insertion
     Examples:
-       $ gg -v copyright[acronym,c,f,misspelling] .
+       $ gg -v copyright{acronym,c,f,misspelling} .
     Available:
        a or acronym        *  to insert variants like M.I.T.
        c or contraction    *  to insert variants like Mass Inst Tech
@@ -81,11 +81,11 @@ ARGUMENTS OPTIONS:
     Options marked with    *  are implemented
 
 PATH INCLUDE:
-    When the {path} is followd by a brace list only filenames matching the list
+    When {path} is followd by a brace list only filenames matching the list
     will be included in the search.
     Examples:
-       $ gg copyright .[.cpp,.md]  # Only files with these extensions
-       $ gg copyright .['gg.*ion'] # Only files with 'gg' then 'ion' in filename
+       $ gg copyright .{.cpp,.md}  # Only search files with these extensions
+       $ gg copyright .{'gg.*ion'} # Only files with 'gg' then 'ion' in filename
 
 OPTIONS:
     -{N}               # threadcount to cpu core ratio (1-9) (deprecate)
@@ -94,7 +94,7 @@ OPTIONS:
     -n, --nibbles      # use nibbles (lower memory use half-speed search)
     -s, --suppress     # suppress permission denied errors
     -t, --test         # test algorithms (unit and timing)  TODO
-    -v, --variant      # enable variant syntax with [] brackets
+    -v, --variant      # enable variant syntax with {} braces
 
 OUTPUT:
     canonical paths of files fulfilling the set conditions.
