@@ -770,10 +770,11 @@ operator ()()
 		string patterns{s_target.substr (brace)};
 		s_target = s_target.substr (0, brace);
 		tokenize (s_filesx, patterns, ',', "{}");
-		for (auto& pattern: s_filesx)
+		for (size_t I=s_filesx.size (), i=1; i<I; ++i)
 		{
-			s_regex.emplace_back (regex (pattern.data ()));
-			debugf (1, "Target restriction: '%s'\n", pattern.data ());
+			auto& restriction{s_filesx[i]};
+			s_regex.emplace_back (regex (restriction.data ()));
+			debugf (1, "Target restriction: '%s'\n", restriction.data ());
 		}
 	}
 	debugf (1, "Final target: %s\n", s_target.data ());
