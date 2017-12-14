@@ -47,7 +47,7 @@ SOFTWARE.
 ### Usage
 
 ```
-R"Synopsis(Greased Grep version %u.%u.%u
+Synopsis(Greased Grep version 0.0.591
 
 USAGE: gg [-{N}] [-c] [-d] [-n] [-s] [-t] [-v] [+|-]{str} [[+|-]{str}...] {path} 
 
