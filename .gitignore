@@ -9,5 +9,7 @@ old
 old/*
 experiment
 experiment/*
+parser
+parser/*
 3rdparty
 3rdparty/*
