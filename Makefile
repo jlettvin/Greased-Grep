@@ -48,8 +48,8 @@ COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
 COPTS_FINAL=-O3  $(COPTS_BOTH)
 COPTS=$(COPTS_DEBUG)
 LOPTS=-pthread -lfmt -lstdc++fs
-CEXES=gg makeREADME
-#CEXES=gg thread_queue
+CEXES=gg make_README
+#CEXES=gg thread_queue make_README
 ################################################################################
 
 ################################################################################
@@ -67,8 +67,9 @@ test: FORCE
 #	./thread_queue
 
 ################################################################################
-makeREADME: makeREADME.cpp $(CHDR) Makefile
+make_README: make_README.cpp $(CHDR) Makefile
 	$(CC) $(COPTS) -o $@ $< $(LOPTS)
+	@./make_README > README.md
 
 ################################################################################
 gg:	gg.cpp $(CHDR) Makefile
@@ -100,7 +101,6 @@ before:    FORCE
 ################################################################################
 .PHONY:
 after:    FORCE
-	@./makeREADME > README.md
 	@echo "$ gede --args gg -d -n aa test   # to debug"
 	@echo $$(yes '-' | head -n 40)
 	@seq 3 | xargs -I -- echo $$(yes '^' | head -n 40)
@@ -110,6 +110,9 @@ after:    FORCE
 .PHONY:
 clean:    FORCE
 	rm -fr $(CEXES)
+	rm -f thread_queue
+	rm -f *.out
+	rm -f temp.dump
 	rm -f *.gcov *.gcda *.gcno
 
 ################################################################################
