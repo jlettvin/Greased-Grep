@@ -65,10 +65,10 @@ _____________________________________________________________________________*/
 #include "gg.h"                    // declarations
 #include "state_table.h"           // Mechanism for finite state machine
 #include "thread_queue.h"          // filename distribution to threads
-#include "utility.h"
+#include "utility.h"               // tokenize
 
 //..............................................................................
-#include "variant.h"
+#include "variant.h"               // variant implementations
 
 static const char* s_path=".";
 
