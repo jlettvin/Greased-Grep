@@ -49,7 +49,7 @@ SOFTWARE.
 ```
 Synopsis(Greased Grep version 0.0.591
 
-USAGE: gg [-{N}] [-c] [-d] [-n] [-s] [-t] [-v] [+|-]{str} [[+|-]{str}...] {path} 
+USAGE: gg [-d] [-[1-9]] [-{c|n|s|t|v}]... [[+|-]{str}]... {path} 
 
 Greased Grep UTF8 fuzzy search for files having (case insensitive):
     all instances of +{str} or {str} and
@@ -64,7 +64,16 @@ ARGUMENTS:
     -{str}[options]    # add reject string
     {path}[include]    # file or top directory for recursive search
 
-ARGUMENTS OPTIONS:
+OPTIONS:
+    -d, --debug        # turn on debugging output (first on command-line)
+    -c, --case         # case sensitive search
+    -n, --nibbles      # use nibbles (lower memory use half-speed search)
+    -s, --suppress     # suppress permission denied errors
+    -t, --test         # test algorithms (unit and timing)  TODO
+    -v, --variant      # enable variant syntax with {} braces
+    -1 -2 ... -8 -9    # threadcount to cpu core ratio (1-9) (deprecate)
+
+ACCEPT/REJECT VARIANTS:
     When the --variant option is used
     A [str] followed by a bracket-list triggers variant insertion
     Examples:
@@ -87,15 +96,6 @@ PATH INCLUDE:
        $ gg copyright .{.cpp,.md}  # Only search files with these extensions
        $ gg copyright .{'gg.*ion'} # Only files with 'gg' then 'ion' in filename
 
-OPTIONS:
-    -{N}               # threadcount to cpu core ratio (1-9) (deprecate)
-    -c, --case         # case sensitive search
-    -d, --debug        # turn on debugging output
-    -n, --nibbles      # use nibbles (lower memory use half-speed search)
-    -s, --suppress     # suppress permission denied errors
-    -t, --test         # test algorithms (unit and timing)  TODO
-    -v, --variant      # enable variant syntax with {} braces
-
 OUTPUT:
     canonical paths of files fulfilling the set conditions.
 
@@ -108,6 +108,16 @@ EXAMPLES:
         # Find all files with missing or other than Lettvin copyright.
     $ gg 愚公移山 .
         # Find the foolish old man who moved the mountains
+
+NOTES:
+    Interpreting command-lines:
+        -1 ,,, -9   : -3 if there are 4 cores, gg will have 3*4 = 12 threads
+        foo1        :    foo1 is accept string
+        +foo2       :    foo2 is accept string
+        -foo3       :    foo3 is reject string
+        bar[a,l]    :    bar  is accept string with acronyms and levenshtein1
+        .           :    current directory
+        .{.cpp$,.h$}:    current directoy but only for .cpp and .h files.
 
 Report bugs to: jlettvin@gmail.com
 Home page: https://github.com/jlettvin/Greased-Grep

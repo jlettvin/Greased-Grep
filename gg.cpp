@@ -28,7 +28,7 @@ R"Synopsis(Greased Grep version %u.%u.%u
 
 PATH: %s
 
-USAGE: gg [-{N}] [-c] [-d] [-n] [-s] [-t] [-v] [+|-]{str} [[+|-]{str}...] {path} 
+USAGE: gg [-d] [-[1-9]] [-{c|n|s|t|v}]... [[+|-]{str}]... {path} 
 
 Greased Grep UTF8 fuzzy search for files having (case insensitive):
     all instances of +{str} or {str} and
@@ -43,7 +43,16 @@ ARGUMENTS:
     -{str}[options]    # add reject string
     {path}[include]    # file or top directory for recursive search
 
-ARGUMENTS OPTIONS:
+OPTIONS:
+    -d, --debug        # turn on debugging output (first on command-line)
+    -c, --case         # case sensitive search
+    -n, --nibbles      # use nibbles (lower memory use half-speed search)
+    -s, --suppress     # suppress permission denied errors
+    -t, --test         # test algorithms (unit and timing)  TODO
+    -v, --variant      # enable variant syntax with {} braces
+    -1 -2 ... -8 -9    # threadcount to cpu core ratio (1-9) (deprecate)
+
+ACCEPT/REJECT VARIANTS:
     When the --variant option is used
     A [str] followed by a bracket-list triggers variant insertion
     Examples:
@@ -66,15 +75,6 @@ PATH INCLUDE:
        $ gg copyright .{.cpp,.md}  # Only search files with these extensions
        $ gg copyright .{'gg.*ion'} # Only files with 'gg' then 'ion' in filename
 
-OPTIONS:
-    -{N}               # threadcount to cpu core ratio (1-9) (deprecate)
-    -c, --case         # case sensitive search
-    -d, --debug        # turn on debugging output
-    -n, --nibbles      # use nibbles (lower memory use half-speed search)
-    -s, --suppress     # suppress permission denied errors
-    -t, --test         # test algorithms (unit and timing)  TODO
-    -v, --variant      # enable variant syntax with {} braces
-
 OUTPUT:
     canonical paths of files fulfilling the set conditions.
 
@@ -87,6 +87,16 @@ EXAMPLES:
         # Find all files with missing or other than Lettvin copyright.
     $ gg 愚公移山 .
         # Find the foolish old man who moved the mountains
+
+NOTES:
+    Interpreting command-lines:
+        -1 ,,, -9   : -3 if there are 4 cores, gg will have 3*4 = 12 threads
+        foo1        :    foo1 is accept string
+        +foo2       :    foo2 is accept string
+        -foo3       :    foo3 is reject string
+        bar[a,l]    :    bar  is accept string with acronyms and levenshtein1
+        .           :    current directory
+        .{.cpp$,.h$}:    current directoy but only for .cpp and .h files.
 
 Report bugs to: jlettvin@gmail.com
 Home page: https://github.com/jlettvin/Greased-Grep
@@ -729,6 +739,7 @@ GreasedGrep (int32_t a_argc, char** a_argv) // ctor
 {
 	while (--a_argc)
 	{
+		//debugf (1, "CTOR: '%s' '%s'\n", *a_argv, *(a_argv + 1));
 		ingest (*++a_argv);
 	}
 } // ctor
@@ -861,6 +872,10 @@ option (string_view a_str)
 		synopsis ("command-line options must be two or more chars");
 	}
 
+	// Doing debug first is special
+	//s_debug += (a_str == "--debug");
+	//s_debug += (two && (letter == 'd'));
+
 	if (a_str.size () == 2 && isdigit(a_str[1]))
 	{
 		s_oversize = (size_t)(a_str[1] - '0');
@@ -869,12 +884,35 @@ option (string_view a_str)
 		return true;
 	}
 
+	debugf (1, "OPTION: preparse: '%s'\n", a_str.data ());
+
 	if      (a_str == "--case"     || (opt && letter == 'c')) s_caseless = false;
 	else if (a_str == "--debug"    || (opt && letter == 'd')) s_debug   += 1;
 	else if (a_str == "--nibbles"  || (opt && letter == 'n')) s_nibbles  = true;
 	else if (a_str == "--suppress" || (opt && letter == 's')) s_suppress = true;
 	else if (a_str == "--test"     || (opt && letter == 't')) s_test     = true;
 	else if (a_str == "--variant"  || (opt && letter == 'v')) s_variant  = true;
+	else if (a_str[0] == a_str[1] && a_str[1] == '-')
+	{
+		debugf (1, "OPTIONS:\n");
+		for (size_t I=a_str.size (), i=2; i < I; ++i)
+		{
+			char opt{a_str[i]};
+			debugf (1, "OPTION: '%c'\n", opt);
+			switch (opt)
+			{
+				case 'c': option ("-c"); break;
+				case 'd': option ("-d"); break;
+				case 'n': option ("-n"); break;
+				case 's': option ("-s"); break;
+				case 't': option ("-t"); break;
+				case 'v': option ("-v"); break;
+				default:
+					synopsis ("OPTION: '%c' is illegal", a_str[i]);
+					break;
+			}
+		}
+	}
 	else if (opt)
 	{
 		synopsis ("unknown arg '%s'", a_str.data ());
@@ -900,7 +938,9 @@ ingest (string_view a_str)
 	// Handle options
 	size_t size{a_str.size ()};
 	bool minus1{size == 2 && a_str[0] == '-'};
-	bool minus2{size >= 3 && a_str[0] == '-' && a_str[1] == '-'};
+	bool minus2{size >= 2 && a_str[0] == '-' && a_str[1] == '-'};
+
+	debugf (1, "INGEST: %d %d %s\n", minus1, minus2, a_str.data ());
 
 	if ((minus1 || minus2) && option (a_str)) return;
 
@@ -1013,8 +1053,9 @@ compile (int32_t a_sign, string_view a_sv)
 			debugf (1, "BR %zu %zu\n", bracket_init, bracket_fini);
 			b_str = a_sv.substr (bracket_init + 1, bracket_fini - bracket_init - 1);
 			a_str = a_sv.substr (0, bracket_init);
-			debugf (1, "Braced [%s][%s]\n", a_str.c_str (), b_str.c_str ());
-			// TODO use utilit.h tokenize here
+			debugf (1, "Bracketed [%s][%s]\n", a_str.c_str (), b_str.c_str ());
+			// TODO use utility.h tokenize here
+			// TODO figure out how to implement [acls] instead of [a,c,l,s]
 			size_t comma = b_str.find_first_of (',');
 			while (comma != string::npos)
 			{
@@ -1287,6 +1328,7 @@ main (int32_t a_argc, char** a_argv)
 		s_path = const_cast<const char*>(app.c_str ());
 		Lettvin::GreasedGrep gg (a_argc, a_argv);
 		gg ();
+		Lettvin::debugf (1, "CTOR: '%s' '%s'\n", *a_argv, *(a_argv + 1));
 	}
 	catch (const std::exception &e)
 	//catch (...)
