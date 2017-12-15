@@ -163,7 +163,7 @@ namespace Lettvin
             'M': 'MmNJKL< jkl,',
             'N': 'NnBHJM bhjm',
             'O': 'OoI90PLK()iplk',
-            'P': 'PpO0-[;Lo)_{:l',
+            'P': 'PpO0-[\x3bLo\x7d_\x7b:l',
             'Q': 'Qq  12WA!@wa',
             'R': 'Rr45TFDE$%tfde',
             'S': 'SsAWEDXZawedxz',
@@ -178,7 +178,7 @@ namespace Lettvin
 
     # Map Dvorak keyboard to possible fat_fingerings.
     DVORAK = {
-            'A': 'Aa?:,Oo;\'',
+            'A': 'Aa?:,Oo\x3b\'',
             'B': 'BbXxDdHhMm ',
             'C': 'CcGg24$$4TtHh',
             'D': 'DdIiFfGgHhBbXx',
@@ -189,20 +189,20 @@ namespace Lettvin
             'I': 'IiUuYyFfDdXxKk',
             'J': 'JjQqEeUuKk ',
             'K': 'KkJjUuIiXx ',
-            'L': 'LlRr6@8*/&SsNn',
+            'L': 'LlRr6\x408\x2a/&SsNn',
             'M': 'MmBbHhTtWw ',
             'N': 'NnTtRrLlSsVvWw',
-            'O': 'OoAa,.EeQq;\'',
-            'P': 'Pp.3)1"YyUuEe',
+            'O': 'OoAa,.EeQq\x3b\'',
+            'P': 'Pp.3\x291\x22YyUuEe',
             'Q': 'Qq\':OoEeJj ',
-            'R': 'RrCc4$6@LlNnTt',
+            'R': 'RrCc4\x246@LlNnTt',
             'S': 'SsNnLl&/-ZzVv',
             'T': 'TtHhCcRrNnWwMm',
             'U': 'UuEePpYyIiKkJj',
             'V': 'VvWwNnSsZz',
             'W': 'Ww MmTtNnVv',
             'X': 'Xx KkIiDdBb',
-            'Y': 'YyPp1"9%FfIiUu',
+            'Y': 'YyPp1\x229%FfIiUu',
             'Z': 'ZzVvSs-',
     }
 
@@ -309,4 +309,41 @@ namespace Lettvin
 		{"unicode"     , unicode}		,{"u", unicode}
 	};
 
+	//__________________________________________________________________________
+	bool is_variant (const char* id)
+	{
+		mapvariant_t::const_iterator citer;
+		citer = s_variant_generator.find (id);
+		return (citer != s_variant_generator.end ());
+	}
+
+	//__________________________________________________________________________
+	void synopsis_if_not_variant (const char* id)
+	{
+		if (!is_variant (id))
+		{
+			synopsis ("VARIANT: bad '%s'", id);
+		}
+	}
+
+	//__________________________________________________________________________
+	bool register_variant (vector<string>& registry, string id)
+	{
+		registry.push_back (id);
+		debugf (1, "variant: '%s'\n", id);
+		return true;
+	}
+
+	//__________________________________________________________________________
+	bool descramble_variants (vector<string>& variant_names, string scrambled)
+	{
+		for (size_t I=scrambled.size (), i=0; i<I; ++i)
+		{
+			string single (scrambled.substr (i,1));
+			debugf (1, "VARIANT descramble '%s'", single);
+			synopsis_if_not_variant (single.c_str ());
+			register_variant (variant_names, single);
+		}
+		return true;
+	}
 }

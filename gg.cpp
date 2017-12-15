@@ -70,8 +70,6 @@ _____________________________________________________________________________*/
 //..............................................................................
 #include "variant.h"               // variant implementations
 
-static const char* s_path=".";
-
 namespace fs = std::experimental::filesystem;
 using namespace std;  // No naming collisions in this small namespace
 
@@ -86,46 +84,6 @@ void experiment1_target ()
 	auto [hello, code] = experiment1_source ();
 }
 
-//------------------------------------------------------------------------------
-/// @brief synopsis (document usage in case of failure)
-void Lettvin::synopsis (const char* a_message, ...)
-//------------------------------------------------------------------------------
-{
-	if (a_message != nullptr)
-	{
-		printf (" # ERROR: ");
-	}
-	va_list args;
-	va_start (args, a_message);
-	vprintf (a_message, args);
-	va_end (args);
-	printf ("\n");
-	printf (s_synopsis,
-			s_version.major,
-			s_version.minor,
-			s_version.build,
-			s_path);
-	exit (1);
-} // synopsis
-
-//------------------------------------------------------------------------------
-/// @brief synopsis (document usage in case of failure)
-void Lettvin::syntax (const char* a_message, ...)
-//------------------------------------------------------------------------------
-{
-	printf (" # SYNTAX ERROR: ");
-	va_list args;
-	va_start (args, a_message);
-	vprintf (a_message, args);
-	va_end (args);
-	printf ("\n");
-	printf (s_synopsis,
-			s_version.major,
-			s_version.minor,
-			s_version.build,
-			s_path);
-	exit (1);
-}
 
 //------------------------------------------------------------------------------
 /// @brief nibbles converts algorithm from byte to nibble tables.
@@ -662,7 +620,7 @@ operator ()()
 	{
 		string patterns{s_target.substr (brace)};
 		s_target = s_target.substr (0, brace);
-		tokenize (s_filesx, patterns, ',', "{}");
+		tokenize (s_filesx, patterns, "{,}");
 		for (size_t I=s_filesx.size (), i=1; i<I; ++i)
 		{
 			auto& restriction{s_filesx[i]};
@@ -923,7 +881,6 @@ compile (int32_t a_sign, string_view a_sv)
 
 	if (s_variant)
 	{
-		mapvariant_t::const_iterator citer;
 		size_t bracket_init{a_sv.find_first_of ('[')};
 		if (bracket_init != string_view::npos)
 		{
@@ -937,30 +894,21 @@ compile (int32_t a_sign, string_view a_sv)
 			a_str = a_sv.substr (0, bracket_init);
 			debugf (1, "Bracketed [%s][%s]\n", a_str.c_str (), b_str.c_str ());
 			// TODO use utility.h tokenize here
-			// TODO figure out how to implement [acls] instead of [a,c,l,s]
 			size_t comma = b_str.find_first_of (',');
 			while (comma != string::npos)
 			{
 				string token = b_str.substr (0, comma);
 				b_str = b_str.substr (comma + 1);
 				comma = b_str.find_first_of (',');
-				variant_names.push_back (token);
-				citer = s_variant_generator.find (token);
-				if (citer == s_variant_generator.end ())
-				{
-					syntax ("BAD variant name [%s]\n", token.c_str ());
-				}
-				debugf (1, "variant: %s\n", token.c_str ());
+				is_variant (token.c_str ())
+					? register_variant (variant_names, token)
+					: descramble_variants (variant_names, token);
 			}
 			if (b_str.size ())
 			{
-				variant_names.push_back (b_str);
-				citer = s_variant_generator.find (b_str);
-				if (citer == s_variant_generator.end ())
-				{
-					syntax ("BAD variant name [%s]\n", b_str.c_str ());
-				}
-				debugf (1, "variant: %s\n", b_str.c_str ());
+				is_variant (b_str.c_str ())
+					? register_variant (variant_names, b_str)
+					: descramble_variants (variant_names, b_str);
 			}
 		}
 
@@ -1207,7 +1155,7 @@ main (int32_t a_argc, char** a_argv)
 		std::ios::sync_with_stdio (true);
 		//fs::path app{fs::canonical (fs::path (a_argv[0]))};
 		fs::path app{fs::path (a_argv[0])};
-		s_path = const_cast<const char*>(app.c_str ());
+		Lettvin::s_path = const_cast<const char*>(app.c_str ());
 		Lettvin::GreasedGrep gg (a_argc, a_argv);
 		gg ();
 		Lettvin::debugf (1, "CTOR: '%s' '%s'\n", *a_argv, *(a_argv + 1));

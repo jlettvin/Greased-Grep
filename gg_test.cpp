@@ -23,5 +23,58 @@ SOFTWARE.
 _____________________________________________________________________________*/
 
 //..............................................................................
+// g++ --std=c++17 -o gg_test gg_test.cpp
+#define CATCH_CONFIG_MAIN
 #include "catch.hpp"               // Testing framework
 
+#include <cstdarg>                 // vararg
+#include <vector>
+#include <string>
+#include <tuple>
+
+int32_t debugf (size_t a_debug, const char *fmt, ...);
+
+#include "utility.h"
+
+using namespace std;
+using namespace Lettvin;
+
+//______________________________________________________________________________
+SCENARIO ("Simple test of catch.hpp")
+{
+	GIVEN ("CATCH_CONFIG_MAIN is defined and catch.hpp is included")
+	{
+		THEN ("We should pass a trivial test")
+		{
+			REQUIRE (true == true);
+		}
+	}
+}
+
+//______________________________________________________________________________
+SCENARIO ("Test utility functions")
+{
+	GIVEN ("Some test data to exercise the tokenizer")
+	{
+		const vector<string> expect{{"a","bb","ccc"}};
+		vector<tuple<string,string,string::size_type>>
+		candidates{{
+			{"[a,bb,ccc]", "[,]", string::npos},
+			{ "a bb ccc" , " "  , string::npos},
+			{"{a:bb:ccc}", "{:}", string::npos}
+		}};
+
+		THEN ("Test tokenize")
+		{
+			for (auto& candidate:candidates)
+			{
+				vector<string> target;
+				auto source = get<0>(candidate);
+				auto sep    = get<1>(candidate);
+				auto ret = tokenize (target, source, sep);
+				REQUIRE (target == expect      );
+				//REQUIRE (ret    == string::npos);
+			}
+		}
+	}
+}

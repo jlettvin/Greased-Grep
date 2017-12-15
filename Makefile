@@ -36,7 +36,7 @@
 
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
-CSRC=gg.cpp thread_queue.cpp ggtest.cpp
+CSRC=gg.cpp thread_queue.cpp gg_test.cpp
 CHDR=catch.hpp gg.h gg_version.h thread_queue.h utility.h variant.h
 ARCHIVE=.gitignore LICENSE Makefile README.md $(CSRC) $(CHDR) test
 EMPTY=
@@ -48,12 +48,12 @@ COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
 COPTS_FINAL=-O3  $(COPTS_BOTH)
 COPTS=$(COPTS_DEBUG)
 LOPTS=-pthread -lfmt -lstdc++fs
-CEXES=gg make_README
+CEXES=gg gg_test make_README
 #CEXES=gg thread_queue make_README
 ################################################################################
 
 ################################################################################
-all: before $(CEXES) test after
+all: before $(CEXES) test README.md after
 
 ################################################################################
 .PHONY:
@@ -63,13 +63,21 @@ test: FORCE
 	./gg -s abc def ghi jkl .
 	./gg -s -d +abc +def +ghi +jkl $(REJECT) .
 	./gg -c -d -n AA .
+	./gg_test
 
 #	./thread_queue
 
 ################################################################################
+README.md:	make_README
+	@./make_README > README.md
+
+################################################################################
 make_README: make_README.cpp $(CHDR) Makefile
 	$(CC) $(COPTS) -o $@ $< $(LOPTS)
-	@./make_README > README.md
+
+################################################################################
+gg_test:	gg_test.cpp $(CHDR) Makefile
+	$(CC) $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
 gg:	gg.cpp $(CHDR) Makefile
