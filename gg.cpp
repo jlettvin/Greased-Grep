@@ -22,8 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 _____________________________________________________________________________*/
 
-static const char* s_path=".";
-
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 // Turn GG_COMPILE true to run compile AFTER command-line processing
 // For now, tests fail when GG_COMPILE is true
@@ -71,6 +69,8 @@ static const char* s_path=".";
 
 //..............................................................................
 #include "variant.h"
+
+static const char* s_path=".";
 
 namespace fs = std::experimental::filesystem;
 using namespace std;  // No naming collisions in this small namespace
@@ -652,7 +652,7 @@ operator ()()
 	if (s_target.size () < 1 &&
 		((s_accept.size () < 2) && (s_reject.size () < 2)))
 	{
-		Lettvin::synopsis ("pattern(s) and directory required.");
+		Lettvin::syntax ("pattern(s) and directory required.");
 	}
 
 	// Find filename regexes
@@ -675,14 +675,14 @@ operator ()()
 	// Validate ingested args
 	if (s_accept.size () < 2 && s_reject.size () < 2)
 	{
-		synopsis ("specify at least one accept or reject str");
+		syntax ("specify at least one accept or reject str");
 	}
 
 	// Check for valid directory
 	if (!fs::is_directory (s_target) &&
 		!fs::is_regular_file (s_target))
 	{
-		synopsis ("last arg must be dir or file");
+		syntax ("last arg must be dir or file");
 	}
 
 	// Compile and check for collisions between accept and reject lists
@@ -747,11 +747,11 @@ option (string_view a_str)
 
 	if (strs)
 	{
-		synopsis ("(%s) options must precede other args", a_str.data ());
+		syntax ("(%s) options must precede other args", a_str.data ());
 	}
 	if (bad)
 	{
-		synopsis ("command-line options must be two or more chars");
+		syntax ("command-line options must be two or more chars");
 	}
 
 	// Doing debug first is special
@@ -790,14 +790,14 @@ option (string_view a_str)
 				case 't': option ("-t"); break;
 				case 'v': option ("-v"); break;
 				default:
-					synopsis ("OPTION: '%c' is illegal", a_str[i]);
+					syntax ("OPTION: '%c' is illegal", a_str[i]);
 					break;
 			}
 		}
 	}
 	else if (opt)
 	{
-		synopsis ("unknown arg '%s'", a_str.data ());
+		syntax ("unknown arg '%s'", a_str.data ());
 	}
 	else
 	{
@@ -838,7 +838,7 @@ ingest (string_view a_str)
 
 		if (candidate.size () < 2)
 		{
-			synopsis ("pattern strings must be longer than 1 byte");
+			syntax ("pattern strings must be longer than 1 byte");
 		}
 		field.push_back (candidate);
 #if !GG_COMPILE
