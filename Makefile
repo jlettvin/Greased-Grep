@@ -67,9 +67,12 @@ test: FORCE
 #	./thread_queue
 
 ################################################################################
+makeREADME: makeREADME.cpp Makefile
+	$(CC) $(COPTS) -o $@ $< $(LOPTS)
+
+################################################################################
 gg:	gg.cpp Makefile $(CHDR)
-	@./reversion.py gg_version.h
-	$(CC) $(COPTS) -o gg gg.cpp $(LOPTS)
+	$(CC) $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
 #thread_queue: thread_queue.cpp thread_queue.h
@@ -92,10 +95,12 @@ before:    FORCE
 	@echo $$(yes '-' | head -n 40)
 	@seq 3 | xargs -I -- echo $$(yes 'v' | head -n 40)
 	@echo $$(yes '-' | head -n 40)
+	@./reversion.py gg_version.h
 
 ################################################################################
 .PHONY:
 after:    FORCE
+	@./makeREADME > README.md
 	@echo "$ gede --args gg -d -n aa test   # to debug"
 	@echo $$(yes '-' | head -n 40)
 	@seq 3 | xargs -I -- echo $$(yes '^' | head -n 40)

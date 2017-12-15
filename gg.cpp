@@ -23,124 +23,6 @@ SOFTWARE.
 _____________________________________________________________________________*/
 
 static const char* s_path=".";
-static const char* s_synopsis =
-R"Synopsis(Greased Grep version %u.%u.%u
-
-PATH: %s
-
-USAGE: gg [-d] [-[1-9]] [-{c|n|s|t|v}]... [[+|-]{str}]... {path} 
-
-Greased Grep UTF8 fuzzy search for files having (case insensitive):
-    all instances of +{str} or {str} and
-	no  instances of -{str} instances in
-	files found along {path}
-
-        {str} are simple strings (no regex).
-        {str} may be single-quoted to avoid shell interpretation.
-
-ARGUMENTS:
-    [+]{str}[options]  # add accept string (+ optional)
-    -{str}[options]    # add reject string
-    {path}[include]    # file or top directory for recursive search
-
-OPTIONS:
-    -d, --debug        # turn on debugging output (first on command-line)
-    -c, --case         # case sensitive search
-    -n, --nibbles      # use nibbles (lower memory use half-speed search)
-    -s, --suppress     # suppress permission denied errors
-    -t, --test         # test algorithms (unit and timing)  TODO
-    -v, --variant      # enable variant syntax with {} braces
-    -1 -2 ... -8 -9    # threadcount to cpu core ratio (1-9) (deprecate)
-
-ACCEPT/REJECT VARIANTS:
-    When the --variant option is used
-    A [str] followed by a bracket-list triggers variant insertion
-    Examples:
-       $ gg -v copyright{acronym,c,f,misspelling} .
-    Available:
-       a or acronym        *  to insert variants like M.I.T.
-       c or contraction    *  to insert variants like Mass Inst Tech
-       e or ellipses       *  to insert variants like Massachu
-       f or fatfinger         to insert variants like NUR
-       l or levenshtein1   *  to insert variants like MTI
-       s or sensitive      *  to insert required variants like mit
-       t or thesaurus         to insert synonyms like "quick" for "fast"
-       u or unicode           to insert NFKD variants
-    Options marked with    *  are implemented
-
-PATH INCLUDE:
-    When {path} is followd by a brace list only filenames matching the list
-    will be included in the search.
-    Examples:
-       $ gg copyright .{.cpp,.md}  # Only search files with these extensions
-       $ gg copyright .{'gg.*ion'} # Only files with 'gg' then 'ion' in filename
-
-OUTPUT:
-    canonical paths of files fulfilling the set conditions.
-
-EXAMPLES:
-    $ gg include /usr/local/src
-        # find all files having the string 'inlude' in /usr/local/src
-    $ gg '#include <experimental/filesystem>' /usr/local/src
-        # find all files having the quoted string in /usr/local/src
-    $ gg copyright -Lettvin .
-        # Find all files with missing or other than Lettvin copyright.
-    $ gg 愚公移山 .
-        # Find the foolish old man who moved the mountains
-
-NOTES:
-    Interpreting command-lines:
-        -1 ,,, -9   : -3 if there are 4 cores, gg will have 3*4 = 12 threads
-        foo1        :    foo1 is accept string
-        +foo2       :    foo2 is accept string
-        -foo3       :    foo3 is reject string
-        bar[a,l]    :    bar  is accept string with acronyms and levenshtein1
-        .           :    current directory
-        .{.cpp$,.h$}:    current directoy but only for .cpp and .h files.
-
-Report bugs to: jlettvin@gmail.com
-Home page: https://github.com/jlettvin/Greased-Grep
-)Synopsis";
-
-// Industry standard post-processing algorithms are not applicable
-//       m or metaphone         may dismiss as post-processing
-//       n or nyssis            may dismiss as post-processing
-//       s or soundex           may dismiss as post-processing
-
-//TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-// TODO embed FSM interpreter to enable specialized programming within C++
-// TODO debug filename regex options.
-// TODO allow recursive web page target in place of directory (no memmap).
-// TODO fix final "MAP FAILED" in -d mode
-// TODO implement all variants algorithms
-//      the API exists, but code is undeveloped
-//      Missing: fatfinger, thesaurus, unicode
-// TODO implement m_raw tree as Atom[] and enable search sensitivity to it.
-//      This will enable dump/load to bring in synonym tree.
-// TODO measure performance against fgrep/ack/ag
-//      publishing performance will make gg more attractive
-// TODO ingest args with ctor but compile strs at beginning of ftor
-//      compilation in ftor currently fails
-// TODO use memcmp for unique final string
-//      When the tail end of a search is unique memcmp is faster
-// TODO implement self-test (-t)
-//      client-usable as opposed to unit-test and performance test
-// TODO translate UTF8->UnicodeCodepoint->NFKD->UnicodeCodepoint->UTF8
-//      strings with identical appearance should be comparable
-//      this could be done by decomposing and recomposing during compilation
-//      for instance; convert to Unicode Codepoints, and decompose, then
-//      recompose to canonical NFKD, then reconvert to UTF8, then
-//      strings so recomposed can be compared properly
-// DONE make targets indirect from search to support multiple matches
-//      currently the target is the direct index into the match array
-// DONE make variant case sensitive locally.
-// DONE catch filesystem error (No such file or dir) without termination
-// DONE debug fatal error doing ~/bin/gg from ~/Desktop/github
-// DONE variants: acronym, contraction, ellipses, levenshtein1, sensitive
-// DONE multithread: 1 manager, N-1 workers where N=cpu count
-// DONE oversize multiplier on cpu count yields no speed advantage
-// DONE enable choice between state planes of size 16 and 256.
-//TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 // Turn GG_COMPILE true to run compile AFTER command-line processing
@@ -181,7 +63,7 @@ Home page: https://github.com/jlettvin/Greased-Grep
 #include "catch.hpp"               // Testing framework
 
 //..............................................................................
-#include "gg_version.h"            // version
+#include "gg_version.h"            // s_version and s_synopsis
 #include "gg.h"                    // declarations
 #include "state_table.h"           // Mechanism for finite state machine
 #include "thread_queue.h"          // filename distribution to threads
