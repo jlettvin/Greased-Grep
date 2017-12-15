@@ -48,7 +48,7 @@ COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
 COPTS_FINAL=-O3  $(COPTS_BOTH)
 COPTS=$(COPTS_DEBUG)
 LOPTS=-pthread -lfmt -lstdc++fs
-CEXES=gg
+CEXES=gg makeREADME
 #CEXES=gg thread_queue
 ################################################################################
 
@@ -67,11 +67,11 @@ test: FORCE
 #	./thread_queue
 
 ################################################################################
-makeREADME: makeREADME.cpp Makefile
+makeREADME: makeREADME.cpp $(CHDR) Makefile
 	$(CC) $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
-gg:	gg.cpp Makefile $(CHDR)
+gg:	gg.cpp $(CHDR) Makefile
 	$(CC) $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
