@@ -46,7 +46,8 @@ EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
 ################################################################################
 CC=g++
-COPTS_BOTH=-Wextra -Wall -Werror -std=c++17
+# Removed -Werror to ignore warnings
+COPTS_BOTH=-Wextra -Wall -std=c++17
 COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
 COPTS_FINAL=-O3  $(COPTS_BOTH)
 COPTS=$(COPTS_DEBUG)
@@ -72,7 +73,7 @@ test: FORCE
 
 ################################################################################
 README.md:	make_README
-	@./make_README > README.md
+	./make_README > README.md
 
 ################################################################################
 make_README: make_README.cpp $(CHDR) Makefile

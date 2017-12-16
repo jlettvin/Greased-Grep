@@ -1,5 +1,5 @@
 
-# Greased-Grep (version 0.0.701)
+# Greased-Grep (version 0.0.708)
 ## High performance O(N) case insensitive UTF8<br />threaded recursive fuzzy search for files having<br />all of one set and none of another set of strings
 ### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
 ### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
@@ -42,88 +42,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
-
-<hr />
-
-### Usage
-
-```
-Synopsis(Greased Grep version 0.0.701
-
-USAGE: gg [-d] [-[1-9]] [-{c|n|s|t|v}]... [[+|-]{str}]... {path} 
-
-Greased Grep UTF8 fuzzy search for files having (case insensitive):
-    all instances of +{str} or {str} and
-	no  instances of -{str} instances in
-	files found along {path}
-
-        {str} are simple strings (no regex).
-        {str} may be single-quoted to avoid shell interpretation.
-
-ARGUMENTS:
-    [+]{str}[options]  # add accept string (+ optional)
-    -{str}[options]    # add reject string
-    {path}[include]    # file or top directory for recursive search
-
-OPTIONS:
-    -d, --debug        # turn on debugging output (first on command-line)
-    -c, --case         # case sensitive search
-    -n, --nibbles      # use nibbles (lower memory use half-speed search)
-    -s, --suppress     # suppress permission denied errors
-    -t, --test         # test algorithms (unit and timing)  TODO
-    -v, --variant      # enable variant syntax with {} braces
-    -1 -2 ... -8 -9    # threadcount to cpu core ratio (1-9) (deprecate)
-
-ACCEPT/REJECT VARIANTS:
-    When the --variant option is used
-    A [str] followed by a bracket-list triggers variant insertion
-    Examples:
-       $ gg -v copyright{acronym,c,f,misspelling} .
-    Available:
-       a or acronym        *  to insert variants like M.I.T.
-       c or contraction    *  to insert variants like Mass Inst Tech
-       e or ellipses       *  to insert variants like Massachu
-       f or fatfinger         to insert variants like NUR
-       l or levenshtein1   *  to insert variants like MTI
-       s or sensitive      *  to insert required variants like mit
-       t or thesaurus         to insert synonyms like "quick" for "fast"
-       u or unicode           to insert NFKD variants
-    Options marked with    *  are implemented
-
-PATH INCLUDE:
-    When {path} is followd by a brace list only filenames matching the list
-    will be included in the search.
-    Examples:
-       $ gg copyright .{.cpp,.md}  # Only search files with these extensions
-       $ gg copyright .{'gg.*ion'} # Only files with 'gg' then 'ion' in filename
-
-OUTPUT:
-    canonical paths of files fulfilling the set conditions.
-
-EXAMPLES:
-    $ gg include /usr/local/src
-        # find all files having the string 'inlude' in /usr/local/src
-    $ gg '#include <experimental/filesystem>' /usr/local/src
-        # find all files having the quoted string in /usr/local/src
-    $ gg copyright -Lettvin .
-        # Find all files with missing or other than Lettvin copyright.
-    $ gg 愚公移山 .
-        # Find the foolish old man who moved the mountains
-
-NOTES:
-    Interpreting command-lines:
-        -1 ,,, -9   : -3 if there are 4 cores, gg will have 3*4 = 12 threads
-        foo1        :    foo1 is accept string
-        +foo2       :    foo2 is accept string
-        -foo3       :    foo3 is reject string
-        bar[a,l]    :    bar  is accept string with acronyms and levenshtein1
-        .           :    current directory
-        .{.cpp$,.h$}:    current directoy but only for .cpp and .h files.
-
-Report bugs to: jlettvin@gmail.com
-Home page: https://github.com/jlettvin/Greased-Grep
-```
-
 <hr />
 
 The last example is a good illustration.
@@ -272,3 +190,83 @@ RESTful interface to permit paging states for persistent searches
 such as regular rescraping of web-pages.
 FSM graphviz.dot syntax reader and code generator
 <hr />
+
+### Usage
+
+```
+
+Synopsis(Greased Grep version 0.0.708
+
+USAGE: gg [-d] [-[1-9]] [-{c|n|s|t|v}]... [[+|-]{str}]... {path} 
+
+Greased Grep UTF8 fuzzy search for files having (case insensitive):
+    all instances of +{str} or {str} and
+	no  instances of -{str} instances in
+	files found along {path}
+
+        {str} are simple strings (no regex).
+        {str} may be single-quoted to avoid shell interpretation.
+
+ARGUMENTS:
+    [+]{str}[options]  # add accept string (+ optional)
+    -{str}[options]    # add reject string
+    {path}[include]    # file or top directory for recursive search
+
+OPTIONS:
+    -d, --debug        # turn on debugging output (first on command-line)
+    -c, --case         # case sensitive search
+    -n, --nibbles      # use nibbles (lower memory use half-speed search)
+    -s, --suppress     # suppress permission denied errors
+    -t, --test         # test algorithms (unit and timing)  TODO
+    -v, --variant      # enable variant syntax with {} braces
+    -1 -2 ... -8 -9    # threadcount to cpu core ratio (1-9) (deprecate)
+
+ACCEPT/REJECT VARIANTS:
+    When the --variant option is used
+    A [str] followed by a bracket-list triggers variant insertion
+    Examples:
+       $ gg -v copyright{acronym,c,f,misspelling} .
+    Available:
+       a or acronym        *  to insert variants like M.I.T.
+       c or contraction    *  to insert variants like Mass Inst Tech
+       e or ellipses       *  to insert variants like Massachu
+       f or fatfinger         to insert variants like NUR
+       l or levenshtein1   *  to insert variants like MTI
+       s or sensitive      *  to insert required variants like mit
+       t or thesaurus         to insert synonyms like "quick" for "fast"
+       u or unicode           to insert NFKD variants
+    Options marked with    *  are implemented
+
+PATH INCLUDE:
+    When {path} is followd by a brace list only filenames matching the list
+    will be included in the search.
+    Examples:
+       $ gg copyright .{.cpp,.md}  # Only search files with these extensions
+       $ gg copyright .{'gg.*ion'} # Only files with 'gg' then 'ion' in filename
+
+OUTPUT:
+    canonical paths of files fulfilling the set conditions.
+
+EXAMPLES:
+    $ gg include /usr/local/src
+        # find all files having the string 'inlude' in /usr/local/src
+    $ gg '#include <experimental/filesystem>' /usr/local/src
+        # find all files having the quoted string in /usr/local/src
+    $ gg copyright -Lettvin .
+        # Find all files with missing or other than Lettvin copyright.
+    $ gg 愚公移山 .
+        # Find the foolish old man who moved the mountains
+
+NOTES:
+    Interpreting command-lines:
+        -1 ,,, -9   : -3 if there are 4 cores, gg will have 3*4 = 12 threads
+        foo1        :    foo1 is accept string
+        +foo2       :    foo2 is accept string
+        -foo3       :    foo3 is reject string
+        bar[a,l]    :    bar  is accept string with acronyms and levenshtein1
+        .           :    current directory
+        .{.cpp$,.h$}:    current directoy but only for .cpp and .h files.
+
+Report bugs to: jlettvin@gmail.com
+Home page: https://github.com/jlettvin/Greased-Grep
+```

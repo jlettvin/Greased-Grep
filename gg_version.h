@@ -24,58 +24,9 @@ _____________________________________________________________________________*/
 
 #pragma once
 
-static const struct { unsigned major, minor, build; } s_version{0,0,701};
+static const struct { unsigned major, minor, build; } s_version{0,0,708};
 
-static const char* s_synopsis = R"README(
-# Greased-Grep (version %u.%u.%u)
-## High performance O(N) case insensitive UTF8<br />threaded recursive fuzzy search for files having<br />all of one set and none of another set of strings
-### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
-### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
-### $ gg 愚公移山 .                 # find the foolish old man who moved mountains
-### $ gg case .{.cpp,.h,'gg.*ion'}  # find in filenames with these patterns
-
-"gg" name was chosen for this frequently-used command because it is easy to type.
-"gg" is the left-hand index-finger letter, and typing it twice is easy.
-
-Initial gg/grep performance shows gg is 10%% to 100%% faster than grep
-for combinations of simple accept/reject tokens.
-It also finds matches despite misspellings, acronyms, and typos
-without reductions in speed.
-The search algorithm speed is independent from token count and complexity.
-
-<hr />
-
-### Copyright
-
-```
-            The MIT License (https://opensource.org/licenses/MIT)
-
-        Copyright (c) 2017, Jonathan D. Lettvin, All Rights Reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-<hr />
-
-### Usage
-
-```
+static const char* s_synopsis = R"SYNOPSIS(
 Synopsis(Greased Grep version %u.%u.%u
 
 USAGE: gg [-d] [-[1-9]] [-{c|n|s|t|v}]... [[+|-]{str}]... {path} 
@@ -150,8 +101,52 @@ NOTES:
 
 Report bugs to: jlettvin@gmail.com
 Home page: https://github.com/jlettvin/Greased-Grep
-```
+)SYNOPSIS";
 
+static const char* s_readme = R"README(
+# Greased-Grep (version %u.%u.%u)
+## High performance O(N) case insensitive UTF8<br />threaded recursive fuzzy search for files having<br />all of one set and none of another set of strings
+### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
+### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
+### $ gg 愚公移山 .                 # find the foolish old man who moved mountains
+### $ gg case .{.cpp,.h,'gg.*ion'}  # find in filenames with these patterns
+
+"gg" name was chosen for this frequently-used command because it is easy to type.
+"gg" is the left-hand index-finger letter, and typing it twice is easy.
+
+Initial gg/grep performance shows gg is 10%% to 100%% faster than grep
+for combinations of simple accept/reject tokens.
+It also finds matches despite misspellings, acronyms, and typos
+without reductions in speed.
+The search algorithm speed is independent from token count and complexity.
+
+<hr />
+
+### Copyright
+
+```
+            The MIT License (https://opensource.org/licenses/MIT)
+
+        Copyright (c) 2017, Jonathan D. Lettvin, All Rights Reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 <hr />
 
 The last example is a good illustration.
@@ -300,4 +295,7 @@ RESTful interface to permit paging states for persistent searches
 such as regular rescraping of web-pages.
 FSM graphviz.dot syntax reader and code generator
 <hr />
+
+### Usage
+
 )README";

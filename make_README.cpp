@@ -29,8 +29,12 @@ _____________________________________________________________________________*/
 int main ()
 {
 	fmt::printf (
-			s_synopsis,
-			s_version.major, s_version.minor, s_version.build,
+			s_readme,
 			s_version.major, s_version.minor, s_version.build);
+	fmt::printf ("```\n");
+	fmt::printf (
+			s_synopsis,
+			s_version.major, s_version.minor, s_version.build);
+	fmt::printf ("```\n");
 	return 0;
 }
