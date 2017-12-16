@@ -36,7 +36,7 @@
 
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
-CSRC=gg.cpp gg_tqueue.cpp gg_state.cpp gg_test.cpp
+CSRC=gg.cpp gg_utility.cpp gg_tqueue.cpp gg_state.cpp gg_test.cpp
 CHDR=\
 	 catch.hpp \
 	 gg_globals.h gg.h gg_version.h \
@@ -79,12 +79,12 @@ make_README: make_README.cpp $(CHDR) Makefile
 	$(CC) $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
-gg_test:	gg_test.cpp gg_state.cpp $(CHDR) Makefile
-	$(CC) $(COPTS) -o $@ gg_globals.cpp gg_test.cpp gg_state.cpp $(LOPTS)
+gg_test:	gg_test.cpp gg_utility.cpp gg_state.cpp $(CHDR) Makefile
+	$(CC) $(COPTS) -o $@ gg_utility.cpp gg_globals.cpp gg_test.cpp gg_state.cpp $(LOPTS)
 
 ################################################################################
-gg:	gg.cpp gg_state.cpp $(CHDR) Makefile
-	$(CC) $(COPTS) -o $@ gg_globals.cpp gg.cpp gg_state.cpp $(LOPTS)
+gg:	gg.cpp gg_utility.cpp gg_state.cpp $(CHDR) Makefile
+	$(CC) $(COPTS) -o $@ gg_utility.cpp gg_globals.cpp gg.cpp gg_state.cpp $(LOPTS)
 
 ################################################################################
 #gg_tqueue: gg_tqueue.cpp gg_tqueue.h
