@@ -47,7 +47,7 @@ REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
 ################################################################################
 CC=g++
 # Removed -Werror to ignore warnings
-COPTS_BOTH=-Wextra -Wall -std=c++17
+COPTS_BOTH=-Wextra -Wall -std=c++17 -Wno-unused-variable
 COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
 COPTS_FINAL=-O3  $(COPTS_BOTH)
 COPTS=$(COPTS_DEBUG)
