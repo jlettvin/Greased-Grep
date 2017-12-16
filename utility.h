@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include <cstdarg>
 #include <string_view>
 
 #include "gg_version.h"
@@ -9,7 +11,16 @@ namespace Lettvin
 {
 	using namespace std;
 
+	typedef vector<string> vs_t;
+	typedef vector<string_view> vsv_t;
+
 	const char* s_path=".";
+	size_t s_debug   {0};
+
+	//--------------------------------------------------------------------------
+	void
+	noop () {}
+	//--------------------------------------------------------------------------
 
 	//--------------------------------------------------------------------------
 	/// @brief synopsis (document usage in case of failure)
@@ -35,7 +46,8 @@ namespace Lettvin
 
 	//--------------------------------------------------------------------------
 	/// @brief synopsis (document usage in case of failure)
-	void syntax (const char* a_message, ...)
+	void
+	syntax (const char* a_message, ...)
 	//--------------------------------------------------------------------------
 	{
 		printf (" # SYNTAX ERROR: ");
@@ -52,6 +64,29 @@ namespace Lettvin
 		exit (1);
 	}
 
+	//--------------------------------------------------------------------------
+	int
+	debugf (size_t a_debug, const char *fmt, ...)
+	//--------------------------------------------------------------------------
+	{
+		static const char* indent{"  "};
+		int32_t ret = 0;
+		if (s_debug >= a_debug)
+		{
+			va_list args;
+			va_start (args, fmt);
+			printf (" #'");
+			for (size_t i=0; i < a_debug; ++i)
+			{
+				printf ("%s", indent);
+			}
+			printf ("DBG(%lu): ", a_debug);
+			ret = vprintf (fmt, args);
+			va_end (args);
+		}
+		return ret;
+	} // debugf
+
 	//__________________________________________________________________________
 	/// @brief convert a (delimited?) view with separators into a vector of views
 	///
@@ -63,13 +98,12 @@ namespace Lettvin
 	/// example 2: tokenize (myvector, "this,that and another", " ,");
 	string::size_type
 	tokenize (
-			vector<string>& target,
+			vs_t& target,
 			string a_source,
 			string separator=" ")
 	{
 		string::size_type N = a_source.size ();
 		string::size_type truncate = string::npos;
-#if 1
 		string source;
 		char sep;
 		switch (separator.size ())
@@ -103,45 +137,6 @@ namespace Lettvin
 			e = source.find_first_of (sep, b);
 		}
 		target.push_back (source.substr (b));
-#else
-		debugf (1, "TOKENIZE[I]: '%s'\n", a_source.data ());
-		if (oc[0])
-		{
-			auto e = source.find_first_of (oc[1]);
-			truncate = e;
-			if (source[0] != oc[0])
-			{
-				synopsis ("TOKENIZE: missing '%s'[0]", oc);
-			}
-			if (e == string_view::npos)
-			{
-				synopsis ("TOKENIZE: missing '%s'[1]", oc);
-			}
-			source = a_source.substr (1, e-1);
-			//source.remove_prefix (1);
-			//e = source.find_first_of (oc[1]);
-			//source.remove_suffix (e-1);
-			debugf (1, "TOKENIZE[S]: '%s' %zu %zu\n",
-				source.c_str (),
-				source.size (),
-				e);
-		}
-		string::size_type b{0};
-		string::size_type e{0};
-		while ((b = source.find_first_not_of (sep, b)) != string_view::npos)
-		{
-			e = source.find_first_of (sep, b);
-			target.emplace_back (string_view (source.substr (b, e-b-1)));
-			b = e;
-			debugf (1, "TOKENIZE[B]: '%s'\n", target.back ().data ());
-		}
-		if (e != string_view::npos && e != source.size ())
-		{
-			target.emplace_back (
-					string_view (source.substr (e, source.size () - 1)));
-			debugf (1, "TOKENIZE[A]: '%s'\n", target.back ().data ());
-		}
-#endif
 		return truncate;
 	}
 }

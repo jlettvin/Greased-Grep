@@ -36,8 +36,8 @@
 
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
-CSRC=gg.cpp thread_queue.cpp gg_test.cpp
-CHDR=catch.hpp gg.h gg_version.h thread_queue.h utility.h variant.h
+CSRC=gg.cpp thread_queue.cpp state_table.cpp gg_test.cpp
+CHDR=catch.hpp gg.h gg_version.h thread_queue.h state_table.h utility.h variant.h
 ARCHIVE=.gitignore LICENSE Makefile README.md $(CSRC) $(CHDR) test
 EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
@@ -76,12 +76,12 @@ make_README: make_README.cpp $(CHDR) Makefile
 	$(CC) $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
-gg_test:	gg_test.cpp $(CHDR) Makefile
-	$(CC) $(COPTS) -o $@ $< $(LOPTS)
+gg_test:	gg_test.cpp state_table.cpp $(CHDR) Makefile
+	$(CC) $(COPTS) -o $@ gg_test.cpp state_table.cpp $(LOPTS)
 
 ################################################################################
-gg:	gg.cpp $(CHDR) Makefile
-	$(CC) $(COPTS) -o $@ $< $(LOPTS)
+gg:	gg.cpp state_table.cpp $(CHDR) Makefile
+	$(CC) $(COPTS) -o $@ gg.cpp state_table.cpp $(LOPTS)
 
 ################################################################################
 #thread_queue: thread_queue.cpp thread_queue.h

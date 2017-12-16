@@ -66,6 +66,7 @@ _____________________________________________________________________________*/
 #include "catch.hpp"               // Testing framework
 
 //..............................................................................
+#include "utility.h"               // Finite State Machine
 #include "state_table.h"           // Finite State Machine
 #include "gg_version.h"            // version
 
@@ -78,10 +79,7 @@ namespace Lettvin
 	using namespace std;  // No naming collisions in this small namespace
 
 	//--------------------------------------------------------------------------
-	void synopsis (const char* a_message, ...); ///< report errors and exit
-	void syntax   (const char* a_message, ...); ///< report errors and exit
 	void nibbles ();                            ///< convert to nibbles not bytes
-	int32_t debugf (size_t a_debug, const char *fmt, ...);
 	//--------------------------------------------------------------------------
 
 	typedef int32_t       i24_t;
@@ -97,7 +95,6 @@ namespace Lettvin
 
 	uint8_t s_root    {1};                ///< syntax tree root plane number
 
-	size_t s_debug   {0};
 	size_t s_mask    {0xffULL};
 	size_t s_prefill {1};
 	size_t s_size    {256};
@@ -123,14 +120,10 @@ namespace Lettvin
 	string s_target;
 
 	vector<regex>           s_regex;         ///< filename match regexes
-	vector<string_view>     s_accept {{""}}; ///< list of accept {str} args
-	vector<string_view>     s_reject {{""}}; ///< list of reject {str} args
-	vector<string>          s_filesx {{""}}; ///< list of filename regex patterns
+	vsv_t                   s_accept {{""}}; ///< list of accept {str} args
+	vsv_t                   s_reject {{""}}; ///< list of reject {str} args
+	vs_t                    s_filesx {{""}}; ///< list of filename regex patterns
 	vector< set<int32_t> >  s_set    {{ 0}}; ///< per-candidate sets
-
-	//--------------------------------------------------------------------------
-	void noop () {}
-	//--------------------------------------------------------------------------
 
 	//--------------------------------------------------------------------------
 	/// @brief measure time to perform a function

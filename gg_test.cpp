@@ -35,6 +35,7 @@ _____________________________________________________________________________*/
 int32_t debugf (size_t a_debug, const char *fmt, ...);
 
 #include "utility.h"
+#include "state_table.h"
 
 using namespace std;
 using namespace Lettvin;
@@ -78,3 +79,30 @@ SCENARIO ("Test utility functions")
 		}
 	}
 }
+
+//______________________________________________________________________________
+SCENARIO ("Test Table")
+{
+	GIVEN ("Some test data to exercise the Table")
+	{
+		typedef tuple<vs_t,string> tvs_t;
+		const vector<tvs_t> expect{
+			{{"a","b"}, ""}
+		};
+		for (auto& candidate:expect)
+		{
+			auto tokens = get<0>(candidate);
+			auto output = get<1>(candidate);
+#if 0
+			Table table;
+			size_t index{0};
+			for (auto& token:tokens)
+			{
+				++index;
+				table.insert (token, index, index);
+			}
+#endif
+		}
+	}
+}
+

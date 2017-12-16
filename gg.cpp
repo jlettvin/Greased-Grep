@@ -70,20 +70,6 @@ _____________________________________________________________________________*/
 //..............................................................................
 #include "variant.h"               // variant implementations
 
-namespace fs = std::experimental::filesystem;
-using namespace std;  // No naming collisions in this small namespace
-
-// Stroustrup recommends returning multiple like this.
-tuple <string, int> experiment1_source ()
-{
-	return tuple<string, int> ("hello", 1);
-}
-
-void experiment1_target ()
-{
-	auto [hello, code] = experiment1_source ();
-}
-
 
 //------------------------------------------------------------------------------
 /// @brief nibbles converts algorithm from byte to nibble tables.
@@ -97,31 +83,9 @@ void Lettvin::nibbles ()
 	s_size    = 16;
 } // nibbles
 
-//------------------------------------------------------------------------------
-int
-Lettvin::debugf (size_t a_debug, const char *fmt, ...)
-//------------------------------------------------------------------------------
-{
-	static const char* indent{"  "};
-	int32_t ret = 0;
-	if (s_debug >= a_debug)
-	{
-		va_list args;
-		va_start (args, fmt);
-		printf (" #'");
-		for (size_t i=0; i < a_debug; ++i)
-		{
-			printf ("%s", indent);
-		}
-		printf ("DBG(%lu): ", a_debug);
-		ret = vprintf (fmt, args);
-		va_end (args);
-	}
-	return ret;
-} // debugf
-
 //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
+#ifndef STATE_TABLE_CPP
 //------------------------------------------------------------------------------
 Lettvin::Atom::
 Atom ()
@@ -192,7 +156,7 @@ operator[] (uint8_t a_off)
 } ///< operator[]
 
 //------------------------------------------------------------------------------
-vector<Lettvin::Atom>&
+std::vector<Lettvin::Atom>&
 Lettvin::State::
 handle ()
 //------------------------------------------------------------------------------
@@ -301,6 +265,7 @@ show_tables (ostream& a_os)
 	return a_os;
 } // show_tables
 
+#endif //STATE_TABLE_CPP
 //------------------------------------------------------------------------------
 /// @brief insert either case-sensitive or both case letters into tree
 ///
@@ -868,14 +833,14 @@ compile (int32_t a_sign, string_view a_sv)
 	s_set.resize (setindex + 1);
 	set<int32_t>& setterminal{s_set[setindex]};  ///< insert 1st & variant terminals
 
-	vector<string> variant_names;
+	vs_t variant_names;
 
 	// Initially, the string as given is searched
 	// TODO generate variants like levenshtein, fatfinger
 	// TODO handle collision for variants
 	// TODO generate all NFKD variants for insertion
 	// e.g. "than" and "then" are legitimate mutual variants.
-	vector<string> strs;
+	vs_t strs;
 	bool caseless{s_caseless};
 	strs.emplace_back (a_str);
 

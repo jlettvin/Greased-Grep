@@ -150,11 +150,13 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief indexer
-		State& operator[] (uint8_t a_offset);
+		State&
+		operator[] (uint8_t a_offset);
 
 		//----------------------------------------------------------------------
 		/// @brief add State planes to vector
-		void operator++ ();
+		void
+		operator++ ();
 
 		//----------------------------------------------------------------------
 		/// @brief return current size of vector
@@ -162,26 +164,31 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief debug utility for displaying the entire table
-		ostream& show_tables (ostream& a_os);
+		ostream&
+		show_tables (ostream& a_os);
 
 		//----------------------------------------------------------------------
 		/// @brief insert strings into tables
-		void insert (string_view a_str, i24_t id, size_t setindex);
+		void
+		insert (string_view a_str, i24_t id, size_t setindex);
 
 		//----------------------------------------------------------------------
 		/// @brief find and report found strings
 		///
 		/// when reject list is empty, terminate on completion of accept list
 		/// when reject list is non-empty, terminate on first reject
-		void search (void* a_pointer, auto a_bytecount, const char* a_label="");
+		void
+		search (void* a_pointer, auto a_bytecount, const char* a_label="");
 
 		//----------------------------------------------------------------------
 		/// @brief dump tree to file
-		void dump (const char* filename, const char* a_title="");
+		void
+		dump (const char* filename, const char* a_title="");
 
 		//----------------------------------------------------------------------
 		/// @brief load tree from file
-		void load (const char* filename);
+		void
+		load (const char* filename);
 
 	//--------
 	protected:
@@ -198,12 +205,13 @@ namespace Lettvin
 		/// @brief insert either case-sensitive or both case letters into tree
 		///
 		/// Distribute characters into state tables for searching.
-		void insert (
+		void
+		insert (
 				char* a_chars,
 				auto& a_from,
 				auto& a_next,
-				bool a_stop=false,
-				bool a_nibbles=false);
+				bool  a_stop=false,
+				bool  a_nibbles=false);
 
 	}; // class Table
 
