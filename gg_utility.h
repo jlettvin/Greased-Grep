@@ -5,17 +5,12 @@
 #include <cstdarg>
 #include <string_view>
 
+#include "gg_globals.h"
 #include "gg_version.h"
 
 namespace Lettvin
 {
 	using namespace std;
-
-	typedef vector<string> vs_t;
-	typedef vector<string_view> vsv_t;
-
-	const char* s_path=".";
-	size_t s_debug   {0};
 
 	//--------------------------------------------------------------------------
 	void

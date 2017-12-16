@@ -36,8 +36,11 @@
 
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
-CSRC=gg.cpp thread_queue.cpp state_table.cpp gg_test.cpp
-CHDR=catch.hpp gg.h gg_version.h thread_queue.h state_table.h utility.h variant.h
+CSRC=gg.cpp gg_tqueue.cpp gg_state.cpp gg_test.cpp
+CHDR=\
+	 catch.hpp \
+	 gg_globals.h gg.h gg_version.h \
+	 gg_tqueue.h gg_state.h gg_utility.h gg_variant.h
 ARCHIVE=.gitignore LICENSE Makefile README.md $(CSRC) $(CHDR) test
 EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
@@ -49,7 +52,7 @@ COPTS_FINAL=-O3  $(COPTS_BOTH)
 COPTS=$(COPTS_DEBUG)
 LOPTS=-pthread -lfmt -lstdc++fs
 CEXES=gg gg_test make_README
-#CEXES=gg thread_queue make_README
+#CEXES=gg gg_tqueue make_README
 ################################################################################
 
 ################################################################################
@@ -65,7 +68,7 @@ test: FORCE
 	./gg -c -d -n AA .
 	./gg_test
 
-#	./thread_queue
+#	./gg_tqueue
 
 ################################################################################
 README.md:	make_README
@@ -76,16 +79,16 @@ make_README: make_README.cpp $(CHDR) Makefile
 	$(CC) $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
-gg_test:	gg_test.cpp state_table.cpp $(CHDR) Makefile
-	$(CC) $(COPTS) -o $@ gg_test.cpp state_table.cpp $(LOPTS)
+gg_test:	gg_test.cpp gg_state.cpp $(CHDR) Makefile
+	$(CC) $(COPTS) -o $@ gg_globals.cpp gg_test.cpp gg_state.cpp $(LOPTS)
 
 ################################################################################
-gg:	gg.cpp state_table.cpp $(CHDR) Makefile
-	$(CC) $(COPTS) -o $@ gg.cpp state_table.cpp $(LOPTS)
+gg:	gg.cpp gg_state.cpp $(CHDR) Makefile
+	$(CC) $(COPTS) -o $@ gg_globals.cpp gg.cpp gg_state.cpp $(LOPTS)
 
 ################################################################################
-#thread_queue: thread_queue.cpp thread_queue.h
-#	@echo "Test thread_queue"
+#gg_tqueue: gg_tqueue.cpp gg_tqueue.h
+#	@echo "Test gg_tqueue"
 #	g++ -DMAIN $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
@@ -118,7 +121,7 @@ after:    FORCE
 .PHONY:
 clean:    FORCE
 	rm -fr $(CEXES)
-	rm -f thread_queue
+	rm -f gg_tqueue
 	rm -f *.out
 	rm -f temp.dump
 	rm -f *.gcov *.gcda *.gcno

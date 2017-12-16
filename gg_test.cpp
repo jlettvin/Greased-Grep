@@ -34,8 +34,8 @@ _____________________________________________________________________________*/
 
 int32_t debugf (size_t a_debug, const char *fmt, ...);
 
-#include "utility.h"
-#include "state_table.h"
+#include "gg_utility.h"
+#include "gg_state.h"
 
 using namespace std;
 using namespace Lettvin;

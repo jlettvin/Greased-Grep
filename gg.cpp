@@ -63,12 +63,12 @@ _____________________________________________________________________________*/
 //..............................................................................
 #include "gg_version.h"            // s_version and s_synopsis
 #include "gg.h"                    // declarations
-#include "state_table.h"           // Mechanism for finite state machine
-#include "thread_queue.h"          // filename distribution to threads
-#include "utility.h"               // tokenize
+#include "gg_state.h"              // Mechanism for finite state machine
+#include "gg_tqueue.h"             // filename distribution to threads
+#include "gg_utility.h"            // tokenize
 
 //..............................................................................
-#include "variant.h"               // variant implementations
+#include "gg_variant.h"            // variant implementations
 
 
 //------------------------------------------------------------------------------
@@ -509,10 +509,14 @@ void Lettvin::Table::dump (const char* a_filename, const char* a_title)
 			{
 				union { unsigned integral; uint8_t u08[4]; } datum{
 					.integral = atom.integral ()};
-				write (fd, &datum.u08[s_order.u08.array[0]], 1);
-				write (fd, &datum.u08[s_order.u08.array[1]], 1);
-				write (fd, &datum.u08[s_order.u08.array[2]], 1);
-				write (fd, &datum.u08[s_order.u08.array[3]], 1);
+				//write (fd, &datum.u08[s_order.u08.array[0]], 1);
+				//write (fd, &datum.u08[s_order.u08.array[1]], 1);
+				//write (fd, &datum.u08[s_order.u08.array[2]], 1);
+				//write (fd, &datum.u08[s_order.u08.array[3]], 1);
+				write (fd, &datum.u08[0], 1);
+				write (fd, &datum.u08[1], 1);
+				write (fd, &datum.u08[2], 1);
+				write (fd, &datum.u08[3], 1);
 			}
 		}
 	}
@@ -858,7 +862,7 @@ compile (int32_t a_sign, string_view a_sv)
 			b_str = a_sv.substr (bracket_init + 1, bracket_fini - bracket_init - 1);
 			a_str = a_sv.substr (0, bracket_init);
 			debugf (1, "Bracketed [%s][%s]\n", a_str.c_str (), b_str.c_str ());
-			// TODO use utility.h tokenize here
+			// TODO use gg_utility.h tokenize here
 			size_t comma = b_str.find_first_of (',');
 			while (comma != string::npos)
 			{

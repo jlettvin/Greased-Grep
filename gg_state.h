@@ -3,14 +3,11 @@
 #include <vector>
 #include <string_view>
 
+#include "gg_globals.h"
+
 namespace Lettvin
 {
 	using namespace std;
-
-	typedef unsigned      integral_t;
-	static_assert (sizeof(integral_t) == 4);
-	typedef int32_t       i24_t;
-	static_assert (sizeof(int32_t) == 4);
 
 #if false
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
