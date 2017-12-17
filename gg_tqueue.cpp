@@ -27,7 +27,7 @@ _____________________________________________________________________________*/
 
 #include <thread>
 
-#include "thread_queue.h"
+#include "gg_tqueue.h"
 
 
 #ifdef MAIN

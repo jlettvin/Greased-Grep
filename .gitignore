@@ -2,6 +2,7 @@ gg
 gg_test
 thread_queue
 make_README
+*.o
 gede2.ini
 temp.dump
 make.out

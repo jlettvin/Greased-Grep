@@ -36,21 +36,54 @@
 
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
-CSRC=gg.cpp gg_utility.cpp gg_tqueue.cpp gg_state.cpp gg_test.cpp
+
+CSRC=\
+	gg.cpp \
+	gg_globals.cpp \
+	gg_utility.cpp \
+	gg_tqueue.cpp \
+	gg_state.cpp
+
+COBJ=\
+	gg_globals.o \
+	gg_utility.o \
+	gg_tqueue.o \
+	gg_state.o
+
 CHDR=\
-	 catch.hpp \
-	 gg_globals.h gg.h gg_version.h \
-	 gg_tqueue.h gg_state.h gg_utility.h gg_variant.h
-ARCHIVE=.gitignore LICENSE Makefile README.md $(CSRC) $(CHDR) test
+	catch.hpp \
+	gg_version.h \
+	gg.h \
+	gg_globals.h \
+	gg_utility.h \
+	gg_tqueue.h \
+	gg_state.h \
+	gg_variant.h
+
+ARCHIVE=\
+	.gitignore \
+	LICENSE \
+	README.md \
+	Makefile \
+	$(CSRC) \
+	$(CHDR) \
+	gg_test.cpp \
+	test
+
 EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
 ################################################################################
-CC=g++
+
+CDEBUG=-g -ggdb -O0
+CFINAL=-O3
+CXX=g++
+CXXFLAGS=\
+	-std=c++17 \
+	-Wextra -Wall \
+	-Wno-unused-variable \
+	$(CDEBUG)
+
 # Removed -Werror to ignore warnings
-COPTS_BOTH=-Wextra -Wall -std=c++17 -Wno-unused-variable
-COPTS_DEBUG=-g -ggdb -O0 $(COPTS_BOTH)
-COPTS_FINAL=-O3  $(COPTS_BOTH)
-COPTS=$(COPTS_DEBUG)
 LOPTS=-pthread -lfmt -lstdc++fs
 CEXES=gg gg_test make_README
 #CEXES=gg gg_tqueue make_README
@@ -77,35 +110,37 @@ README.md:	make_README
 
 ################################################################################
 make_README: make_README.cpp $(CHDR) Makefile
-	$(CC) $(COPTS) -o $@ $< $(LOPTS)
+	$(CXX) $(CXXFLAGS) -o $@ $< $(LOPTS)
 
 ################################################################################
-gg_test:	gg_utility.cpp gg_globals.cpp gg_state.cpp gg.cpp gg_test.cpp $(CHDR) Makefile
-	$(CC) \
+# gg_test.cpp main is used in place of gg.cpp when -DGG_TEST is defined
+gg_test: gg_test.cpp $(COBJ) $(CHDR) Makefile
+	$(CXX) \
+		-o $@ \
 		-DGG_TEST \
-		$(COPTS) \
-		-o \
-		$@ \
-		gg_utility.cpp gg_globals.cpp gg_state.cpp gg_test.cpp gg.cpp \
+		$(CXXFLAGS) \
+		$(COBJ) \
+		gg_test.cpp \
+		gg.cpp \
 		$(LOPTS)
 
 ################################################################################
-gg:	gg_utility.cpp gg_globals.cpp gg_state.cpp gg.cpp $(CHDR) Makefile
-	$(CC) \
-		$(COPTS) \
-		-o \
-		$@ \
-		gg_utility.cpp gg_globals.cpp gg_state.cpp gg.cpp \
+gg: $(COBJ) $(CHDR) Makefile
+	$(CXX) \
+		-o $@ \
+		$(CXXFLAGS) \
+		$(COBJ) \
+		gg.cpp \
 		$(LOPTS)
 
 ################################################################################
 #gg_tqueue: gg_tqueue.cpp gg_tqueue.h
 #	@echo "Test gg_tqueue"
-#	g++ -DMAIN $(COPTS) -o $@ $< $(LOPTS)
+#	g++ -DMAIN $(CXXFLAGS) -o $@ $< $(LOPTS)
 
 ################################################################################
 #	g++ -O3 -Wextra -Wall -Werror -std=c++17 -o gg gg.cpp -lfmt -lstdc++fs
-#	$(CC) $(COPTS) -o $@ $< $(LOPTS)
+#	$(CXX) $(CXXFLAGS) -o $@ $< $(LOPTS)
 #	@g++ -O3 -Wextra -Wall -Werror -std=c++17 -o gg gg.cpp -lfmt -lstdc++fs
 #	@strip gg
 #	@./gg -s abc def ghi jkl .
