@@ -93,15 +93,13 @@ SCENARIO ("Test Table")
 		{
 			auto tokens = get<0>(candidate);
 			auto output = get<1>(candidate);
-#if 0
 			Table table;
 			size_t index{0};
 			for (auto& token:tokens)
 			{
 				++index;
-				table.insert (token, index, index);
+				//table.insert (token, index, index);
 			}
-#endif
 		}
 	}
 }

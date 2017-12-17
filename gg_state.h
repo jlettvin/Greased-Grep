@@ -24,7 +24,7 @@ _____________________________________________________________________________*/
 
 #pragma once
 
-#define STATE_TABLE_CPP
+//#define SEARCH_MOVED
 
 #include <vector>
 #include <string_view>

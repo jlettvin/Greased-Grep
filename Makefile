@@ -80,12 +80,23 @@ make_README: make_README.cpp $(CHDR) Makefile
 	$(CC) $(COPTS) -o $@ $< $(LOPTS)
 
 ################################################################################
-gg_test:	gg_test.cpp gg_utility.cpp gg_state.cpp $(CHDR) Makefile
-	$(CC) $(COPTS) -o $@ gg_utility.cpp gg_globals.cpp gg_test.cpp gg_state.cpp $(LOPTS)
+gg_test:	gg_utility.cpp gg_globals.cpp gg_state.cpp gg.cpp gg_test.cpp $(CHDR) Makefile
+	$(CC) \
+		-DGG_TEST \
+		$(COPTS) \
+		-o \
+		$@ \
+		gg_utility.cpp gg_globals.cpp gg_state.cpp gg_test.cpp gg.cpp \
+		$(LOPTS)
 
 ################################################################################
-gg:	gg.cpp gg_utility.cpp gg_state.cpp $(CHDR) Makefile
-	$(CC) $(COPTS) -o $@ gg_utility.cpp gg_globals.cpp gg.cpp gg_state.cpp $(LOPTS)
+gg:	gg_utility.cpp gg_globals.cpp gg_state.cpp gg.cpp $(CHDR) Makefile
+	$(CC) \
+		$(COPTS) \
+		-o \
+		$@ \
+		gg_utility.cpp gg_globals.cpp gg_state.cpp gg.cpp \
+		$(LOPTS)
 
 ################################################################################
 #gg_tqueue: gg_tqueue.cpp gg_tqueue.h
