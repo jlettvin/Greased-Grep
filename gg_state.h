@@ -24,8 +24,6 @@ _____________________________________________________________________________*/
 
 #pragma once
 
-//#define SEARCH_MOVED
-
 #include <vector>
 #include <string_view>
 
@@ -201,7 +199,7 @@ namespace Lettvin
 		/// when reject list is empty, terminate on completion of accept list
 		/// when reject list is non-empty, terminate on first reject
 		void
-		search (void* a_pointer, auto a_bytecount, const char* a_label="");
+		follow (void* a_pointer, auto a_bytecount, const char* a_label="");
 
 		//----------------------------------------------------------------------
 		/// @brief dump tree to file

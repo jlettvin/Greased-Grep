@@ -37,28 +37,33 @@
 ################################################################################
 DATETIME=`date +%Y%m%d%H%M%S`
 
-CSRC=\
+GSRC=\
 	gg.cpp \
 	gg_globals.cpp \
 	gg_utility.cpp \
 	gg_tqueue.cpp \
 	gg_state.cpp
 
-COBJ=\
+CSRC=$(GSRC)
+
+GOBJ=\
 	gg_globals.o \
 	gg_utility.o \
 	gg_tqueue.o \
 	gg_state.o
 
-CHDR=\
-	catch.hpp \
+COBJ=$(GOBJ)
+
+GHDR=\
 	gg_version.h \
-	gg.h \
 	gg_globals.h \
 	gg_utility.h \
 	gg_tqueue.h \
 	gg_state.h \
-	gg_variant.h
+	gg_variant.h \
+	gg.h
+
+CHDR=catch.hpp $(GOBJ)
 
 ARCHIVE=\
 	.gitignore \
@@ -74,6 +79,8 @@ EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
 ################################################################################
 
+# TODO remove bug forcing definition of follow to be in gg.cpp
+CDEF=-DSEARCH_MOVED
 CDEBUG=-g -ggdb -O0
 CFINAL=-O3
 CXX=g++
@@ -81,6 +88,7 @@ CXXFLAGS=\
 	-std=c++17 \
 	-Wextra -Wall \
 	-Wno-unused-variable \
+	$(CDEF) \
 	$(CDEBUG)
 
 # Removed -Werror to ignore warnings
@@ -167,6 +175,7 @@ after:    FORCE
 ################################################################################
 .PHONY:
 clean:    FORCE
+	rm -f *.o
 	rm -fr $(CEXES)
 	rm -f gg_tqueue
 	rm -f *.out

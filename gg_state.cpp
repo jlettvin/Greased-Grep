@@ -321,7 +321,74 @@ insert (string_view a_str, i24_t id, size_t setindex)
 	}
 }
 
-#ifdef SEARCH_MOVED
+//------------------------------------------------------------------------------
+// @brief dump tree to file
+//
+// TODO must output state size and table size
+// TODO best practice read entire, then swap if needed
+// TODO output s_order.u64 to file to establish file order
+void Lettvin::Table::dump (const char* a_filename, const char* a_title)
+{
+	int32_t fd = open (
+			a_filename,
+			O_RDWR|O_CREAT,
+			S_IRWXU|S_IRWXG|S_IRWXO);
+	if (fd > 0)
+	{
+		debugf (1, "dump PASS: %s: %s\n", a_filename, a_title);
+		char   zero{0};
+		size_t endian{0x3736353433323130};
+		const char* cdcz{"\x04\x1a"};
+		size_t consumed{34+strlen (a_title)};
+		size_t needed{256-consumed};
+
+		write (fd, "gg dump:", 8);
+		write (fd, "endian: ", 8);
+		write (fd, &endian   , 8);
+		write (fd, " title: ", 8);
+		write (fd, a_title   , strlen (a_title));
+		write (fd, cdcz      , 2);
+		for (size_t i=0; i<needed; ++i)
+		{
+			write (fd, &zero, 1);
+		}
+		
+		for (auto& state:m_table)
+		{
+			for (auto& atom: state.handle ())
+			{
+				union { unsigned integral; uint8_t u08[4]; } datum{
+					.integral = atom.integral ()};
+				//write (fd, &datum.u08[s_order.u08.array[0]], 1);
+				//write (fd, &datum.u08[s_order.u08.array[1]], 1);
+				//write (fd, &datum.u08[s_order.u08.array[2]], 1);
+				//write (fd, &datum.u08[s_order.u08.array[3]], 1);
+				write (fd, &datum.u08[0], 1);
+				write (fd, &datum.u08[1], 1);
+				write (fd, &datum.u08[2], 1);
+				write (fd, &datum.u08[3], 1);
+			}
+		}
+	}
+	else
+	{
+		debugf (1, "dump FAIL: %s: %s\n", a_filename, a_title);
+	}
+	close (fd);
+}
+
+//------------------------------------------------------------------------------
+// @brief load tree from file
+void Lettvin::Table::load (const char* a_filename)
+{
+	int32_t fd = open (a_filename, O_RDONLY, 0);
+	if (fd >= 0)
+	{
+	}
+	close (fd);
+}
+
+#ifndef SEARCH_MOVED
 //------------------------------------------------------------------------------
 /// @brief find and report found strings
 ///
@@ -329,7 +396,7 @@ insert (string_view a_str, i24_t id, size_t setindex)
 /// when reject list is non-empty, terminate on first reject
 void
 Lettvin::Table::
-search (void* a_pointer, auto a_bytecount, const char* a_label)
+follow (void* a_pointer, auto a_bytecount, const char* a_label)
 //------------------------------------------------------------------------------
 {
 	//debugf (1, "SEARCH %s\n", a_label);
@@ -408,73 +475,6 @@ search (void* a_pointer, auto a_bytecount, const char* a_label)
 		// This next line should never be executed.
 		if (wrote == -1) printf ("%s\n", a_label);
 	}
-} // search
+} // follow
 #endif // SEARCH_MOVED
-
-//------------------------------------------------------------------------------
-// @brief dump tree to file
-//
-// TODO must output state size and table size
-// TODO best practice read entire, then swap if needed
-// TODO output s_order.u64 to file to establish file order
-void Lettvin::Table::dump (const char* a_filename, const char* a_title)
-{
-	int32_t fd = open (
-			a_filename,
-			O_RDWR|O_CREAT,
-			S_IRWXU|S_IRWXG|S_IRWXO);
-	if (fd > 0)
-	{
-		debugf (1, "dump PASS: %s: %s\n", a_filename, a_title);
-		char   zero{0};
-		size_t endian{0x3736353433323130};
-		const char* cdcz{"\x04\x1a"};
-		size_t consumed{34+strlen (a_title)};
-		size_t needed{256-consumed};
-
-		write (fd, "gg dump:", 8);
-		write (fd, "endian: ", 8);
-		write (fd, &endian   , 8);
-		write (fd, " title: ", 8);
-		write (fd, a_title   , strlen (a_title));
-		write (fd, cdcz      , 2);
-		for (size_t i=0; i<needed; ++i)
-		{
-			write (fd, &zero, 1);
-		}
-		
-		for (auto& state:m_table)
-		{
-			for (auto& atom: state.handle ())
-			{
-				union { unsigned integral; uint8_t u08[4]; } datum{
-					.integral = atom.integral ()};
-				//write (fd, &datum.u08[s_order.u08.array[0]], 1);
-				//write (fd, &datum.u08[s_order.u08.array[1]], 1);
-				//write (fd, &datum.u08[s_order.u08.array[2]], 1);
-				//write (fd, &datum.u08[s_order.u08.array[3]], 1);
-				write (fd, &datum.u08[0], 1);
-				write (fd, &datum.u08[1], 1);
-				write (fd, &datum.u08[2], 1);
-				write (fd, &datum.u08[3], 1);
-			}
-		}
-	}
-	else
-	{
-		debugf (1, "dump FAIL: %s: %s\n", a_filename, a_title);
-	}
-	close (fd);
-}
-
-//------------------------------------------------------------------------------
-// @brief load tree from file
-void Lettvin::Table::load (const char* a_filename)
-{
-	int32_t fd = open (a_filename, O_RDONLY, 0);
-	if (fd >= 0)
-	{
-	}
-	close (fd);
-}
 
