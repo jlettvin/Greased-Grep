@@ -24,7 +24,7 @@ _____________________________________________________________________________*/
 
 #pragma once
 
-static const struct { unsigned major, minor, build; } s_version{0,0,754};
+static const struct { unsigned major, minor, build; } s_version{0,0,767};
 
 static const char* s_synopsis = R"SYNOPSIS(
 Synopsis(Greased Grep version %u.%u.%u
@@ -261,7 +261,7 @@ but code simplification merits this choice.
 // TODO implement all variants algorithms
 //      the API exists, but code is undeveloped
 //      Missing: fatfinger, thesaurus, unicode
-// TODO implement m_raw tree as Atom[] and enable search sensitivity to it.
+// TODO implement m_raw tree as Transition[] and enable search sensitivity to it.
 //      This will enable dump/load to bring in synonym tree.
 // TODO measure performance against fgrep/ack/ag
 //      publishing performance will make gg more attractive

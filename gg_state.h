@@ -35,9 +35,7 @@ namespace Lettvin
 
 #if false
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-	/// @brief Single state-transition element.
-	///
-	/// This class will contain the compiled and optimized state tables.
+	/// @brief An engine to traverse compacted state tables
 	//__________________________________________________________________________
 	template<typename T=unsigned, size_t S=256>
 	class
@@ -58,9 +56,9 @@ namespace Lettvin
 		/// @brief FSM dtor
 		~FSM ()
 		{
-			if (nullptr != m_element)
+			if (nullptr != m_trnasition)
 			{
-				delete [] m_element;
+				delete [] m_trnasition;
 			}
 		}
 
@@ -68,19 +66,19 @@ namespace Lettvin
 		/// @brief FSM ftor
 		void operator ()(
 				size_t  a_state,
-				size_t  a_element,
+				size_t  a_trnasition,
 				uint8_t a_target,
 				size_t  a_symbol)
 		{
-			if (nullptr == m_element)
+			if (nullptr == m_trnasition)
 			{
 				// allocate
-				m_element = new state_t[m_count];
+				m_trnasition = new state_t[m_count];
 			}
-			size_t index = (a_state * S) + a_element;
-			auto& element{m_element [index]};
-			element.named.target = a_target;
-			element.named.symbol = a_symbol;
+			size_t index = (a_state * S) + a_trnasition;
+			auto& trnasition{m_trnasition [index]};
+			trnasition.named.target = a_target;
+			trnasition.named.symbol = a_symbol;
 		}
 
 	//------
@@ -94,27 +92,27 @@ namespace Lettvin
 				uint8_t target ;
 				T       symbol : bits;
 			} named;
-		} element_t, *element_p;
-		typedef element_t state_t[S];
+		} trnasition, *trnasition;
+		typedef trnasition state_t[S];
 
-		element_p m_element = nullptr;
+		trnasition m_trnasition = nullptr;
 		size_t m_count;
 	};
 
 #endif
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-	/// @brief Single state-transition element.
+	/// @brief Single state-table transition element.
 	///
 	/// constructor/getters/setters for atomic element unit.
 	//__________________________________________________________________________
 	class
-	Atom
+	Transition
 	{
 	//------
 	public:
 	//------
-		Atom ();
+		Transition ();
 		integral_t  integral ()  const;
 		uint8_t     tgt ()       const;
 		i24_t       str ()       const;
@@ -131,10 +129,10 @@ namespace Lettvin
 		{
 			.integral=0
 		};
-	}; // class Atom
+	}; // class Transition
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-	/// @brief Single state-transition plane of 256 Atoms
+	/// @brief Single state-transition plane of 256 Transition
 	///
 	/// constructor/indexer
 	//__________________________________________________________________________
@@ -145,12 +143,12 @@ namespace Lettvin
 	public:
 	//------
 		State ();
-		Atom& operator[] (uint8_t a_off);
-		vector<Atom>& handle ();
+		Transition& operator[] (uint8_t a_off);
+		vector<Transition>& handle ();
 	//------
 	private:
 	//------
-		vector<Atom> m_handle;
+		vector<Transition> m_handle;
 	}; // class State
 
 	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -194,14 +192,6 @@ namespace Lettvin
 		insert (string_view a_str, i24_t id, size_t setindex);
 
 		//----------------------------------------------------------------------
-		/// @brief find and report found strings
-		///
-		/// when reject list is empty, terminate on completion of accept list
-		/// when reject list is non-empty, terminate on first reject
-		void
-		follow (void* a_pointer, auto a_bytecount, const char* a_label="");
-
-		//----------------------------------------------------------------------
 		/// @brief dump tree to file
 		void
 		dump (const char* filename, const char* a_title="");
@@ -210,6 +200,14 @@ namespace Lettvin
 		/// @brief load tree from file
 		void
 		load (const char* filename);
+
+		//----------------------------------------------------------------------
+		/// @brief find and report found strings
+		///
+		/// when reject list is empty, terminate on completion of accept list
+		/// when reject list is non-empty, terminate on first reject
+		void
+		follow (void* a_pointer, auto a_bytecount, const char* a_label="");
 
 	//--------
 	protected:

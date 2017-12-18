@@ -26,14 +26,14 @@ _____________________________________________________________________________*/
 #include "gg.h"
 
 //------------------------------------------------------------------------------
-Lettvin::Atom::
-Atom ()
+Lettvin::Transition::
+Transition ()
 //------------------------------------------------------------------------------
 {}
 
 //------------------------------------------------------------------------------
 Lettvin::integral_t
-Lettvin::Atom::
+Lettvin::Transition::
 integral () const
 {
 	return m_the.integral;
@@ -41,7 +41,7 @@ integral () const
 
 //------------------------------------------------------------------------------
 uint8_t
-Lettvin::Atom::
+Lettvin::Transition::
 tgt () const
 //------------------------------------------------------------------------------
 {
@@ -50,7 +50,7 @@ tgt () const
 
 //------------------------------------------------------------------------------
 Lettvin::i24_t
-Lettvin::Atom::
+Lettvin::Transition::
 str () const
 //------------------------------------------------------------------------------
 {
@@ -59,7 +59,7 @@ str () const
 
 //------------------------------------------------------------------------------
 void
-Lettvin::Atom::
+Lettvin::Transition::
 tgt (uint8_t a_tgt)
 //------------------------------------------------------------------------------
 {
@@ -68,7 +68,7 @@ tgt (uint8_t a_tgt)
 
 //------------------------------------------------------------------------------
 void
-Lettvin::Atom::
+Lettvin::Transition::
 str (i24_t a_str)
 //------------------------------------------------------------------------------
 {
@@ -86,7 +86,7 @@ State ()
 } // State
 
 //------------------------------------------------------------------------------
-Lettvin::Atom&
+Lettvin::Transition&
 Lettvin::State::
 operator[] (uint8_t a_off)
 //------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ operator[] (uint8_t a_off)
 } ///< operator[]
 
 //------------------------------------------------------------------------------
-std::vector<Lettvin::Atom>&
+std::vector<Lettvin::Transition>&
 Lettvin::State::
 handle ()
 //------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ show_tables (ostream& a_os)
 			bool content{false};
 			for (unsigned col=0; col < COLS; ++col)
 			{
-				Atom& entry{plane[static_cast<char>(row+col)]};
+				Transition& entry{plane[static_cast<char>(row+col)]};
 				int32_t tgt{static_cast<int32_t>(entry.tgt ())};
 				int32_t str{static_cast<int32_t>(entry.str ())};
 				content |= !!tgt;
@@ -183,7 +183,7 @@ show_tables (ostream& a_os)
 			for (unsigned col=0; col < COLS; ++col)
 			{
 				char id{static_cast<char>(row+col)};
-				Atom& entry{plane[id]};
+				Transition& entry{plane[id]};
 				int32_t tgt{static_cast<int32_t>(entry.tgt ())};
 				char gra{id>=' '&&id<='~'?id:'?'};
 				if (tgt) a_os << gra << setw (3) << tgt << ' ';
@@ -192,7 +192,7 @@ show_tables (ostream& a_os)
 			printf ("|\n # |");
 			for (size_t col=0; col < COLS; ++col)
 			{
-				Atom& entry{plane[row+col]};
+				Transition& entry{plane[row+col]};
 				int32_t str{static_cast<int32_t>(entry.str ())};
 				if (str) a_os << setw (4) << str << ' ';
 				else     a_os << ".....";
@@ -239,8 +239,8 @@ insert (
 	{
 		debugf (1, "INSERT %2.2x and %2.2x on plane %x\n",
 				a_chars[0], a_chars[1], a_from);
-		Atom& element{operator[] (a_from)[c0]};
-		auto to{element.tgt ()};
+		Transition& trnasition{operator[] (a_from)[c0]};
+		auto to{trnasition.tgt ()};
 		a_next = a_from;
 		if (to) {
 			a_from = to;
@@ -250,7 +250,7 @@ insert (
 			a_from = Table::size ();
 			operator++ ();
 		}
-		element.tgt (a_from);
+		trnasition.tgt (a_from);
 		if (c0 != c1)
 		{
 			operator[] (a_next)[c1].tgt (a_from);
@@ -388,7 +388,6 @@ void Lettvin::Table::load (const char* a_filename)
 	close (fd);
 }
 
-#ifndef SEARCH_MOVED
 //------------------------------------------------------------------------------
 /// @brief find and report found strings
 ///
@@ -422,8 +421,8 @@ follow (void* a_pointer, auto a_bytecount, const char* a_label)
 				// Two-step for nibbles
 				n00 = (c>>4) & 0xf;
 				//debugf (1, "NIBBLE H %2.2x %2.2x\n", n00, tgt);
-				auto element{operator[] (tgt)[n00]};
-				tgt = element.tgt ();
+				auto trnasition{operator[] (tgt)[n00]};
+				tgt = trnasition.tgt ();
 				n00 = c & 0xf;
 				//debugf (1, "NIBBLE L %2.2x %2.2x\n", n00, tgt);
 				if (!tgt) break;
@@ -432,9 +431,9 @@ follow (void* a_pointer, auto a_bytecount, const char* a_label)
 			{
 				//debugf (1, "BYTE %c\n", c);
 			}
-			auto element = operator[] (tgt)[n00];
-			tgt = element.tgt ();
-			str = element.str ();
+			auto trnasition = operator[] (tgt)[n00];
+			tgt = trnasition.tgt ();
+			str = trnasition.str ();
 			if (str) {
 #if SETINDIRECT
 				set<int32_t>& setitem{s_set[str]};
@@ -476,5 +475,4 @@ follow (void* a_pointer, auto a_bytecount, const char* a_label)
 		if (wrote == -1) printf ("%s\n", a_label);
 	}
 } // follow
-#endif // SEARCH_MOVED
 

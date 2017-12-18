@@ -1,5 +1,5 @@
 
-# Greased-Grep (version 0.0.753)
+# Greased-Grep (version 0.0.767)
 ## High performance O(N) case insensitive UTF8<br />threaded recursive fuzzy search for files having<br />all of one set and none of another set of strings
 ### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
 ### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
@@ -156,7 +156,7 @@ but code simplification merits this choice.
 // TODO implement all variants algorithms
 //      the API exists, but code is undeveloped
 //      Missing: fatfinger, thesaurus, unicode
-// TODO implement m_raw tree as Atom[] and enable search sensitivity to it.
+// TODO implement m_raw tree as Transition[] and enable search sensitivity to it.
 //      This will enable dump/load to bring in synonym tree.
 // TODO measure performance against fgrep/ack/ag
 //      publishing performance will make gg more attractive
@@ -195,7 +195,7 @@ FSM graphviz.dot syntax reader and code generator
 
 ```
 
-Synopsis(Greased Grep version 0.0.753
+Synopsis(Greased Grep version 0.0.767
 
 USAGE: gg [-d] [-[1-9]] [-{c|n|s|t|v}]... [[+|-]{str}]... {path} 
 

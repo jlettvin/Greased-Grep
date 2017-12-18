@@ -374,9 +374,9 @@ compile (int32_t a_sign, string_view a_sv)
 	string b_str     {};
 	string a_str     {a_sv};
 
-	// TODO setindex is used as an indirect forward reference from an Atom.
+	// TODO setindex is used as an indirect forward reference from an Transition.
 	// s_set[setindex] are the direct forward references of candidates which
-	// terminate on a particular Atom.
+	// terminate on a particular Transition.
 	// When using variants, the probability of token identity drops with
 	// each addition to the set.
 	size_t setindex = s_set.size ();
@@ -486,7 +486,7 @@ mapped_search (const char* a_filename)
 	}
 	catch (...)
 	{
-		debugf (1, "MAPPED_SEARCH: file open failed\n", a_filename);
+		printf ("gg:mapped_search OPEN EXCEPTION: %s\n", a_filename);
 		return;
 	}
 
@@ -502,7 +502,7 @@ mapped_search (const char* a_filename)
 
 		if (contents == MAP_FAILED)
 		{
-			debugf (1, "MAP FAILED: %s\n", a_filename);
+			printf ("gg:mapped_search MAP FAILED: %s\n", a_filename);
 		}
 		else
 		{
@@ -515,7 +515,7 @@ mapped_search (const char* a_filename)
 	}
 	else
 	{
-		debugf (1, "OPEN FAILED: %s\n", a_filename);
+		printf ("gg:mapped_search OPEN FAILED: %s\n", a_filename);
 	}
 } // mapped_search
 
@@ -692,8 +692,8 @@ follow (void* a_pointer, auto a_bytecount, const char* a_label)
 				// Two-step for nibbles
 				n00 = (c>>4) & 0xf;
 				//debugf (1, "NIBBLE H %2.2x %2.2x\n", n00, tgt);
-				auto element{operator[] (tgt)[n00]};
-				tgt = element.tgt ();
+				auto transition{operator[] (tgt)[n00]};
+				tgt = transition.tgt ();
 				n00 = c & 0xf;
 				//debugf (1, "NIBBLE L %2.2x %2.2x\n", n00, tgt);
 				if (!tgt) break;
@@ -702,9 +702,9 @@ follow (void* a_pointer, auto a_bytecount, const char* a_label)
 			{
 				//debugf (1, "BYTE %c\n", c);
 			}
-			auto element = operator[] (tgt)[n00];
-			tgt = element.tgt ();
-			str = element.str ();
+			auto transition = operator[] (tgt)[n00];
+			tgt = transition.tgt ();
+			str = transition.str ();
 			if (str) {
 #if SETINDIRECT
 				set<int32_t>& setitem{s_set[str]};
