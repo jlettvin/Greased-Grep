@@ -393,10 +393,9 @@ void Lettvin::Table::load (const char* a_filename)
 ///
 /// when reject list is empty, terminate on completion of accept list
 /// when reject list is non-empty, terminate on first reject
-TODO(Why does this not get compiled);
 void
 Lettvin::Table::
-follow (void* a_pointer, auto a_bytecount, const char* a_label)
+follow (void* a_pointer, size_t a_bytecount, const char* a_label)
 //------------------------------------------------------------------------------
 {
 	//debugf (1, "SEARCH %s\n", a_label);

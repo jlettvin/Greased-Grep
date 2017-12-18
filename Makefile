@@ -80,8 +80,6 @@ REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
 ################################################################################
 
 # TODO remove bug forcing definition of follow to be in gg.cpp
-CDEF=-DSEARCH_MOVED
-#CDEF=
 CDEBUG=-g -ggdb -O0
 CFINAL=-O3
 CXX=g++
@@ -89,7 +87,6 @@ CXXFLAGS=\
 	-std=c++17 \
 	-Wextra -Wall \
 	-Wno-unused-variable \
-	$(CDEF) \
 	$(CDEBUG)
 
 # Removed -Werror to ignore warnings
