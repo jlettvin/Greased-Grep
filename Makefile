@@ -79,7 +79,9 @@ EMPTY=
 REJECT=-$(EMPTY)m$(EMPTY)n$(EMPTY)o
 ################################################################################
 
-# TODO remove bug forcing definition of follow to be in gg.cpp
+# TODO remove bug forcing GG_COMPILE in ingest rather than ftor
+GG_COMPILE=
+#GG_COMPILE=-DGG_COMPILE
 CDEBUG=-g -ggdb -O0
 CFINAL=-O3
 CXX=g++
@@ -87,6 +89,7 @@ CXXFLAGS=\
 	-std=c++17 \
 	-Wextra -Wall \
 	-Wno-unused-variable \
+	$(GG_COMPILE) \
 	$(CDEBUG)
 
 # Removed -Werror to ignore warnings

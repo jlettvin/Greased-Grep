@@ -23,11 +23,6 @@ SOFTWARE.
 _____________________________________________________________________________*/
 
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-// Turn GG_COMPILE true to run compile AFTER command-line processing
-// For now, tests fail when GG_COMPILE is true
-#define GG_COMPILE false
-
-//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 //..............................................................................
 #include <experimental/filesystem> // recursive directory walk

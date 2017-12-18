@@ -23,9 +23,6 @@ SOFTWARE.
 _____________________________________________________________________________*/
 
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-// Turn GG_COMPILE true to run compile AFTER command-line processing
-// For now, tests fail when GG_COMPILE is true
-#define GG_COMPILE false
 
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
@@ -285,6 +282,8 @@ option (string_view a_str)
 
 //------------------------------------------------------------------------------
 /// @brief ingest inserts state-transition table data
+//
+// For now, gg fails when GG_COMPILE is defined
 void
 Lettvin::GreasedGrep::
 ingest (string_view a_str)
@@ -314,7 +313,7 @@ ingest (string_view a_str)
 			syntax ("pattern strings must be longer than 1 byte");
 		}
 		field.push_back (candidate);
-#if !GG_COMPILE
+#ifndef GG_COMPILE
 		// This compile passes
 		i24_t sign            {rejecting?-1:+1};
 		compile (sign, candidate);
@@ -346,7 +345,7 @@ compile (int32_t a_sign)
 		s_noreject = false;
 	}
 
-#if GG_COMPILE
+#ifdef GG_COMPILE
 		// This compile fails
 	for (size_t i = 1; i < I; ++i)
 	{
