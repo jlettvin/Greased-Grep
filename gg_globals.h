@@ -31,19 +31,21 @@ _____________________________________________________________________________*/
 
 #include <regex>
 
+#define DO_PRAGMA(x) _Pragma (#x)
+#define TODO(x) DO_PRAGMA(message ("TODO - " #x))
+
+#define SIZED_TYPEDEF(o,n,s) typedef o n; static_assert (sizeof (o) == s)
+
 namespace Lettvin
 {
 	using namespace std;
 
 	//__________________________________________________________________________
-	typedef int32_t             i24_t;
-	typedef unsigned            integral_t;
+	SIZED_TYPEDEF(int32_t , i24_t     ,4);
+	SIZED_TYPEDEF(unsigned, integral_t,4);
 
 	typedef vector<string>      vs_t;
 	typedef vector<string_view> vsv_t;
-
-	static_assert (sizeof(int32_t)    == 4);
-	static_assert (sizeof(integral_t) == 4);
 
 	//__________________________________________________________________________
 	extern size_t      s_debug   ;

@@ -102,16 +102,16 @@ CEXES=gg gg_test make_README
 all: before $(CEXES) test README.md after
 
 ################################################################################
+#	./gg -d ab . > artifact/ab.art
+#	./gg -d xy . > artifact/xy.art
+#	./gg -c -d -n AA .
+#	./gg_tqueue
 .PHONY:
 test: FORCE
-	./gg -d ab . > artifact/ab.art
-	./gg -d xy . > artifact/xy.art
 	./gg -s abc def ghi jkl .
 	./gg -s -d +abc +def +ghi +jkl $(REJECT) .
-	./gg -c -d -n AA .
 	./gg_test
 
-#	./gg_tqueue
 
 ################################################################################
 README.md:	make_README

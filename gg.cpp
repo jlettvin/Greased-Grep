@@ -385,11 +385,6 @@ compile (int32_t a_sign, string_view a_sv)
 
 	vs_t variant_names;
 
-	// Initially, the string as given is searched
-	// TODO generate variants like levenshtein, fatfinger
-	// TODO handle collision for variants
-	// TODO generate all NFKD variants for insertion
-	// e.g. "than" and "then" are legitimate mutual variants.
 	vs_t strs;
 	bool caseless{s_caseless};
 	strs.emplace_back (a_str);
@@ -664,6 +659,7 @@ show_tokens (ostream& a_os)
 /// when reject list is empty, terminate on completion of accept list
 /// when reject list is non-empty, terminate on first reject
 // TODO This function belongs in gg_state.cpp (grep SEARCH_MOVED)
+TODO(Why does this get compiled and the one in gg_state not);
 void
 Lettvin::Table::
 follow (void* a_pointer, auto a_bytecount, const char* a_label)
