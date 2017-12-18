@@ -747,33 +747,3 @@ follow (void* a_pointer, auto a_bytecount, const char* a_label)
 	}
 } // follow
 #endif // SEARCH_MOVED
-
-
-//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-#ifndef GG_TEST
-//------------------------------------------------------------------------------
-/// @brief main (program execution entrypoint)
-int
-main (int32_t a_argc, char** a_argv)
-//------------------------------------------------------------------------------
-{
-	try
-	{
-		std::ios::sync_with_stdio (true);
-		//fs::path app{fs::canonical (fs::path (a_argv[0]))};
-		fs::path app{fs::path (a_argv[0])};
-		Lettvin::s_path = const_cast<const char*>(app.c_str ());
-		Lettvin::GreasedGrep gg (a_argc, a_argv);
-		gg ();
-		Lettvin::debugf (1, "CTOR: '%s' '%s'\n", *a_argv, *(a_argv + 1));
-	}
-	catch (const std::exception &e)
-	//catch (...)
-	{
-		Lettvin::synopsis ("Unexpected signal caught (%s).", e.what ());
-	}
-	return 0;
-} // main
-#endif
-//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-

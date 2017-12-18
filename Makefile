@@ -128,8 +128,8 @@ gg_test: gg_test.cpp $(COBJ) $(CHDR) Makefile
 		-DGG_TEST \
 		$(CXXFLAGS) \
 		$(COBJ) \
-		gg_test.cpp \
 		gg.cpp \
+		gg_test.cpp \
 		$(LOPTS)
 
 ################################################################################
@@ -139,6 +139,7 @@ gg: $(COBJ) $(CHDR) Makefile
 		$(CXXFLAGS) \
 		$(COBJ) \
 		gg.cpp \
+		gg_main.cpp \
 		$(LOPTS)
 
 ################################################################################
