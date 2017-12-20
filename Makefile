@@ -128,25 +128,30 @@ make_README: make_README.cpp $(CHDR) Makefile
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LOPTS)
 
 ################################################################################
+# state machine library
+gg.a: $(GOBJ)
+	ar rvs $@ $(GOBJ)
+
+################################################################################
 # gg_test.cpp main is used in place of gg.cpp when -DGG_TEST is defined
-gg_test: gg_test.cpp $(COBJ) $(CHDR) Makefile
+gg_test: gg.a gg.cpp gg_test.cpp $(CHDR) Makefile
 	$(CXX) \
 		-o $@ \
 		-DGG_TEST \
 		$(CXXFLAGS) \
-		$(COBJ) \
 		gg.cpp \
 		gg_test.cpp \
+		gg.a \
 		$(LOPTS)
 
 ################################################################################
-gg: $(COBJ) $(CHDR) Makefile
+gg: gg.a gg.cpp gg_main.cpp $(CHDR) Makefile
 	$(CXX) \
 		-o $@ \
 		$(CXXFLAGS) \
-		$(COBJ) \
 		gg.cpp \
 		gg_main.cpp \
+		gg.a \
 		$(LOPTS)
 
 ################################################################################
