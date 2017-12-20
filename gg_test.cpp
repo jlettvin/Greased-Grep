@@ -98,6 +98,7 @@ SCENARIO ("Test Table")
 			for (auto& token:tokens)
 			{
 				++index;
+				INFO ("TOKEN: " << index << " is '" << token << "'");
 				//table.insert (token, index, index);
 			}
 		}

@@ -112,6 +112,12 @@ test: FORCE
 	./gg -s -d +abc +def +ghi +jkl $(REJECT) .
 	./gg_test
 
+################################################################################
+.PHONY:
+time: FORCE
+	@-time grep -FlirZ copyright .|xargs -0 grep -FliZ lettvin|tail -3
+	@-time ./gg -s copyright -lettvin .|tail -3
+
 
 ################################################################################
 README.md:	make_README
@@ -170,6 +176,7 @@ before:    FORCE
 .PHONY:
 after:    FORCE
 	@echo "$ gede --args gg -d -n aa test   # to debug"
+	@echo "scan-build g++ -c gg.cpp  # use clang static analysis"
 	@echo $$(yes '-' | head -n 40)
 	@seq 3 | xargs -I -- echo $$(yes '^' | head -n 40)
 	@echo $$(yes '-' | head -n 40)

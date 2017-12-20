@@ -93,4 +93,5 @@ namespace Lettvin
 		//struct { unsigned short array[4]; } u16;
 		//struct { unsigned char  array[8]; } u08;
 	//} s_order;
+    void nibbles ();
 }

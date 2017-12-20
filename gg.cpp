@@ -68,20 +68,7 @@ _____________________________________________________________________________*/
 #include "gg_variant.h"            // variant implementations
 
 
-//------------------------------------------------------------------------------
-/// @brief nibbles converts algorithm from byte to nibble tables.
-/// This saves considerable memory but slows the search by a factor of 2.
-void Lettvin::nibbles ()
-//------------------------------------------------------------------------------
-{
-	s_nibbles = true;
-	s_prefill = 2;
-	s_mask    = 0x0fULL;
-	s_size    = 16;
-} // nibbles
-
 //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-
 
 //------------------------------------------------------------------------------
 /// @brief ctor
