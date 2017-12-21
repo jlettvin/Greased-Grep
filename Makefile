@@ -90,7 +90,7 @@ CXXFLAGS=\
 	-Wextra -Wall \
 	-Wno-unused-variable \
 	$(GG_COMPILE) \
-	$(CDEBUG)
+	$(CFINAL)
 
 # Removed -Werror to ignore warnings
 LOPTS=-pthread -lfmt -lstdc++fs
@@ -129,8 +129,10 @@ make_README: make_README.cpp $(CHDR) Makefile
 
 ################################################################################
 # state machine library
+# ranlib after ar rvs guarantees correct library if original ar is used.
 gg.a: $(GOBJ)
 	ar rvs $@ $(GOBJ)
+	ranlib $@
 
 ################################################################################
 # gg_test.cpp main is used in place of gg.cpp when -DGG_TEST is defined

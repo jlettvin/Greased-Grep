@@ -27,6 +27,7 @@ _____________________________________________________________________________*/
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"               // Testing framework
 
+#include <sstream>
 #include <cstdarg>                 // vararg
 #include <vector>
 #include <string>
@@ -85,15 +86,32 @@ SCENARIO ("Test Table")
 {
 	GIVEN ("Some test data to exercise the Table")
 	{
+		const string empty (R"table( # 
+ #    00   01   02   03   04   05   06   07   08   09   10   11   12   13   14   15
+ #  ________________________________________________________________________________     PLANE: 0
+ # |________________________________________________________________________________|
+ # 
+ #    00   01   02   03   04   05   06   07   08   09   10   11   12   13   14   15
+ #  ________________________________________________________________________________     PLANE: 1
+ # |________________________________________________________________________________|
+)table");
 		typedef tuple<vs_t,string> tvs_t;
 		const vector<tvs_t> expect{
 			{{"a","b"}, ""}
 		};
 		for (auto& candidate:expect)
 		{
+			stringstream ss;
 			auto tokens = get<0>(candidate);
 			auto output = get<1>(candidate);
+
 			Table table;
+			// Test the empty table for empty contents
+			table.show_tables (ss);
+			const string& result (ss.str ());
+			REQUIRE (result == empty);
+			ss.clear ();
+
 			size_t index{0};
 			for (auto& token:tokens)
 			{
@@ -101,6 +119,8 @@ SCENARIO ("Test Table")
 				INFO ("TOKEN: " << index << " is '" << token << "'");
 				//table.insert (token, index, index);
 			}
+
+			// After table.insert... test again
 		}
 	}
 }

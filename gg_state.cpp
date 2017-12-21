@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 _____________________________________________________________________________*/
 
+#include <iomanip>
+
 #include "gg_state.h"
 #include "gg.h"
 
@@ -159,7 +161,8 @@ show_tables (ostream& a_os)
 		a_os << " # " << endl << " # ";
 		for (unsigned col=0; col < COLS; ++col)
 		{
-			printf ("   %2.2x", col);
+			a_os << "   " << std::setfill ('0') << std::setw (2) << col;
+			//printf ("   %2.2x", col);
 		}
 		a_os << endl << " #  " << string (5*COLS, '_') << 
 			"     PLANE: " << state << endl << " # ";
@@ -189,7 +192,8 @@ show_tables (ostream& a_os)
 				if (tgt) a_os << gra << setw (3) << tgt << ' ';
 				else     a_os << ".....";
 			}
-			printf ("|\n # |");
+			a_os << "|\n # |";
+			//printf ("|\n # |");
 			for (size_t col=0; col < COLS; ++col)
 			{
 				Transition& entry{plane[row+col]};
@@ -197,7 +201,8 @@ show_tables (ostream& a_os)
 				if (str) a_os << setw (4) << str << ' ';
 				else     a_os << ".....";
 			}
-			printf ("|%2.2x\n # ", row);
+			a_os << "|" << std::setfill ('0') << std::setw (2) << row << "\n # ";
+			//printf ("|%2.2x\n # ", row);
 		}
 		a_os << "|" << string (5*COLS, '_') << "|" << endl;
 	}
