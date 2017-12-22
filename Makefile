@@ -89,6 +89,7 @@ CXXFLAGS=\
 	-std=c++17 \
 	-Wextra -Wall \
 	-Wno-unused-variable \
+	-fno-strict-aliasing \
 	$(GG_COMPILE) \
 	$(CFINAL)
 

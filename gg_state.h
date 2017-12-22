@@ -56,9 +56,9 @@ namespace Lettvin
 		/// @brief FSM dtor
 		~FSM ()
 		{
-			if (nullptr != m_trnasition)
+			if (nullptr != m_transition)
 			{
-				delete [] m_trnasition;
+				delete [] m_transition;
 			}
 		}
 
@@ -66,19 +66,19 @@ namespace Lettvin
 		/// @brief FSM ftor
 		void operator ()(
 				size_t  a_state,
-				size_t  a_trnasition,
+				size_t  a_transition,
 				uint8_t a_target,
 				size_t  a_symbol)
 		{
-			if (nullptr == m_trnasition)
+			if (nullptr == m_transition)
 			{
 				// allocate
-				m_trnasition = new state_t[m_count];
+				m_transition = new state_t[m_count];
 			}
-			size_t index = (a_state * S) + a_trnasition;
-			auto& trnasition{m_trnasition [index]};
-			trnasition.named.target = a_target;
-			trnasition.named.symbol = a_symbol;
+			size_t index = (a_state * S) + a_transition;
+			auto& transition{m_transition [index]};
+			transition.named.target = a_target;
+			transition.named.symbol = a_symbol;
 		}
 
 	//------
@@ -92,10 +92,10 @@ namespace Lettvin
 				uint8_t target ;
 				T       symbol : bits;
 			} named;
-		} trnasition, *trnasition;
-		typedef trnasition state_t[S];
+		} transition, *transition;
+		typedef transition state_t[S];
 
-		trnasition m_trnasition = nullptr;
+		transition m_transition = nullptr;
 		size_t m_count;
 	};
 
@@ -176,6 +176,11 @@ namespace Lettvin
 		/// @brief add State planes to vector
 		void
 		operator++ ();
+
+		//----------------------------------------------------------------------
+		/// @brief add State planes to vector
+		void
+		operator++ (int);
 
 		//----------------------------------------------------------------------
 		/// @brief return current size of vector

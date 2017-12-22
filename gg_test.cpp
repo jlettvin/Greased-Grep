@@ -82,6 +82,79 @@ SCENARIO ("Test utility functions")
 }
 
 //______________________________________________________________________________
+SCENARIO ("Test Transition, State, and Table")
+{
+	GIVEN ("Constructed Transition")
+	{
+		Transition transition;
+		THEN ("Test Transition target API")
+		{
+			REQUIRE (transition.integral () == 0); // test ctor empty
+
+			INFO ("Just one");
+			transition.tgt (1);
+			REQUIRE (transition.tgt() == 1);
+			REQUIRE (transition.integral () != 0);
+
+			INFO ("Try all");
+			for (size_t tgt=1;tgt<256;++tgt)
+			{
+				transition.tgt (tgt);
+				REQUIRE (transition.tgt() == tgt);
+				REQUIRE (transition.integral () != 0);
+			}
+			transition.tgt (0);
+			REQUIRE (transition.tgt() == 0);
+			REQUIRE (transition.integral () == 0);
+		}
+
+		THEN ("Test Terminal string API")
+		{
+			int top = (1 << 23) - 1;
+			for (i24_t str=1;str<top;++str)
+			{
+				transition.str (str);
+				REQUIRE (transition.str () == str);
+				transition.str (-str);
+				REQUIRE (transition.str () == -str);
+				REQUIRE (transition.integral () != 0);
+			}
+			transition.str (0);
+			REQUIRE (transition.str () == 0);
+			REQUIRE (transition.integral () == 0);
+		}
+	}
+
+#if 0
+	GIVEN ("State construction and operation of API")
+	{
+		THEN ("Test State")
+		{
+			State state;
+
+			for (size_t source=0; source<256; ++source)
+			{
+				REQUIRE (state[source].integral () == 0); // test ctor empty
+				REQUIRE (state[source].integral () == 0);
+				state[source].tgt ('B');
+				REQUIRE (state[127].integral () != 0);
+				state[127].tgt (0);
+				REQUIRE (state[127].integral () == 0);
+			}
+		}
+		THEN ("Test Table")
+		{
+			Table table;
+			REQUIRE (table.size () == 2);
+			++table;
+			table++;
+			REQUIRE (table.size () == 4);
+		}
+	}
+#endif
+}
+
+//______________________________________________________________________________
 SCENARIO ("Test Table")
 {
 	GIVEN ("Some test data to exercise the Table")
@@ -106,6 +179,7 @@ SCENARIO ("Test Table")
 			auto output = get<1>(candidate);
 
 			Table table;
+
 			// Test the empty table for empty contents
 			table.show_tables (ss);
 			const string& result (ss.str ());

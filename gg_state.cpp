@@ -136,6 +136,15 @@ operator++ ()
 //------------------------------------------------------------------------------
 {
 	m_table.resize (m_table.size () + 1);
+} // ++operator
+
+//------------------------------------------------------------------------------
+void
+Lettvin::Table::
+operator++ (int)
+//------------------------------------------------------------------------------
+{
+	m_table.resize (m_table.size () + 1);
 } // operator++
 
 //------------------------------------------------------------------------------
@@ -162,7 +171,6 @@ show_tables (ostream& a_os)
 		for (unsigned col=0; col < COLS; ++col)
 		{
 			a_os << "   " << std::setfill ('0') << std::setw (2) << col;
-			//printf ("   %2.2x", col);
 		}
 		a_os << endl << " #  " << string (5*COLS, '_') << 
 			"     PLANE: " << state << endl << " # ";
@@ -193,7 +201,6 @@ show_tables (ostream& a_os)
 				else     a_os << ".....";
 			}
 			a_os << "|\n # |";
-			//printf ("|\n # |");
 			for (size_t col=0; col < COLS; ++col)
 			{
 				Transition& entry{plane[row+col]};
@@ -202,7 +209,6 @@ show_tables (ostream& a_os)
 				else     a_os << ".....";
 			}
 			a_os << "|" << std::setfill ('0') << std::setw (2) << row << "\n # ";
-			//printf ("|%2.2x\n # ", row);
 		}
 		a_os << "|" << string (5*COLS, '_') << "|" << endl;
 	}
@@ -244,8 +250,8 @@ insert (
 	{
 		debugf (1, "INSERT %2.2x and %2.2x on plane %x\n",
 				a_chars[0], a_chars[1], a_from);
-		Transition& trnasition{operator[] (a_from)[c0]};
-		auto to{trnasition.tgt ()};
+		Transition& transition{operator[] (a_from)[c0]};
+		auto to{transition.tgt ()};
 		a_next = a_from;
 		if (to) {
 			a_from = to;
@@ -255,7 +261,7 @@ insert (
 			a_from = Table::size ();
 			operator++ ();
 		}
-		trnasition.tgt (a_from);
+		transition.tgt (a_from);
 		if (c0 != c1)
 		{
 			operator[] (a_next)[c1].tgt (a_from);
@@ -273,6 +279,8 @@ insert (string_view a_str, i24_t id, size_t setindex)
 	auto next      {from};
 	char last[2]   {0,0};
 
+	logf ("insert A");
+
 	// Cardinal setindex retrieves this terminal set
 	set<int32_t>& setitem{s_set[setindex]};
 
@@ -286,6 +294,8 @@ insert (string_view a_str, i24_t id, size_t setindex)
 	{
 		s_firsts += a_str[0];
 	}
+
+	logf ("insert B");
 
 	// Insert a_str into state transition tree
 	for (size_t I=a_str.size () - 1, i=0; i <= I; ++i)
@@ -305,6 +315,9 @@ insert (string_view a_str, i24_t id, size_t setindex)
 			insert (last, from, next, stop, s_nibbles);
 		}
 	}
+
+	logf ("insert C");
+
 	if (s_caseless)
 	{
 #if SETINDIRECT
@@ -324,6 +337,7 @@ insert (string_view a_str, i24_t id, size_t setindex)
 		operator[] (next)[last[0]&s_mask].str (id);
 #endif
 	}
+	logf ("insert D");
 }
 
 //------------------------------------------------------------------------------
@@ -347,15 +361,17 @@ void Lettvin::Table::dump (const char* a_filename, const char* a_title)
 		size_t consumed{34+strlen (a_title)};
 		size_t needed{256-consumed};
 
-		write (fd, "gg dump:", 8);
-		write (fd, "endian: ", 8);
-		write (fd, &endian   , 8);
-		write (fd, " title: ", 8);
-		write (fd, a_title   , strlen (a_title));
-		write (fd, cdcz      , 2);
+		int N = int (strlen (a_title));
+
+		assertf (8 != write (fd, "gg dump:", 8), 1, "dump 1 fail\n");
+		assertf (8 != write (fd, "endian: ", 8), 1, "dump 2 fail\n");
+		assertf (8 != write (fd, &endian   , 8), 1, "dump 3 fail\n");
+		assertf (8 != write (fd, " title: ", 8), 1, "dump 4 fail\n");
+		assertf (N != write (fd, a_title   , N), 1, "dump 5 fail\n");
+		assertf (2 != write (fd, cdcz      , 2), 1, "dump 6 fail\n");
 		for (size_t i=0; i<needed; ++i)
 		{
-			write (fd, &zero, 1);
+			assertf (1 != write (fd, &zero, 1), 1, "dump 7 fail\n");
 		}
 		
 		for (auto& state:m_table)
@@ -368,10 +384,10 @@ void Lettvin::Table::dump (const char* a_filename, const char* a_title)
 				//write (fd, &datum.u08[s_order.u08.array[1]], 1);
 				//write (fd, &datum.u08[s_order.u08.array[2]], 1);
 				//write (fd, &datum.u08[s_order.u08.array[3]], 1);
-				write (fd, &datum.u08[0], 1);
-				write (fd, &datum.u08[1], 1);
-				write (fd, &datum.u08[2], 1);
-				write (fd, &datum.u08[3], 1);
+				assertf (1 != write (fd, &datum.u08[0], 1), 1, "dump 8 fail\n");
+				assertf (1 != write (fd, &datum.u08[1], 1), 1, "dump 9 fail\n");
+				assertf (1 != write (fd, &datum.u08[2], 1), 1, "dump A fail\n");
+				assertf (1 != write (fd, &datum.u08[3], 1), 1, "dump B fail\n");
 			}
 		}
 	}
@@ -426,8 +442,8 @@ follow (void* a_pointer, size_t a_bytecount, const char* a_label)
 				// Two-step for nibbles
 				n00 = (c>>4) & 0xf;
 				//debugf (1, "NIBBLE H %2.2x %2.2x\n", n00, tgt);
-				auto trnasition{operator[] (tgt)[n00]};
-				tgt = trnasition.tgt ();
+				auto transition{operator[] (tgt)[n00]};
+				tgt = transition.tgt ();
 				n00 = c & 0xf;
 				//debugf (1, "NIBBLE L %2.2x %2.2x\n", n00, tgt);
 				if (!tgt) break;
@@ -436,9 +452,9 @@ follow (void* a_pointer, size_t a_bytecount, const char* a_label)
 			{
 				//debugf (1, "BYTE %c\n", c);
 			}
-			auto trnasition = operator[] (tgt)[n00];
-			tgt = trnasition.tgt ();
-			str = trnasition.str ();
+			auto transition = operator[] (tgt)[n00];
+			tgt = transition.tgt ();
+			str = transition.str ();
 			if (str) {
 #if SETINDIRECT
 				set<int32_t>& setitem{s_set[str]};
