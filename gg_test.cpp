@@ -125,23 +125,29 @@ SCENARIO ("Test Transition, State, and Table")
 		}
 	}
 
-#if 0
 	GIVEN ("State construction and operation of API")
 	{
 		THEN ("Test State")
 		{
 			State state;
 
-			for (size_t source=0; source<256; ++source)
+			REQUIRE (state[127].integral () == 0); // test ctor empty
+			for (size_t source=1; source<256; ++source)
 			{
-				REQUIRE (state[source].integral () == 0); // test ctor empty
-				REQUIRE (state[source].integral () == 0);
 				state[source].tgt ('B');
-				REQUIRE (state[127].integral () != 0);
-				state[127].tgt (0);
-				REQUIRE (state[127].integral () == 0);
+				REQUIRE (state[source].integral () != 0);
+
+				state[source].tgt (0);
+				state[source].str (1024);
+				REQUIRE (state[source].integral () != 0);
+
+				state[source].str (0);
+				REQUIRE (state[source].integral () == 0);
 			}
 		}
+	}
+	GIVEN ("Table construction and operation of simple API")
+	{
 		THEN ("Test Table")
 		{
 			Table table;
@@ -149,9 +155,17 @@ SCENARIO ("Test Transition, State, and Table")
 			++table;
 			table++;
 			REQUIRE (table.size () == 4);
+			REQUIRE (table[3][1].integral () == 0);
+			for (size_t tt=0; tt < table.size (); ++tt)
+			{
+				// Use fixed state offset and value
+				table[tt][1].tgt (1);
+				REQUIRE (table[tt][1].integral () != 0);
+				table[tt][1].tgt (0);
+				REQUIRE (table[tt][1].integral () == 0);
+			}
 		}
 	}
-#endif
 }
 
 //______________________________________________________________________________
@@ -170,7 +184,7 @@ SCENARIO ("Test Table")
 )table");
 		typedef tuple<vs_t,string> tvs_t;
 		const vector<tvs_t> expect{
-			{{"a","b"}, ""}
+			{{"a","b"}, "ab"}
 		};
 		for (auto& candidate:expect)
 		{
@@ -189,13 +203,14 @@ SCENARIO ("Test Table")
 			size_t index{0};
 			for (auto& token:tokens)
 			{
-				++index;
+				//++index; // TODO why is non-zero core-dump?
 				INFO ("TOKEN: " << index << " is '" << token << "'");
-				//table.insert (token, index, index);
+				table.insert (token, index, index);
 			}
 
 			// After table.insert... test again
 		}
+		// TODO insert, dump, load, and follow
 	}
 }
 

@@ -279,8 +279,6 @@ insert (string_view a_str, i24_t id, size_t setindex)
 	auto next      {from};
 	char last[2]   {0,0};
 
-	logf ("insert A");
-
 	// Cardinal setindex retrieves this terminal set
 	set<int32_t>& setitem{s_set[setindex]};
 
@@ -294,8 +292,6 @@ insert (string_view a_str, i24_t id, size_t setindex)
 	{
 		s_firsts += a_str[0];
 	}
-
-	logf ("insert B");
 
 	// Insert a_str into state transition tree
 	for (size_t I=a_str.size () - 1, i=0; i <= I; ++i)
@@ -316,28 +312,13 @@ insert (string_view a_str, i24_t id, size_t setindex)
 		}
 	}
 
-	logf ("insert C");
+	debugf (1, "LINK %x %lx %x\n", next, last[0]&s_mask, id);
+	setitem.insert (id);
 
-	if (s_caseless)
+	for (size_t i=0, I=s_caseless?2:1; i<I; ++i)
 	{
-#if SETINDIRECT
-		setitem.insert (id);
-		for (auto c:last) operator[] (next)[c&s_mask].str (setindex);
-#else
-		for (auto c:last) operator[] (next)[c&s_mask].str (id);
-#endif
+		operator[] (next)[last[i]&s_mask].str (setindex);
 	}
-	else
-	{
-		debugf (1, "LINK %x %lx %x\n", next, last[0]&s_mask, id);
-#if SETINDIRECT
-		setitem.insert (id);
-		operator[] (next)[last[0]&s_mask].str (setindex);
-#else
-		operator[] (next)[last[0]&s_mask].str (id);
-#endif
-	}
-	logf ("insert D");
 }
 
 //------------------------------------------------------------------------------
@@ -456,7 +437,6 @@ follow (void* a_pointer, size_t a_bytecount, const char* a_label)
 			tgt = transition.tgt ();
 			str = transition.str ();
 			if (str) {
-#if SETINDIRECT
 				set<int32_t>& setitem{s_set[str]};
 				for (auto item:setitem)
 				{
@@ -469,15 +449,6 @@ follow (void* a_pointer, size_t a_bytecount, const char* a_label)
 					done = (s_noreject && full_accept);
 					if (done) break;
 				}
-#else
-				if (str < 0) return; ///< Immediate rejection
-				// If not immediate rejection, add to rejected list
-				auto& chose{(str>0)?accepted:rejected};
-				chose.insert (str);
-				bool full_accept{s_accept.size () == accepted.size ()};
-				// completion optimization
-				done = (s_noreject && full_accept);
-#endif
 			}
 			if (done || !tgt) break;
 		}

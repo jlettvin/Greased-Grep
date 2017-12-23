@@ -71,8 +71,6 @@ _____________________________________________________________________________*/
 #include "gg_state.h"              // Finite State Machine
 #include "gg_version.h"            // version
 
-#define SETINDIRECT true
-
 namespace fs = std::experimental::filesystem;
 
 namespace Lettvin

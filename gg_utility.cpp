@@ -23,12 +23,14 @@ SOFTWARE.
 _____________________________________________________________________________*/
 
 #include <string>
+#include <cstdio>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <cstdio>
-
+#include <unistd.h>
 #include <stdarg.h>
+
 #include <fmt/format.h>
 
 #include "gg_utility.h"
@@ -124,22 +126,22 @@ assertf (bool a_flag, size_t a_debug, const char *fmt, ...)
 
 int
 Lettvin::
-logf (const char *fmt, ...)
+logf (const char *fmt)
 {
 	int32_t ret = 0;
 	static const mode_t mode{S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH};
 	{
-		va_list args;
-		va_start (args, fmt);
-		/*
+		//va_list args;
+		//va_start (args, fmt);
 		int fd = open ("gg.log", O_CREAT | O_APPEND, mode);
 		if (fd >= 0)
 		{
-			ret = vdprintf (fd, fmt, args);
+			auto count = write (fd, fmt, strlen (fmt));
+			(count == int (strlen (fmt)));
+			//ret = vdprintf (fd, fmt, args);
 			close (fd);
 		}
-		*/
-		va_end (args);
+		//va_end (args);
 	}
 	return ret;
 } // logf
