@@ -485,7 +485,7 @@ mapped_search (const char* a_filename)
 		}
 		else
 		{
-			follow (contents, filesize, a_filename);
+			track (contents, filesize, a_filename);
 			int32_t rc = munmap (contents, filesize);
 			if (rc != 0) synopsis ("munmap failed");
 		}

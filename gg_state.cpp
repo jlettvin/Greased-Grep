@@ -409,7 +409,7 @@ void Lettvin::Table::load (const char* a_filename)
 /// when reject list is non-empty, terminate on first reject
 void
 Lettvin::Table::
-follow (void* a_pointer, size_t a_bytecount, const char* a_label)
+track (void* a_pointer, size_t a_bytecount, const char* a_label)
 //------------------------------------------------------------------------------
 {
 	//debugf (1, "SEARCH %s\n", a_label);
@@ -478,5 +478,5 @@ follow (void* a_pointer, size_t a_bytecount, const char* a_label)
 		// This next line should never be executed.
 		if (wrote == -1) printf ("%s\n", a_label);
 	}
-} // follow
+} // track
 

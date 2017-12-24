@@ -212,7 +212,7 @@ namespace Lettvin
 		/// when reject list is empty, terminate on completion of accept list
 		/// when reject list is non-empty, terminate on first reject
 		void
-		follow (void* a_pointer, size_t a_bytecount, const char* a_label="");
+		track (void* a_pointer, size_t a_bytecount, const char* a_label="");
 
 	//--------
 	protected:
