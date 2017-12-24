@@ -195,19 +195,36 @@ SCENARIO ("Test Table")
 			Table table;
 
 			// Test the empty table for empty contents
-			table.show_tables (ss);
-			const string& result (ss.str ());
-			REQUIRE (result == empty);
-			ss.clear ();
+			{
+				table.show_tables (ss);
+				const string& result (ss.str ());
+				REQUIRE (result == empty);
+				ss.clear ();
+			}
 
 			size_t index{0};
 			for (auto& token:tokens)
 			{
-				++index; // TODO why is non-zero core-dump?
+				++index;
 				INFO ("TOKEN: " << index << " is '" << token << "'");
 				table.insert (token, index);
 			}
 
+			{
+				table.show_tables (ss);
+				const string& result (ss.str ());
+				REQUIRE (result != empty);
+
+				auto& t1a{table[1]['a']};
+				auto& t1b{table[1]['b']};
+
+				REQUIRE (t1a.tgt () == 2);
+				REQUIRE (t1b.tgt () == 3);
+				REQUIRE (t1a.str () == 1);
+				REQUIRE (t1b.str () == 2);
+
+				ss.clear ();
+			}
 			// After table.insert... test again
 		}
 		// TODO insert, dump, load, and follow
