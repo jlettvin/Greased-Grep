@@ -271,6 +271,10 @@ insert (
 
 //------------------------------------------------------------------------------
 /// @brief insert strings into tables
+///
+/// If setindex is not passed, it defaults to 0; which generates a setindex.
+/// The passed or generated setindex is returned so variant insertion
+/// can use the same setindex for all variants.
 size_t
 Lettvin::Table::
 insert (string_view a_str, i24_t id, size_t setindex)

@@ -1,5 +1,5 @@
 
-# Greased-Grep (version 0.0.808)
+# Greased-Grep (version 0.0.810)
 ## High performance O(N) case insensitive UTF8<br />threaded recursive fuzzy search for files having<br />all of one set and none of another set of strings
 ### $ gg copyright -Lettvin .       # find files with copyright and without Lettvin
 ### $ gg +smile +joy -frown -sad .  # files filled with nothing but happiness
@@ -195,7 +195,7 @@ FSM graphviz.dot syntax reader and code generator
 
 ```
 
-Synopsis(Greased Grep version 0.0.808
+Synopsis(Greased Grep version 0.0.810
 
 USAGE: gg [-d] [-[1-9]] [-{c|n|s|t|v}]... [[+|-]{str}]... {path} 
 
