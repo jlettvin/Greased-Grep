@@ -208,7 +208,8 @@ show_tables (ostream& a_os)
 				if (str) a_os << setw (4) << str << ' ';
 				else     a_os << ".....";
 			}
-			a_os << "|" << std::setfill ('0') << std::setw (2) << row << "\n # ";
+			a_os << "|" << std::setfill ('0') <<
+				std::setw (2) << hex << row << dec << "\n # ";
 		}
 		a_os << "|" << string (5*COLS, '_') << "|" << endl;
 	}
