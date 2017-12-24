@@ -365,15 +365,13 @@ compile (int32_t a_sign, string_view a_sv)
 	// terminate on a particular Transition.
 	// When using variants, the probability of token identity drops with
 	// each addition to the set.
-	size_t setindex = s_set.size ();
-	s_set.resize (setindex + 1);
-	set<int32_t>& setterminal{s_set[setindex]};  ///< insert 1st & variant terminals
+	size_t setindex = insert (a_str, id);
+	set<int32_t>& setterminal{s_set[setindex]};  ///< 1st & variant terminals
 
 	vs_t variant_names;
 
 	vs_t strs;
 	bool caseless{s_caseless};
-	strs.emplace_back (a_str);
 
 	if (s_variant)
 	{

@@ -271,7 +271,7 @@ insert (
 
 //------------------------------------------------------------------------------
 /// @brief insert strings into tables
-void
+size_t
 Lettvin::Table::
 insert (string_view a_str, i24_t id, size_t setindex)
 {
@@ -280,6 +280,12 @@ insert (string_view a_str, i24_t id, size_t setindex)
 	char last[2]   {0,0};
 
 	// Cardinal setindex retrieves this terminal set
+	// setindex == 0 means generate a new one
+	if (!setindex)
+	{
+		setindex = s_set.size ();
+		s_set.resize (setindex + 1);
+	}
 	set<int32_t>& setitem{s_set[setindex]};
 
 	// Insert initial char of str for skipping.
@@ -319,6 +325,7 @@ insert (string_view a_str, i24_t id, size_t setindex)
 	{
 		operator[] (next)[last[i]&s_mask].str (setindex);
 	}
+	return setindex;
 }
 
 //------------------------------------------------------------------------------

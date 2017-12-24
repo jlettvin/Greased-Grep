@@ -203,9 +203,9 @@ SCENARIO ("Test Table")
 			size_t index{0};
 			for (auto& token:tokens)
 			{
-				//++index; // TODO why is non-zero core-dump?
+				++index; // TODO why is non-zero core-dump?
 				INFO ("TOKEN: " << index << " is '" << token << "'");
-				table.insert (token, index, index);
+				table.insert (token, index);
 			}
 
 			// After table.insert... test again

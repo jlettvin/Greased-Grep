@@ -193,8 +193,8 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief insert strings into tables
-		void
-		insert (string_view a_str, i24_t id, size_t setindex);
+		size_t
+		insert (string_view a_str, i24_t id, size_t seti=0);
 
 		//----------------------------------------------------------------------
 		/// @brief dump tree to file
