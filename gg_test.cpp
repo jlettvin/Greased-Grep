@@ -54,10 +54,19 @@ SCENARIO ("Simple test of catch.hpp")
 }
 
 //______________________________________________________________________________
-SCENARIO ("Test utility functions")
+SCENARIO ("Test gg_globals")
+{
+}
+
+//______________________________________________________________________________
+SCENARIO ("Test gg_utility functions")
 {
 	GIVEN ("Some test data to exercise the tokenizer")
 	{
+		// TODO Can't test the following functions:
+		// synopsis, syntax, debugf, assertf
+		// These functions terminate the program after outputting explanation
+
 		const vector<string> expect{{"a","bb","ccc"}};
 		vector<tuple<string,string,string::size_type>>
 		candidates{{
@@ -66,6 +75,10 @@ SCENARIO ("Test utility functions")
 			{"{a:bb:ccc}", "{:}", string::npos}
 		}};
 
+		THEN ("Run noop function for completeness")
+		{
+			noop ();  // gg_utility
+		}
 		THEN ("Test tokenize")
 		{
 			for (auto& candidate:candidates)
@@ -73,16 +86,20 @@ SCENARIO ("Test utility functions")
 				vector<string> target;
 				auto source = get<0>(candidate);
 				auto sep    = get<1>(candidate);
-				auto ret = tokenize (target, source, sep);
+				tokenize (target, source, sep);
 				REQUIRE (target == expect      );
-				//REQUIRE (ret    == string::npos);
 			}
 		}
 	}
 }
 
 //______________________________________________________________________________
-SCENARIO ("Test Transition, State, and Table")
+SCENARIO ("Test gg_tqueue classes and functions")
+{
+}
+
+//______________________________________________________________________________
+SCENARIO ("Test gg_state classes and functions")
 {
 	GIVEN ("Constructed Transition")
 	{
@@ -166,11 +183,7 @@ SCENARIO ("Test Transition, State, and Table")
 			}
 		}
 	}
-}
 
-//______________________________________________________________________________
-SCENARIO ("Test Table")
-{
 	GIVEN ("Some test data to exercise the Table")
 	{
 		const string empty (R"table( # 
@@ -190,7 +203,7 @@ SCENARIO ("Test Table")
 		{
 			stringstream ss;
 			auto tokens = get<0>(candidate);
-			auto output = get<1>(candidate);
+			auto input  = get<1>(candidate);
 
 			Table table;
 
@@ -215,6 +228,9 @@ SCENARIO ("Test Table")
 				const string& result (ss.str ());
 				REQUIRE (result != empty);
 
+				const void* ptr = (const void*)input.c_str ();
+				table.track (ptr, 2, "catch");
+
 				auto& t1a{table[1]['a']};
 				auto& t1b{table[1]['b']};
 
@@ -229,5 +245,10 @@ SCENARIO ("Test Table")
 		}
 		// TODO insert, dump, load, and track
 	}
+}
+
+//______________________________________________________________________________
+SCENARIO ("Test gg classes and functions")
+{
 }
 

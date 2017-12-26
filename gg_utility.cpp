@@ -146,7 +146,7 @@ logf (const char *fmt)
 	return ret;
 } // logf
 
-std::string::size_type
+void
 Lettvin::
 tokenize (
 	vs_t& target,
@@ -154,7 +154,6 @@ tokenize (
 	std::string separator)
 {
 	std::string::size_type N = a_source.size ();
-	std::string::size_type truncate = string::npos;
 	std::string source;
 	char sep;
 	switch (separator.size ())
@@ -176,7 +175,6 @@ tokenize (
 			break;
 		default:
 			target.push_back ("FOO");
-			return 0;
 			synopsis ("TOKENIZE: bad delimiters '%s'", separator.data ());
 	}
 	string::size_type b = 0, e = source.find_first_of (sep);
@@ -188,5 +186,4 @@ tokenize (
 		e = source.find_first_of (sep, b);
 	}
 	target.push_back (source.substr (b));
-	return truncate;
 } // tokenize

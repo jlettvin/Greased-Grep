@@ -77,7 +77,7 @@ namespace Lettvin
 	/// oc  is a const char* of delimiters.
 	/// example 1: tokenize (myvector, "[hello world]", ' ', "[]");
 	/// example 2: tokenize (myvector, "this,that and another", " ,");
-	string::size_type
+	void
 	tokenize (
 			vs_t& target,
 			string a_source,
