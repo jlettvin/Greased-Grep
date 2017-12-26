@@ -35,6 +35,7 @@ _____________________________________________________________________________*/
 
 int32_t debugf (size_t a_debug, const char *fmt, ...);
 
+#include "gg_globals.h"
 #include "gg_utility.h"
 #include "gg_state.h"
 
@@ -63,7 +64,7 @@ SCENARIO ("Test gg_utility functions")
 {
 	GIVEN ("Some test data to exercise the tokenizer")
 	{
-		// TODO Can't test the following functions:
+		// TODO(Can't test the following functions:)
 		// synopsis, syntax, debugf, assertf
 		// These functions terminate the program after outputting explanation
 
@@ -243,7 +244,7 @@ SCENARIO ("Test gg_state classes and functions")
 			}
 			// After table.insert... test again
 		}
-		// TODO insert, dump, load, and track
+		// TODO(insert, dump, load, and track)
 	}
 }
 

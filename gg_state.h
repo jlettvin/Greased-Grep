@@ -28,6 +28,7 @@ _____________________________________________________________________________*/
 #include <string_view>
 
 #include "gg_globals.h"
+#include "gg_utility.h"
 
 namespace Lettvin
 {

@@ -131,7 +131,7 @@ make_README: make_README.cpp $(CHDR) Makefile
 ################################################################################
 # state machine library
 # ranlib after ar rvs guarantees correct library if original ar is used.
-gg.a: $(GOBJ)
+gg.a: $(GOBJ) $(CSRC) $(CHDR)
 	ar rvs $@ $(GOBJ)
 	ranlib $@
 

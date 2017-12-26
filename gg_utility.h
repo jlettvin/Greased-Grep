@@ -82,4 +82,4 @@ namespace Lettvin
 			vs_t& target,
 			string a_source,
 			string separator=" ");
-}
+}  // namespace Lettvin

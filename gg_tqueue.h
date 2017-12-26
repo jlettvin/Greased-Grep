@@ -34,6 +34,8 @@ _____________________________________________________________________________*/
  
 #include <fmt/printf.h>
 
+#include "gg_globals.h"
+
 namespace Lettvin
 {
 
@@ -124,8 +126,8 @@ private:
 	std::queue<T> m_queue;
 	std::mutex m_mutex;
 	std::condition_variable m_available;
-	std::condition_variable m_full;       // TODO prevent more than max
-	size_t m_maximum{64};                 // TODO prevent more than max
+	std::condition_variable m_full;       // TODO(prevent more than max)
+	size_t m_maximum{64};                 // TODO(prevent more than max)
 
 }; // class ThreadedQueue
 

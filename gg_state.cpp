@@ -83,7 +83,7 @@ str (i24_t a_str)
 Lettvin::State::
 State ()
 //------------------------------------------------------------------------------
-	: m_handle (s_size)
+	: m_handle (s_shape.size ())
 {
 } // State
 
@@ -112,8 +112,8 @@ Lettvin::Table::
 Table ()
 //------------------------------------------------------------------------------
 {
-	m_table.reserve (s_prefill*256);
-	for (size_t i=0; i < s_prefill; ++i)
+	m_table.reserve (s_shape.prefill () * 256);
+	for (size_t i=0; i < s_shape.prefill (); ++i)
 	{
 		operator++ ();
 		operator++ ();
@@ -126,7 +126,7 @@ Lettvin::Table::
 operator[] (uint8_t a_offset)
 //------------------------------------------------------------------------------
 {
-	return m_table[a_offset & s_mask];
+	return m_table[a_offset & s_shape.mask ()];
 } // operator[]
 
 //------------------------------------------------------------------------------
@@ -162,8 +162,8 @@ Lettvin::Table::
 show_tables (ostream& a_os)
 //------------------------------------------------------------------------------
 {
-	size_t COLS{s_nibbles ? 4ULL : 16ULL};
-	size_t ROWS{s_nibbles ? 4ULL : 16ULL};
+	size_t COLS{s_shape.nibbles () ? 4ULL : 16ULL};
+	size_t ROWS{s_shape.nibbles () ? 4ULL : 16ULL};
 	for (size_t state=0; state < m_table.size (); ++state)
 	{
 		auto& plane{m_table[state]};
@@ -232,7 +232,7 @@ insert (
 {
 	auto c0{a_chars[0]};
 	auto c1{a_chars[1]};
-	if (a_nibbles && s_nibbles)
+	if (a_nibbles && s_shape.nibbles ())
 	{
 		auto upper00{ c0     & 0x0f};
 		auto upper01{(c0>>4) & 0x0f};
@@ -314,21 +314,21 @@ insert (string_view a_str, i24_t id, size_t setindex)
 		{
 			last[0] = static_cast<char> (toupper (u));
 			last[1] = static_cast<char> (tolower (u));
-			insert (last, from, next, stop, s_nibbles);
+			insert (last, from, next, stop, s_shape.nibbles ());
 		}
 		else
 		{
 			last[0] = last[1] = u;
-			insert (last, from, next, stop, s_nibbles);
+			insert (last, from, next, stop, s_shape.nibbles ());
 		}
 	}
 
-	debugf (1, "LINK %x %lx %x\n", next, last[0]&s_mask, id);
+	debugf (1, "LINK %x %lx %x\n", next, last[0] & s_shape.mask (), id);
 	setitem.insert (id);
 
 	for (size_t i=0, I=s_caseless?2:1; i<I; ++i)
 	{
-		operator[] (next)[last[i]&s_mask].str (setindex);
+		operator[] (next)[last[i] & s_shape.mask ()].str (setindex);
 	}
 	return setindex;
 }
@@ -336,9 +336,9 @@ insert (string_view a_str, i24_t id, size_t setindex)
 //------------------------------------------------------------------------------
 // @brief dump tree to file
 //
-// TODO must output state size and table size
-// TODO best practice read entire, then swap if needed
-// TODO output s_order.u64 to file to establish file order
+TODO(must output state size and table size)
+TODO(best practice read entire then swap if needed)
+TODO(output s_order.u64 to file to establish file order)
 void Lettvin::Table::dump (const char* a_filename, const char* a_title)
 {
 	int32_t fd = open (
@@ -430,7 +430,7 @@ track (const void* a_pointer, size_t a_bytecount, const char* a_label)
 		{
 			//debugf (1, "OFFSET\n");
 			auto n00{c};
-			if (s_nibbles)
+			if (s_shape.nibbles ())
 			{
 				// Two-step for nibbles
 				n00 = (c>>4) & 0xf;

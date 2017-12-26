@@ -194,7 +194,7 @@ option (string_view a_str)
 	bool opt    {two && minus1};
 	bool bad    {!(two || more)};
 	bool strs   {s_accept.size () > 1 || s_reject.size () > 1};
-	bool nbls   {s_nibbles};
+	bool nbls   {s_shape.nibbles ()};
 	char letter {two ? a_str[1] : '\0'};
 
 	if (!minus1)
@@ -225,9 +225,11 @@ option (string_view a_str)
 
 	debugf (1, "OPTION: preparse: '%s'\n", a_str.data ());
 
+	bool l_nibbles{false};
+
 	if      (a_str == "--case"     || (opt && letter == 'c')) s_caseless = false;
 	else if (a_str == "--debug"    || (opt && letter == 'd')) s_debug   += 1;
-	else if (a_str == "--nibbles"  || (opt && letter == 'n')) s_nibbles  = true;
+	else if (a_str == "--nibbles"  || (opt && letter == 'n')) l_nibbles  = true;
 	else if (a_str == "--suppress" || (opt && letter == 's')) s_suppress = true;
 	else if (a_str == "--test"     || (opt && letter == 't')) s_test     = true;
 	else if (a_str == "--variant"  || (opt && letter == 'v')) s_variant  = true;
@@ -260,9 +262,10 @@ option (string_view a_str)
 	{
 		return false;
 	}
-	if (s_nibbles && !nbls)
+	if (l_nibbles && !nbls)
 	{
-		nibbles ();
+		/// This is where command-line option -n causes plane size to change.
+		s_shape (true);
 	}
 	return true;
 }
@@ -360,7 +363,7 @@ compile (int32_t a_sign, string_view a_sv)
 	string b_str     {};
 	string a_str     {a_sv};
 
-	// TODO setindex is used as an indirect forward reference from an Transition.
+	TODO(setindex is used as an indirect forward reference from an Transition.)
 	// s_set[setindex] are the direct forward references of candidates which
 	// terminate on a particular Transition.
 	// When using variants, the probability of token identity drops with
@@ -387,7 +390,7 @@ compile (int32_t a_sign, string_view a_sv)
 			b_str = a_sv.substr (bracket_init + 1, bracket_fini - bracket_init - 1);
 			a_str = a_sv.substr (0, bracket_init);
 			debugf (1, "Bracketed [%s][%s]\n", a_str.c_str (), b_str.c_str ());
-			// TODO use gg_utility.h tokenize here
+			TODO(use gg_utility.h tokenize here)
 			size_t comma = b_str.find_first_of (',');
 			while (comma != string::npos)
 			{
@@ -447,7 +450,7 @@ mapped_search (const char* a_filename)
 
 	if (s_regex.size ())
 	{
-		// TODO return if filename pattern does not match a filesx
+		TODO(return if filename pattern does not match a filesx)
 		bool matched{false};
 		for (auto& matcher:s_regex)
 		{

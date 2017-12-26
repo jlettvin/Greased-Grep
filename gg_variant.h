@@ -32,9 +32,10 @@ _____________________________________________________________________________*/
 
 #include <fmt/printf.h>            // modern printf
 
+#include "gg_globals.h"
 #include "gg.h"
 
-// TODO variants won't fully work until target indirection is implemented
+//TODO(variants won't fully work until target indirection is implemented)
 
 namespace Lettvin
 {

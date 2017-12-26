@@ -31,18 +31,15 @@ namespace Lettvin
 	size_t      s_debug    {0};
 
 	bool        s_caseless {true};      ///< case sensitivity initially false
-	bool        s_nibbles  {false};     ///< nibble planes replace bute planes
 	bool        s_suppress {false};     ///< suppress error messages
 
 	bool        s_noreject {true};      ///< are there reject strings?
 	bool        s_test     {false};     ///< run unit and timing tests
 	bool        s_variant  {false};     ///< enable variant syntax
 
-	uint8_t     s_root     {1};          ///< syntax tree root plane number
+	uint8_t     s_root     {1};         ///< syntax tree root plane number
 
-	size_t      s_mask     {0xffULL};
-	size_t      s_prefill  {1};
-	size_t      s_size     {256};
+	Shape       s_shape;
 
 	uint32_t s_oversize{1};
 
@@ -70,17 +67,4 @@ namespace Lettvin
 		//struct { unsigned char  array[8]; } u08;
 	//} s_order { .u64=0x0706050403020100 };
 
-}
-
-//------------------------------------------------------------------------------
-/// @brief nibbles converts algorithm from byte to nibble tables.
-/// This saves considerable memory but slows the search by a factor of 2.
-void Lettvin::nibbles ()
-//------------------------------------------------------------------------------
-{
-	s_nibbles = true;
-	s_prefill = 2;
-	s_mask    = 0x0fULL;
-	s_size    = 16;
-} // nibbles
-
+} // namespace Lettvin

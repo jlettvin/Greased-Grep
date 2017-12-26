@@ -24,17 +24,18 @@ _____________________________________________________________________________*/
 
 #pragma once
 
-#include <cstdint>
-#include <vector>
-#include <string>
-#include <set>
-
-#include <regex>
-
 #define DO_PRAGMA(x) _Pragma (#x)
 #define TODO(x) DO_PRAGMA(message ("TODO - " #x))
 
 #define SIZED_TYPEDEF(o,n,s) typedef o n; static_assert (sizeof (o) == s)
+
+#include <cstdint>
+#include <vector>
+#include <string>
+#include <set>
+#include <cassert>
+
+#include <regex>
 
 namespace Lettvin
 {
@@ -47,11 +48,67 @@ namespace Lettvin
 	typedef vector<string>      vs_t;
 	typedef vector<string_view> vsv_t;
 
+	//CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+	/// @brief Shape controls conversion algorithm from byte to nibble tables.
+	///
+	/// Values which ought to be members, not global
+	TODO(figure out how to make member of transition)
+	//--------------------------------------------------------------------------
+	/// This saves considerable memory but slows the search by a factor of 2.
+	//__________________________________________________________________________
+	class Shape
+	{
+	//------
+	public:
+	//------
+
+		//----------------------------------------------------------------------
+		Shape (bool nibbles=false)
+		{
+			operator()(nibbles);
+			m_used = false;
+		}
+
+		//----------------------------------------------------------------------
+		bool   nibbles () { return m_nibbles; }
+		size_t size    () { return m_size   ; }
+		size_t mask    () { return m_mask   ; }
+		size_t prefill () { return m_prefill; }
+
+		//----------------------------------------------------------------------
+		void operator()(bool nibbles=false)
+		{
+			assert (!m_used);
+			//assertf (!m_used, 1, "Shape change must occur before first use\n");
+			m_used = true;
+			m_nibbles = nibbles;
+			m_size    = m_nibbles ? 16 : 256;
+			m_mask    = m_size - 1;
+			m_prefill = 1 + (size_t)nibbles;
+		}
+
+	//------
+	private:
+	//------
+		bool   m_used    {false};      ///< can be changed before first use
+		bool   m_nibbles {false};      ///< nibble planes replace bute planes
+		size_t m_size    {256};        ///< size of a state plane
+		size_t m_mask    {m_size - 1}; ///< mask used for splitting chars
+		size_t m_prefill {1};          ///< make initial state tables
+	};
+
+}  // namespace Lettvin
+
+#include "gg_utility.h"  ///< requires declarations/definitions from the above.
+
+namespace Lettvin
+{
+	using namespace std;
+
 	//__________________________________________________________________________
 	extern size_t      s_debug   ;
 
 	extern bool        s_caseless;      ///< case sensitivity initially false
-	extern bool        s_nibbles ;      ///< nibble planes replace bute planes
 	extern bool        s_suppress;      ///< suppress error messages
 
 	extern bool        s_noreject;      ///< are there reject strings?
@@ -60,9 +117,7 @@ namespace Lettvin
 
 	extern uint8_t     s_root    ;      ///< syntax tree root plane number
 
-	extern size_t      s_mask    ;
-	extern size_t      s_prefill ;
-	extern size_t      s_size    ;
+	extern Shape       s_shape   ;
 
 	extern uint32_t    s_oversize;
 
@@ -94,4 +149,4 @@ namespace Lettvin
 		//struct { unsigned char  array[8]; } u08;
 	//} s_order;
     void nibbles ();
-}
+}  // namespace Lettvin
