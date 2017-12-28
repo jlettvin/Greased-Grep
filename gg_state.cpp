@@ -44,37 +44,37 @@ integral () const
 //------------------------------------------------------------------------------
 uint8_t
 Lettvin::Transition::
-tgt () const
+nxt () const
 //------------------------------------------------------------------------------
 {
-	return m_the.state.tgt;
-} // tgt
+	return m_the.state.nxt;
+} // nxt
 
 //------------------------------------------------------------------------------
 Lettvin::i24_t
 Lettvin::Transition::
-str () const
+grp () const
 //------------------------------------------------------------------------------
 {
-	return m_the.state.str;
+	return m_the.state.grp;
 } // str
 
 //------------------------------------------------------------------------------
 void
 Lettvin::Transition::
-tgt (uint8_t a_tgt)
+nxt (uint8_t a_nxt)
 //------------------------------------------------------------------------------
 {
-	m_the.state.tgt = a_tgt;
-} // tgt
+	m_the.state.nxt = a_nxt;
+} // nxt
 
 //------------------------------------------------------------------------------
 void
 Lettvin::Transition::
-str (i24_t a_str)
+grp (i24_t a_grp)
 //------------------------------------------------------------------------------
 {
-	m_the.state.str = a_str;
+	m_the.state.grp = a_grp;
 } // str
 
 //SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
@@ -180,9 +180,9 @@ show_tables (ostream& a_os)
 			for (unsigned col=0; col < COLS; ++col)
 			{
 				Transition& entry{plane[static_cast<char>(row+col)]};
-				int32_t tgt{static_cast<int32_t>(entry.tgt ())};
-				int32_t str{static_cast<int32_t>(entry.str ())};
-				content |= !!tgt;
+				int32_t nxt{static_cast<int32_t>(entry.nxt ())};
+				int32_t str{static_cast<int32_t>(entry.grp ())};
+				content |= !!nxt;
 				content |= !!str;
 			}
 			if (!content)
@@ -195,16 +195,16 @@ show_tables (ostream& a_os)
 			{
 				char id{static_cast<char>(row+col)};
 				Transition& entry{plane[id]};
-				int32_t tgt{static_cast<int32_t>(entry.tgt ())};
+				int32_t nxt{static_cast<int32_t>(entry.nxt ())};
 				char gra{id>=' '&&id<='~'?id:'?'};
-				if (tgt) a_os << gra << setw (3) << tgt << ' ';
+				if (nxt) a_os << gra << setw (3) << nxt << ' ';
 				else     a_os << ".....";
 			}
 			a_os << "|\n # |";
 			for (size_t col=0; col < COLS; ++col)
 			{
 				Transition& entry{plane[row+col]};
-				int32_t str{static_cast<int32_t>(entry.str ())};
+				int32_t str{static_cast<int32_t>(entry.grp ())};
 				if (str) a_os << setw (4) << str << ' ';
 				else     a_os << ".....";
 			}
@@ -252,7 +252,7 @@ insert (
 		debugf (1, "INSERT %2.2x and %2.2x on plane %x\n",
 				a_chars[0], a_chars[1], a_from);
 		Transition& transition{operator[] (a_from)[c0]};
-		auto to{transition.tgt ()};
+		auto to{transition.nxt ()};
 		a_next = a_from;
 		if (to) {
 			a_from = to;
@@ -262,10 +262,10 @@ insert (
 			a_from = Table::size ();
 			operator++ ();
 		}
-		transition.tgt (a_from);
+		transition.nxt (a_from);
 		if (c0 != c1)
 		{
-			operator[] (a_next)[c1].tgt (a_from);
+			operator[] (a_next)[c1].nxt (a_from);
 		}
 	}
 } // insert
@@ -328,7 +328,7 @@ insert (string_view a_str, i24_t id, size_t setindex)
 
 	for (size_t i=0, I=s_caseless?2:1; i<I; ++i)
 	{
-		operator[] (next)[last[i] & s_shape.mask ()].str (setindex);
+		operator[] (next)[last[i] & s_shape.mask ()].grp (setindex);
 	}
 	return setindex;
 }
@@ -423,7 +423,7 @@ track (const void* a_pointer, size_t a_bytecount, const char* a_label)
 	{
 		//debugf (1, "ANCHOR\n");
 		contents.remove_prefix (begin);
-		auto tgt{1}; // State
+		auto nxt{1}; // State
 		auto str{0}; // 
 		// inner loop (Finite State Machine optimization)
 		for (char c: contents)
@@ -434,20 +434,20 @@ track (const void* a_pointer, size_t a_bytecount, const char* a_label)
 			{
 				// Two-step for nibbles
 				n00 = (c>>4) & 0xf;
-				//debugf (1, "NIBBLE H %2.2x %2.2x\n", n00, tgt);
-				auto transition{operator[] (tgt)[n00]};
-				tgt = transition.tgt ();
+				//debugf (1, "NIBBLE H %2.2x %2.2x\n", n00, nxt);
+				auto transition{operator[] (nxt)[n00]};
+				nxt = transition.nxt ();
 				n00 = c & 0xf;
-				//debugf (1, "NIBBLE L %2.2x %2.2x\n", n00, tgt);
-				if (!tgt) break;
+				//debugf (1, "NIBBLE L %2.2x %2.2x\n", n00, nxt);
+				if (!nxt) break;
 			}
 			else
 			{
 				//debugf (1, "BYTE %c\n", c);
 			}
-			auto transition = operator[] (tgt)[n00];
-			tgt = transition.tgt ();
-			str = transition.str ();
+			auto transition = operator[] (nxt)[n00];
+			nxt = transition.nxt ();
+			str = transition.grp ();
 			if (str) {
 				set<int32_t>& setitem{s_set[str]};
 				for (auto item:setitem)
@@ -462,7 +462,7 @@ track (const void* a_pointer, size_t a_bytecount, const char* a_label)
 					if (done) break;
 				}
 			}
-			if (done || !tgt) break;
+			if (done || !nxt) break;
 		}
 		contents.remove_prefix (1);
 		begin = contents.find_first_of (s_firsts);

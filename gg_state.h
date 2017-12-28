@@ -114,17 +114,20 @@ namespace Lettvin
 	public:
 	//------
 		Transition ();
-		integral_t  integral ()  const;
-		uint8_t     tgt ()       const;
-		i24_t       str ()       const;
-		void        tgt (uint8_t a_tgt);
-		void        str (i24_t a_str);
+		integral_t  integral () const;
+		uint8_t          nxt () const;
+		i24_t            grp () const;
+		void             nxt (uint8_t a_nxt);
+		void             grp (i24_t a_grp);
 	//------
 	private:
 	//------
 		union {
-			integral_t integral;                         ///< unused name
-			struct { i24_t str:24; uint8_t tgt; } state; ///< strtern/state ids
+			integral_t integral;                         ///< all bit fields
+			struct {
+				i24_t   grp:24;  ///< group id for found sequences
+				uint8_t nxt;     ///< next state plane for continued search
+			} state;
 		}
 		m_the
 		{

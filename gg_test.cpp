@@ -110,19 +110,19 @@ SCENARIO ("Test gg_state classes and functions")
 			REQUIRE (transition.integral () == 0); // test ctor empty
 
 			INFO ("Just one");
-			transition.tgt (1);
-			REQUIRE (transition.tgt() == 1);
+			transition.nxt (1);
+			REQUIRE (transition.nxt() == 1);
 			REQUIRE (transition.integral () != 0);
 
 			INFO ("Try all");
-			for (size_t tgt=1;tgt<256;++tgt)
+			for (size_t nxt=1;nxt<256;++nxt)
 			{
-				transition.tgt (tgt);
-				REQUIRE (transition.tgt() == tgt);
+				transition.nxt (nxt);
+				REQUIRE (transition.nxt() == nxt);
 				REQUIRE (transition.integral () != 0);
 			}
-			transition.tgt (0);
-			REQUIRE (transition.tgt() == 0);
+			transition.nxt (0);
+			REQUIRE (transition.nxt() == 0);
 			REQUIRE (transition.integral () == 0);
 		}
 
@@ -131,14 +131,14 @@ SCENARIO ("Test gg_state classes and functions")
 			int top = (1 << 23) - 1;
 			for (i24_t str=1;str<top;++str)
 			{
-				transition.str (str);
-				REQUIRE (transition.str () == str);
-				transition.str (-str);
-				REQUIRE (transition.str () == -str);
+				transition.grp (str);
+				REQUIRE (transition.grp () == str);
+				transition.grp (-str);
+				REQUIRE (transition.grp () == -str);
 				REQUIRE (transition.integral () != 0);
 			}
-			transition.str (0);
-			REQUIRE (transition.str () == 0);
+			transition.grp (0);
+			REQUIRE (transition.grp () == 0);
 			REQUIRE (transition.integral () == 0);
 		}
 	}
@@ -152,14 +152,14 @@ SCENARIO ("Test gg_state classes and functions")
 			REQUIRE (state[127].integral () == 0); // test ctor empty
 			for (size_t source=1; source<256; ++source)
 			{
-				state[source].tgt ('B');
+				state[source].nxt ('B');
 				REQUIRE (state[source].integral () != 0);
 
-				state[source].tgt (0);
-				state[source].str (1024);
+				state[source].nxt (0);
+				state[source].grp (1024);
 				REQUIRE (state[source].integral () != 0);
 
-				state[source].str (0);
+				state[source].grp (0);
 				REQUIRE (state[source].integral () == 0);
 			}
 		}
@@ -177,9 +177,9 @@ SCENARIO ("Test gg_state classes and functions")
 			for (size_t tt=0; tt < table.size (); ++tt)
 			{
 				// Use fixed state offset and value
-				table[tt][1].tgt (1);
+				table[tt][1].nxt (1);
 				REQUIRE (table[tt][1].integral () != 0);
-				table[tt][1].tgt (0);
+				table[tt][1].nxt (0);
 				REQUIRE (table[tt][1].integral () == 0);
 			}
 		}
@@ -235,10 +235,10 @@ SCENARIO ("Test gg_state classes and functions")
 				auto& t1a{table[1]['a']};
 				auto& t1b{table[1]['b']};
 
-				REQUIRE (t1a.tgt () == 2);
-				REQUIRE (t1b.tgt () == 3);
-				REQUIRE (t1a.str () == 1);
-				REQUIRE (t1b.str () == 2);
+				REQUIRE (t1a.nxt () == 2);
+				REQUIRE (t1b.nxt () == 3);
+				REQUIRE (t1a.grp () == 1);
+				REQUIRE (t1b.grp () == 2);
 
 				ss.clear ();
 			}
