@@ -269,6 +269,7 @@ option (string_view a_str)
 	if      (a_str == "--case"     || (opt && letter == 'c')) s_caseless = false;
 	else if (a_str == "--debug"    || (opt && letter == 'd')) s_debug   += 1;
 	else if (a_str == "--nibbles"  || (opt && letter == 'n')) l_nibbles  = true;
+	else if (a_str == "--quicktree"|| (opt && letter == 'q')) s_quicktree= true;
 	else if (a_str == "--suppress" || (opt && letter == 's')) s_suppress = true;
 	else if (a_str == "--test"     || (opt && letter == 't')) s_test     = true;
 	else if (a_str == "--variant"  || (opt && letter == 'v')) s_variant  = true;
@@ -486,6 +487,12 @@ mapped_search (const char* a_filename)
 	stat (a_filename, &st);
 	auto filesize{st.st_size};
 	int32_t fd;
+
+	if (s_quicktree)
+	{
+		printf ("gg:quicktree (%s)\n", a_filename);
+		return;
+	}
 
 	if (s_regex.size ())
 	{

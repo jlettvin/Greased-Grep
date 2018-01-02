@@ -106,26 +106,27 @@ namespace Lettvin
 	using namespace std;
 
 	//__________________________________________________________________________
-	extern size_t      s_debug   ;
+	extern size_t      s_debug    ;
 
-	extern bool        s_caseless;      ///< case sensitivity initially false
-	extern bool        s_suppress;      ///< suppress error messages
+	extern bool        s_caseless ;      ///< case sensitivity initially false
+	extern bool        s_suppress ;      ///< suppress error messages
 
-	extern bool        s_noreject;      ///< are there reject strings?
-	extern bool        s_test    ;      ///< run unit and timing tests
-	extern bool        s_variant ;      ///< enable variant syntax
+	extern bool        s_noreject ;      ///< are there reject strings?
+	extern bool        s_test     ;      ///< run unit and timing tests
+	extern bool        s_variant  ;      ///< enable variant syntax
+	extern bool        s_quicktree;     ///< just show the filenames
 
-	extern uint8_t     s_root    ;      ///< syntax tree root plane number
+	extern uint8_t     s_root     ;      ///< syntax tree root plane number
 
-	extern Shape       s_shape   ;
+	extern Shape       s_shape    ;
 
-	extern uint32_t    s_oversize;
+	extern uint32_t    s_oversize ;
 
-	extern double      s_overhead;      ///< interval for noop
+	extern double      s_overhead ;      ///< interval for noop
 
-	extern string      s_firsts  ;      ///< string of {arg} first letters
-	extern string      s_target  ;
-	extern const char* s_path    ;
+	extern string      s_firsts   ;      ///< string of {arg} first letters
+	extern string      s_target   ;
+	extern const char* s_path     ;
 
 	//__________________________________________________________________________
 	extern vector<regex>           s_regex ; ///< filename match regexes

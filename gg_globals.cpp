@@ -37,6 +37,8 @@ namespace Lettvin
 	bool        s_test     {false};     ///< run unit and timing tests
 	bool        s_variant  {false};     ///< enable variant syntax
 
+	bool        s_quicktree{false};     ///< just show the filenames
+
 	uint8_t     s_root     {1};         ///< syntax tree root plane number
 
 	Shape       s_shape;
