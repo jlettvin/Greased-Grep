@@ -27,7 +27,9 @@ _____________________________________________________________________________*/
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 //..............................................................................
+#if EXPERIMENTAL_FILESYSTEM
 #include <experimental/filesystem> // recursive directory walk
+#endif
 
 //..............................................................................
 #include <fmt/printf.h>            // modern printf
@@ -83,6 +85,27 @@ GreasedGrep (int32_t a_argc, char** a_argv) // ctor
 	}
 } // ctor
 
+#if !EXPERIMENTAL_FILESYSTEM
+bool
+Lettvin::GreasedGrep::
+is_directory    (const string& a_path)
+{
+	struct stat buf;
+	stat (a_path.c_str (), &buf);
+	return S_ISDIR (buf.st_mode);
+}
+
+bool
+Lettvin::GreasedGrep::
+is_regular_file (const string& a_path)
+{
+	struct stat buf;
+	stat (a_path.c_str (), &buf);
+	return S_ISREG (buf.st_mode);
+}
+
+#endif
+
 //------------------------------------------------------------------------------
 /// @brief ftor
 void
@@ -136,11 +159,23 @@ operator ()()
 	}
 
 	// Check for valid directory
+	// TODO replace with experiment/dir.cpp
+#if EXPERIMENTAL_FILESYSTEM
 	if (!fs::is_directory (s_target) &&
 		!fs::is_regular_file (s_target))
+#else
+	if (!is_directory (s_target) &&
+		!is_regular_file (s_target))
+#endif // EXPERIMENTAL_FILESYSTEM
 	{
 		syntax ("last arg must be dir or file");
 	}
+#if !EXPERIMENTAL_FILESYSTEM
+	if (is_directory (s_target) && s_target[s_target.size () - 1] != '/')
+	{
+		s_target += '/';
+	}
+#endif
 
 	// Compile and check for collisions between accept and reject lists
 	compile ();
@@ -168,7 +203,11 @@ operator ()()
 	{
 		netsearch (s_target);
 	}
+#if EXPERIMENTAL_FILESYSTEM
 	else if (fs::is_directory (s_target))
+#else
+	else if (is_directory (s_target))
+#endif // EXPERIMENTAL_FILESYSTEM
 	{
 		// Find files and search contents
 		walk (s_target);
@@ -468,7 +507,10 @@ mapped_search (const char* a_filename)
 	}
 	catch (...)
 	{
-		printf ("gg:mapped_search OPEN EXCEPTION: %s\n", a_filename);
+		if (!s_suppress)
+		{
+			printf ("gg:mapped_search OPEN EXCEPTION: %s\n", a_filename);
+		}
 		return;
 	}
 
@@ -484,7 +526,10 @@ mapped_search (const char* a_filename)
 
 		if (contents == MAP_FAILED)
 		{
-			printf ("gg:mapped_search MAP FAILED: %s\n", a_filename);
+			if (!s_suppress)
+			{
+				printf ("gg:mapped_search MAP FAILED: %s\n", a_filename);
+			}
 		}
 		else
 		{
@@ -495,7 +540,7 @@ mapped_search (const char* a_filename)
 
 		close (fd);
 	}
-	else
+	else if (!s_suppress)
 	{
 		printf ("gg:mapped_search OPEN FAILED: %s\n", a_filename);
 	}
@@ -512,6 +557,7 @@ netsearch (string_view a_URL)
 
 //------------------------------------------------------------------------------
 /// @brief walk organizes search for strings in memory-mapped file
+#if EXPERIMENTAL_FILESYSTEM
 void
 Lettvin::GreasedGrep::
 walk (const fs::path& a_path)
@@ -541,6 +587,7 @@ walk (const fs::path& a_path)
 			);
 		}
 		// Master thread
+		// TODO replace with experiment/dir.cpp
 		threads.emplace_back (
 			thread{
 				[&] ()
@@ -588,6 +635,7 @@ walk (const fs::path& a_path)
 		);
 		for (auto& thrd:threads) thrd.join ();
 #else
+		// TODO replace with experiment/dir.cpp
 		for (auto& item: fs::recursive_directory_iterator (a_path))
 		{
 			fs::path path{fs::canonical (fs::path (item.path ()))};
@@ -619,6 +667,58 @@ walk (const fs::path& a_path)
 		}
 	}
 } // walk
+#else  // EXPERIMENTAL_FILESYSTEM
+
+void
+Lettvin::GreasedGrep::
+walk (const string& a_path)
+{
+	try
+	{
+		if (auto dir = opendir (a_path.c_str ()))
+		{
+        	while (auto f = readdir (dir)) {
+				auto name = f->d_name;
+				auto type = f->d_type;
+				bool fine = (name != nullptr);
+
+				if (fine)
+				{
+					if (name[0] == '.')
+					{
+						if (name[1] == '\0') fine = false;
+						if (name[1] == '.' && name[2] == '\0') fine = false;
+					}
+				}
+
+				if (fine)
+				{
+					switch (type)
+					{
+						case DT_DIR:
+							walk (a_path + name + "/");
+							break;
+						case DT_REG:
+							{
+								string path{a_path + name};
+								mapped_search (path.c_str ());
+							}
+							break;
+					}
+				}
+			}
+        	closedir(dir);
+		}
+	}
+	catch (...)
+	{
+		if (!s_suppress)
+		{
+			printf ("gg: %s dir Permission denied\n", a_path.c_str ());
+		}
+	}
+}
+#endif // EXPERIMENTAL_FILESYSTEM
 
 //------------------------------------------------------------------------------
 void
