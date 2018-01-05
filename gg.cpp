@@ -680,52 +680,40 @@ void
 Lettvin::GreasedGrep::
 walk (const string& a_path)
 {
-	try
+	// Don't attempt to assess validity of filenames... just fail.
+	// Treat directories like files and search filenames in directories.
+	// This enables gg to work on sshfs mounted filesystems.
+	auto d{a_path};
+	auto s{d.size ()};
+	if (s && d[s - 1] == '/') d.resize (s-1);
+	errno = 0;
+    if (auto dir = opendir (d.c_str ()))
 	{
-		if (auto dir = opendir (a_path.c_str ()))
+		while (!errno)
 		{
-        	while (auto f = readdir (dir)) {
-				auto name = f->d_name;
-				auto type = f->d_type;
-				bool fine = (name != nullptr);
-
-				if (fine)
+			if (auto f = readdir (dir))
+			{
+				if (auto p = f->d_name)
 				{
-					if (name[0] == '.')
+					if (auto q = p)
 					{
-						if (name[1] == '\0') fine = false;
-						if (name[1] == '.' && name[2] == '\0') fine = false;
+						if (!(*q++ == '.' && (!*q || (*q++ == '.' && !*q))))
+						{
+							auto e = d + "/" + p;
+							walk (e);
+							mapped_search (e.c_str ());
+							errno = 0;
+						}
 					}
+					else break;
 				}
-
-				if (fine)
-				{
-					switch (type)
-					{
-						case DT_DIR:
-							walk (a_path + name + "/");
-							break;
-						case DT_REG:
-							{
-								string path{a_path + name};
-								mapped_search (path.c_str ());
-							}
-							break;
-					}
-				}
+				else break;
 			}
-        	closedir(dir);
-		}
-	}
-	catch (...)
-	{
-		if (!s_suppress)
-		{
-			printf ("gg: %s dir Permission denied\n", a_path.c_str ());
+			else break;
 		}
 	}
 }
-#endif // EXPERIMENTAL_FILESYSTEM
+#endif // !EXPERIMENTAL_FILESYSTEM
 
 //------------------------------------------------------------------------------
 void
