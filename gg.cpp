@@ -27,10 +27,6 @@ _____________________________________________________________________________*/
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 //..............................................................................
-#if EXPERIMENTAL_FILESYSTEM
-#include <experimental/filesystem> // recursive directory walk
-#endif
-
 //..............................................................................
 #include <fmt/printf.h>            // modern printf
 
@@ -85,27 +81,6 @@ GreasedGrep (int32_t a_argc, char** a_argv) // ctor
 	}
 } // ctor
 
-#if !EXPERIMENTAL_FILESYSTEM
-bool
-Lettvin::GreasedGrep::
-is_directory    (const string& a_path)
-{
-	struct stat buf;
-	stat (a_path.c_str (), &buf);
-	return S_ISDIR (buf.st_mode);
-}
-
-bool
-Lettvin::GreasedGrep::
-is_regular_file (const string& a_path)
-{
-	struct stat buf;
-	stat (a_path.c_str (), &buf);
-	return S_ISREG (buf.st_mode);
-}
-
-#endif
-
 //------------------------------------------------------------------------------
 /// @brief ftor
 void
@@ -158,25 +133,6 @@ operator ()()
 		syntax ("specify at least one accept or reject str");
 	}
 
-	// Check for valid directory
-	// TODO replace with experiment/dir.cpp
-#if EXPERIMENTAL_FILESYSTEM
-	if (!fs::is_directory (s_target) &&
-		!fs::is_regular_file (s_target))
-#else
-	if (!is_directory (s_target) &&
-		!is_regular_file (s_target))
-#endif // EXPERIMENTAL_FILESYSTEM
-	{
-		syntax ("last arg must be dir or file");
-	}
-#if !EXPERIMENTAL_FILESYSTEM
-	if (is_directory (s_target) && s_target[s_target.size () - 1] != '/')
-	{
-		s_target += '/';
-	}
-#endif
-
 	// Compile and check for collisions between accept and reject lists
 	compile ();
 
@@ -203,18 +159,10 @@ operator ()()
 	{
 		netsearch (s_target);
 	}
-#if EXPERIMENTAL_FILESYSTEM
-	else if (fs::is_directory (s_target))
-#else
-	else if (is_directory (s_target))
-#endif // EXPERIMENTAL_FILESYSTEM
+	else
 	{
 		// Find files and search contents
 		walk (s_target);
-	}
-	else
-	{
-		mapped_search (s_target.data ());
 	}
 
 } // operator ()
@@ -564,118 +512,6 @@ netsearch (string_view a_URL)
 
 //------------------------------------------------------------------------------
 /// @brief walk organizes search for strings in memory-mapped file
-#if EXPERIMENTAL_FILESYSTEM
-void
-Lettvin::GreasedGrep::
-walk (const fs::path& a_path)
-//------------------------------------------------------------------------------
-{
-	try
-	{
-#if true
-		// Account for existing main thread
-		uint32_t cpus{thread::hardware_concurrency () * s_oversize};
-		vector<thread> threads;
-		Lettvin::ThreadedQueue<string> tq (cpus + 1);  // 1 ahead of workers
-		// Note worker threads are 1 less than cpus
-		for (uint32_t thid = 1; thid < cpus; thid++)
-		{
-			threads.emplace_back (
-				thread{
-					[&] ()
-					{
-						string filename;
-						while ((filename = tq.pop ()).size () != 0)
-						{
-							mapped_search (filename.c_str ());
-						}
-					}
-				}
-			);
-		}
-		// Master thread
-		// TODO replace with experiment/dir.cpp
-		threads.emplace_back (
-			thread{
-				[&] ()
-				{
-					string filename;
-					for (auto& item:
-						fs::recursive_directory_iterator (a_path))
-					{
-						fs::path path (item.path ());
-						try
-						{
-							path = fs::canonical (path);
-						}
-						catch (...)
-						{
-							debugf (1,
-									"WALK CANONICAL failed (%s)\n",
-									path.c_str ());
-							continue;
-						}
-						const char* filename{path.c_str ()};
-						if (fs::is_regular_file (item.status ()))
-						{
-							try
-							{
-								tq.push (path);
-							}
-							catch (...)
-							{
-								if (!s_suppress)
-								{
-									printf (
-										"gg: %s file Permission denied\n",
-										filename);
-								}
-							}
-						}
-					}
-					for (size_t cpu=1; cpu < cpus; ++cpu)
-					{
-						tq.push ("");
-					}
-				}
-			}
-		);
-		for (auto& thrd:threads) thrd.join ();
-#else
-		// TODO replace with experiment/dir.cpp
-		for (auto& item: fs::recursive_directory_iterator (a_path))
-		{
-			fs::path path{fs::canonical (fs::path (item.path ()))};
-			const char* filename{path.c_str ()};
-			if (fs::is_regular_file (item.status ()))
-			{
-				try
-				{
-					mapped_search (filename);
-				}
-				catch (...)
-				{
-					if (!s_suppress)
-					{
-						printf ("gg: %s file Permission denied\n",
-								filename);
-					}
-				}
-			}
-		}
-#endif
-	}
-	catch (...)
-	{
-		if (!s_suppress)
-		{
-			printf ("gg: %s dir Permission denied\n",
-					a_path.filename ().c_str ());
-		}
-	}
-} // walk
-#else  // EXPERIMENTAL_FILESYSTEM
-
 void
 Lettvin::GreasedGrep::
 walk (const string& a_path)
@@ -713,7 +549,6 @@ walk (const string& a_path)
 		}
 	}
 }
-#endif // !EXPERIMENTAL_FILESYSTEM
 
 //------------------------------------------------------------------------------
 void

@@ -24,7 +24,7 @@ _____________________________________________________________________________*/
 
 #pragma once
 
-static const struct { unsigned major, minor, build; } s_version{0,0,925};
+static const struct { unsigned major, minor, build; } s_version{0,0,929};
 
 static const char* s_synopsis = R"SYNOPSIS(
 Synopsis(Greased Grep version %u.%u.%u

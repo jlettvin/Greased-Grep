@@ -24,8 +24,6 @@ _____________________________________________________________________________*/
 
 #pragma once
 
-#define EXPERIMENTAL_FILESYSTEM false
-
 /*
  * A standard plane consumes 32 bits (4 bytes) * 256 = 1KiB/plane.
  * A nibbles  plane consumes 32 bits (4 bytes) *  16 =  64B/plane.
@@ -36,12 +34,7 @@ _____________________________________________________________________________*/
  */
 
 //..............................................................................
-#if EXPERIMENTAL_FILESYSTEM
-#include <experimental/filesystem> // recursive directory walk
-namespace fs = std::experimental::filesystem;
-#else
 #include <dirent.h>
-#endif
 
 //..............................................................................
 #include <fmt/printf.h>            // modern printf
@@ -166,14 +159,10 @@ namespace Lettvin
 
 		//----------------------------------------------------------------------
 		/// @brief walk organizes search for strings in memory-mapped file
-#if EXPERIMENTAL_FILESYSTEM
-		void walk (const fs::path& a_path);
-#else
 		void walk (const string& a_path);
 
 		bool is_directory    (const string& a_path);
 		bool is_regular_file (const string& a_path);
-#endif // EXPERIMENTAL_FILESYSTEM
 
 		//----------------------------------------------------------------------
 		void show_tokens (ostream& a_os);
