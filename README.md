@@ -149,6 +149,8 @@ but code simplification merits this choice.
 
 ### TODO
 ```
+// TODO increase permitted count of open files to at least thread count.
+//      currently errno 24 EMFILE occurs frequently
 // TODO embed FSM interpreter to enable specialized programming within C++
 // TODO debug filename regex options.
 // TODO allow recursive web page target in place of directory (no memmap).

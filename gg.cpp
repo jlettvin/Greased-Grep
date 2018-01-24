@@ -33,6 +33,7 @@ _____________________________________________________________________________*/
 //..............................................................................
 #include <sys/mman.h>              // Memory mapping
 #include <sys/stat.h>              // File status via descriptor
+#include <errno.h>                 // EMFILE
 
 //..............................................................................
 #include <unistd.h>                // file descriptor open/write/close
@@ -44,6 +45,7 @@ _____________________________________________________________________________*/
 #include <sstream>                 // string_stream
 #include <iomanip>                 // setw and other cout formatting
 #include <thread>
+#include <mutex>
 #include <regex>
 
 //..............................................................................
@@ -65,6 +67,7 @@ _____________________________________________________________________________*/
 //..............................................................................
 #include "gg_variant.h"            // variant implementations
 
+static std::mutex open_mtx;
 
 //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
@@ -434,7 +437,12 @@ mapped_search (const char* a_filename)
 	struct stat st;
 	stat (a_filename, &st);
 	auto filesize{st.st_size};
+	if (!filesize)
+	{
+		return; // Can't search an empty file
+	}
 	int32_t fd;
+	int err{0};
 
 	if (s_quicktree)
 	{
@@ -458,7 +466,12 @@ mapped_search (const char* a_filename)
 
 	try
 	{
+		std::unique_lock<std::mutex> lck (open_mtx, std::defer_lock);
+		lck.lock ();
+		errno = 0;
 		fd = open (a_filename, O_RDONLY, 0);
+		err = errno;
+		lck.unlock ();
 	}
 	catch (...)
 	{
@@ -497,7 +510,7 @@ mapped_search (const char* a_filename)
 	}
 	else if (!s_suppress)
 	{
-		printf ("gg:mapped_search OPEN FAILED: %s\n", a_filename);
+		printf ("gg:mapped_search OPEN FAILED(%d): %s\n", err, a_filename);
 	}
 } // mapped_search
 

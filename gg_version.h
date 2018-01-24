@@ -24,7 +24,7 @@ _____________________________________________________________________________*/
 
 #pragma once
 
-static const struct { unsigned major, minor, build; } s_version{0,0,929};
+static const struct { unsigned major, minor, build; } s_version{0,0,932};
 
 static const char* s_synopsis = R"SYNOPSIS(
 Synopsis(Greased Grep version %u.%u.%u
@@ -214,16 +214,13 @@ Please attempt to keep to the code style:
 <hr />
 
 ## C++17
-This code depends on C++17 for experimental libraries.
+Not strictly necessary
 
 ### string_view
 This optimizes string operations over std::string.
 
 ### fmt::printf
 This introduces thread-safe printf.
-
-### experimental/filesystem
-This is a push of boost::filesystem into std::.
 
 <hr />
 
@@ -254,6 +251,8 @@ but code simplification merits this choice.
 
 ### TODO
 ```
+// TODO increase permitted count of open files to at least thread count.
+//      currently errno 24 EMFILE occurs frequently
 // TODO embed FSM interpreter to enable specialized programming within C++
 // TODO debug filename regex options.
 // TODO allow recursive web page target in place of directory (no memmap).

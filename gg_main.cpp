@@ -25,9 +25,6 @@ _____________________________________________________________________________*/
 //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 //..............................................................................
-#include <experimental/filesystem> // recursive directory walk
-
-//..............................................................................
 #include <fmt/printf.h>            // modern printf
 
 //..............................................................................
@@ -72,12 +69,7 @@ main (int32_t a_argc, char** a_argv)
 	try
 	{
 		std::ios::sync_with_stdio (true);
-#if EXPERIMENTAL_FILESYSTEM
-		//fs::path app{fs::canonical (fs::path (a_argv[0]))};
-		fs::path app{fs::path (a_argv[0])};
-#else
 		std::string app{a_argv[0]};
-#endif // EXPERIMENTAL_FILESYSTEM
 		Lettvin::s_path = const_cast<const char*>(app.c_str ());
 		Lettvin::GreasedGrep gg (a_argc, a_argv);
 		gg ();
