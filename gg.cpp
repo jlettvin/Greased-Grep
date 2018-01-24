@@ -441,7 +441,7 @@ mapped_search (const char* a_filename)
 	{
 		return; // Can't search an empty file
 	}
-	int32_t fd;
+	int32_t fd{0};
 	int err{0};
 
 	if (s_quicktree)
@@ -475,6 +475,7 @@ mapped_search (const char* a_filename)
 	}
 	catch (...)
 	{
+		if (fd > 0) close (fd);
 		if (!s_suppress)
 		{
 			printf ("gg:mapped_search OPEN EXCEPTION: %s\n", a_filename);
@@ -499,7 +500,11 @@ mapped_search (const char* a_filename)
 
 		if (contents == MAP_FAILED)
 		{
-			if (err == ENODEV) return;  // TODO discover why this ever occurs.
+			if (err == ENODEV)
+			{
+				if (fd > 0) close (fd);
+				return;  // TODO discover why this ever occurs.
+			}
 			if (!s_suppress)
 			{
 				printf ("gg:mapped_search MAP FAILED(%d): %s\n",
@@ -518,6 +523,7 @@ mapped_search (const char* a_filename)
 	}
 	else if (!s_suppress)
 	{
+		// TODO eliminate EMFILE (24)
 		printf ("gg:mapped_search OPEN FAILED(%d): %s\n", err, a_filename);
 	}
 } // mapped_search
