@@ -484,6 +484,9 @@ mapped_search (const char* a_filename)
 
 	if (fd >= 0)
 	{
+		std::unique_lock<std::mutex> lck (open_mtx, std::defer_lock);
+		lck.lock ();
+		errno = 0;
 		void* contents = mmap (
 				NULL,
 				filesize,
@@ -491,12 +494,17 @@ mapped_search (const char* a_filename)
 				MAP_PRIVATE | MAP_POPULATE,	// Allow preload
 				fd,
 				0);
+		err = errno;
+		lck.unlock ();
 
 		if (contents == MAP_FAILED)
 		{
+			if (err == ENODEV) return;  // TODO discover why this ever occurs.
 			if (!s_suppress)
 			{
-				printf ("gg:mapped_search MAP FAILED: %s\n", a_filename);
+				printf ("gg:mapped_search MAP FAILED(%d): %s\n",
+						err,
+						a_filename);
 			}
 		}
 		else
